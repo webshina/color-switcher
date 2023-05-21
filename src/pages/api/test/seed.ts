@@ -92,4 +92,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default cors(withAuth(handler, { userType: 'admin' }));
+export default cors(withAuth(handler));
