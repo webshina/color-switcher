@@ -33,16 +33,18 @@ const Create: NextPage = () => {
         {!loading ? (
           <>
             <button
-              className="flex items-center px-8 py-3 text-white gradient-bg-discord-purple-to-blue rounded-md"
+              className="flex items-center px-8 py-3 text-white gradient-bg-discord-purple-to-blue rounded-full"
               onClick={handleCreate}
             >
               <BsDiscord size={30} />
               <div className="w-4" />
-              <div className="text-2xl">CONNECT</div>
+              <div className="text-xl">CONNECT</div>
             </button>
           </>
         ) : (
           <>
+            あなたのDiscord HOMEを作成しています...
+            <div className="h-8" />
             <LoadingSpinner />
           </>
         )}
