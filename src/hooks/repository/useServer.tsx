@@ -4,16 +4,14 @@ export const useServer = (props: { serverId: string }) => {
     name: 'web3.0 Engineer Community',
     description:
       'web3.0エンジニアのためのコミュニティです。勉強会やイベントを開催しています。',
-    coverImgURL:
-      'http://localhost:3004/images/mockup/shubham-s-web3-jrAru7fBwA8-unsplash.jpeg',
-    iconImgURL: 'http://localhost:3004/images/mockup/icon.jpeg',
+    coverImgURL: '/images/mockup/shubham-s-web3-jrAru7fBwA8-unsplash.jpeg',
+    iconImgURL: '/images/mockup/icon.jpeg',
     featuredChannels: [
       {
         id: 1,
         name: '📚 勉強会',
         description: 'web3.0エンジニアのための勉強会です。',
-        imageUrl:
-          'http://localhost:3004/images/mockup/priscilla-du-preez-XkKCui44iM0-unsplash.jpeg',
+        imageUrl: '/images/mockup/priscilla-du-preez-XkKCui44iM0-unsplash.jpeg',
         activityLevel: 3,
         conversationSummaries: [
           `議論の中心: Proof Of Stake Blockchain実装とゼロ知識証明学習の優先順位\n`,
@@ -27,8 +25,7 @@ export const useServer = (props: { serverId: string }) => {
         name: '🔧 技術質問',
         description:
           'web3.0開発に関する技術的な質問や困りごとを共有し、解決策を見つけましょう。',
-        imageUrl:
-          'http://localhost:3004/images/mockup/emily-morter-8xAA0f9yQnE-unsplash.jpeg',
+        imageUrl: '/images/mockup/emily-morter-8xAA0f9yQnE-unsplash.jpeg',
         activityLevel: 1,
         conversationSummaries: [
           'Smart Contractの最適なテスト方法についての議論',
@@ -41,8 +38,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 3,
         name: '💼 ジョブ・オポチュニティ',
         description: 'web3.0業界での求人情報や仕事の機会を共有する場所です。',
-        imageUrl:
-          'http://localhost:3004/images/mockup/cytonn-photography-n95VMLxqM2I-unsplash.jpeg',
+        imageUrl: '/images/mockup/cytonn-photography-n95VMLxqM2I-unsplash.jpeg',
         activityLevel: 2,
         conversationSummaries: [
           '新たなBlockchainスタートアップからの求人情報の共有',
@@ -56,8 +52,7 @@ export const useServer = (props: { serverId: string }) => {
         name: '🚀 プロジェクトショーケース',
         description:
           'メンバーが最近取り組んでいるプロジェクトや成果を紹介する場です。',
-        imageUrl:
-          'http://localhost:3004/images/mockup/marvin-meyer-SYTO3xs06fU-unsplash.jpeg',
+        imageUrl: '/images/mockup/marvin-meyer-SYTO3xs06fU-unsplash.jpeg',
         activityLevel: 3,
         conversationSummaries: [
           '新しいDecentralized Application (DApp)のデモとフィードバック',
@@ -156,8 +151,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 1,
         displayName: 'Alex',
         userName: 'Alex#1234',
-        imgURL:
-          'http://localhost:3004/images/mockup/art-hauntington-jzY0KRJopEI-unsplash.jpeg',
+        imgURL: '/images/mockup/art-hauntington-jzY0KRJopEI-unsplash.jpeg',
         activityLevel: 4,
         joinedAtServer: '2022-03-14',
         roles: ['moderator'],
@@ -169,8 +163,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 2,
         displayName: 'Jessica',
         userName: 'Jessica#4567',
-        imgURL:
-          'http://localhost:3004/images/mockup/christian-velitchkov-mXz64B8-3h0-unsplash.jpeg',
+        imgURL: '/images/mockup/christian-velitchkov-mXz64B8-3h0-unsplash.jpeg',
         activityLevel: 5,
         joinedAtServer: '2021-05-22',
         roles: ['admin', 'moderator'],
@@ -181,8 +174,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 3,
         displayName: 'Brian',
         userName: 'Brian#7890',
-        imgURL:
-          'http://localhost:3004/images/mockup/christopher-campbell-rDEOVtE7vOs-unsplash.jpeg',
+        imgURL: '/images/mockup/christopher-campbell-rDEOVtE7vOs-unsplash.jpeg',
         activityLevel: 2,
         joinedAtServer: '2022-07-18',
         roles: ['crew'],
@@ -194,8 +186,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 4,
         displayName: 'Sophia',
         userName: 'Sophia#5678',
-        imgURL:
-          'http://localhost:3004/images/mockup/samsung-memory-DI2SR-IxkCg-unsplash.jpeg',
+        imgURL: '/images/mockup/samsung-memory-DI2SR-IxkCg-unsplash.jpeg',
         activityLevel: 3,
         joinedAtServer: '2023-01-25',
         roles: ['crew'],
@@ -207,8 +198,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 5,
         displayName: 'Robert',
         userName: 'Robert#9012',
-        imgURL:
-          'http://localhost:3004/images/mockup/dominic-blignaut-jal0GatJsGk-unsplash.jpeg',
+        imgURL: '/images/mockup/dominic-blignaut-jal0GatJsGk-unsplash.jpeg',
         activityLevel: 5,
         joinedAtServer: '2021-11-30',
         roles: ['moderator'],
@@ -220,8 +210,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 6,
         displayName: 'Amelia',
         userName: 'Amelia#3456',
-        imgURL:
-          'http://localhost:3004/images/mockup/houcine-ncib-B4TjXnI0Y2c-unsplash.jpeg',
+        imgURL: '/images/mockup/houcine-ncib-B4TjXnI0Y2c-unsplash.jpeg',
         activityLevel: 1,
         joinedAtServer: '2022-08-15',
         roles: ['crew'],
@@ -234,7 +223,7 @@ export const useServer = (props: { serverId: string }) => {
         displayName: 'Edward',
         userName: 'Edward#7891',
         imgURL:
-          'http://localhost:3004/images/mockup/imansyah-muhamad-putera-n4KewLKFOZw-unsplash.jpeg',
+          '/images/mockup/imansyah-muhamad-putera-n4KewLKFOZw-unsplash.jpeg',
         activityLevel: 2,
         joinedAtServer: '2023-02-28',
         roles: ['admin'],
@@ -246,8 +235,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 8,
         displayName: 'Grace',
         userName: 'Grace#1235',
-        imgURL:
-          'http://localhost:3004/images/mockup/jeffery-erhunse-Z9lbmEjyYjU-unsplash.jpeg',
+        imgURL: '/images/mockup/jeffery-erhunse-Z9lbmEjyYjU-unsplash.jpeg',
         activityLevel: 4,
         joinedAtServer: '2022-06-17',
         roles: ['crew'],
@@ -258,8 +246,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 9,
         displayName: 'Liam',
         userName: 'Liam#4568',
-        imgURL:
-          'http://localhost:3004/images/mockup/lachlan-dempsey-6VPEOdpFNAs-unsplash.jpeg',
+        imgURL: '/images/mockup/lachlan-dempsey-6VPEOdpFNAs-unsplash.jpeg',
         activityLevel: 5,
         joinedAtServer: '2021-12-24',
         roles: ['moderator'],
@@ -271,8 +258,7 @@ export const useServer = (props: { serverId: string }) => {
         id: 10,
         displayName: 'Olivia',
         userName: 'Olivia#7892',
-        imgURL:
-          'http://localhost:3004/images/mockup/svetlana-pochatun-DgCaEOnfBdo-unsplash.jpeg',
+        imgURL: '/images/mockup/svetlana-pochatun-DgCaEOnfBdo-unsplash.jpeg',
         activityLevel: 3,
         joinedAtServer: '2023-05-01',
         roles: ['admin', 'crew'],
