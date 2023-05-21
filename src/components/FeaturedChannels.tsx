@@ -28,9 +28,7 @@ export const FeaturedChannels: React.FC<Props> = () => {
                 <div className="h-5" />
 
                 {/* Conversation Summary */}
-                <div className="text-sm font-semibold">
-                  Recent Talk Overview
-                </div>
+                <div className="text-sm font-semibold">最近の会話まとめ</div>
                 <div className="h-3" />
                 <div className="p-4 h-48 overflow-auto rounded-md bg-slate-800">
                   {channel.conversationSummaries.map((summary, index) => {
