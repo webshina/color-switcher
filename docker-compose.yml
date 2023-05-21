@@ -1,0 +1,17 @@
+version: '3'
+services:
+  mysql:
+    platform: linux/x86_64
+    build: ./docker/db
+    environment:
+      MYSQL_ROOT_PASSWORD: nft12345
+      MYSQL_DATABASE: discord-home
+    volumes:
+      - ./docker/db/mysql_data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - '3309:3306'
+    command: --innodb-use-native-aio=0
+volumes:
+  mysql:

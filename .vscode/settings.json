@@ -1,0 +1,8 @@
+{
+  "workbench.colorCustomizations": {
+    "titleBar.inactiveBackground": "#535DEB", // タイトルバーの背景色
+    "titleBar.activeBackground": "#535DEB" // タイトルバーの背景色
+  },
+  "editor.tabSize": 2,
+  "typescript.tsdk": "node_modules/typescript/lib" // タブのサイズ
+}
