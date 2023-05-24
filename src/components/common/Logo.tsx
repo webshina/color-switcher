@@ -1,10 +1,17 @@
-type Props = {};
+type Props = {
+  size?: number;
+  twinkle?: boolean;
+};
 export const Logo: React.FC<Props> = (props) => {
   return (
-    <div className="neon text-2xl">
-      <b>
-        Di<span>sc</span>ord H<span>O</span>ME
-      </b>
+    <div
+      className="neon font-[200]"
+      style={{
+        fontSize: props.size ?? 20,
+      }}
+    >
+      Di<span className={props.twinkle ? 'twinkle' : ''}>sc</span>ord H
+      <span className={props.twinkle ? 'twinkle' : ''}>O</span>ME
     </div>
   );
 };

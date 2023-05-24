@@ -10,9 +10,8 @@ export const FeaturedChannels: React.FC<Props> = () => {
     <div className="flex flex-wrap justify-center lg:justify-start">
       {server.featuredChannels.map((channel) => {
         return (
-          <div className="m-1">
+          <div key={channel.id} className="m-1">
             <ImageCard
-              key={channel.id}
               imgSrc={channel.imageUrl}
               title={channel.name}
               width={350}

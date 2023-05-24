@@ -31,19 +31,14 @@ body {
 }
 
 .neon {
-  text-align: center;
-  margin: auto;
-}
-.neon b {
-  font-weight: 100;
   color: #fee;
-  text-shadow: 0 -40px 100px, 0 0 2px, 0 0 1em #e42575, 0 0 0.5em #e42575,
-    0 0 0.1em #e42575, 0 10px 3px #000;
+  text-shadow: 0 -40px 100px, 0 0 2px, 0 0 1em #8240ed, 0 0 0.5em #8240ed,
+    0 0 0.1em #8240ed, 0 10px 3px #000;
 }
-.neon b span {
+.neon .twinkle {
   animation: blink linear infinite 2s;
 }
-.neon b span:nth-of-type(2) {
+.neon .twinkle:nth-of-type(2) {
   animation: blink linear infinite 3s;
 }
 @keyframes blink {
