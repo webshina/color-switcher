@@ -5,7 +5,7 @@ type Props = {
 export const Logo: React.FC<Props> = (props) => {
   return (
     <div
-      className="neon font-[200]"
+      className="neon font-[200] text-center leading-tight"
       style={{
         fontSize: props.size ?? 20,
       }}

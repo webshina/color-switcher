@@ -15,21 +15,27 @@ body {
 }
 
 .pro-sidebar-inner {
-  @apply !bg-dark text-white;
+  @apply !bg-transparent text-white;
 }
 
+/* Gradients */
 .gradient-bg-discord-purple-to-blue {
   @apply bg-gradient-to-r from-discord-purple to-blue-500;
 }
-
 .gradient-bg-purple-to-pink {
   @apply bg-gradient-to-r from-purple-500 to-pink-300;
 }
-
+.gradient-bg-white-to-dark {
+  @apply bg-gradient-to-b from-white to-[#615c6b];
+}
 .gradient-text-purple-to-pink {
   @apply text-transparent bg-clip-text gradient-bg-purple-to-pink;
 }
+.gradient-text-white-to-dark {
+  @apply text-transparent bg-clip-text gradient-bg-white-to-dark;
+}
 
+/* Neon */
 .neon {
   color: #fee;
   text-shadow: 0 -40px 100px, 0 0 2px, 0 0 1em #8240ed, 0 0 0.5em #8240ed,

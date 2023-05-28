@@ -1,4 +1,4 @@
-export type DiscordMember = {
+export type DiscordMemberItem = {
   id: number;
   displayName: string;
   userName: string;

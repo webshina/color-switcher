@@ -2,7 +2,7 @@ import React from 'react';
 
 type Props = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   fontSize?: number;
   color?: string;
 };
@@ -26,14 +26,18 @@ const Title: React.FC<Props> = ({
             {title}
           </div>
           <div className="my-[5px]" />
-          <div
-            id="subtitle"
-            className="font-extralight"
-            style={{ fontSize: fontSize / 1.8, color }}
-          >
-            {subtitle}
-          </div>
-          <div className="my-[5px]" />
+          {subtitle && (
+            <>
+              <div
+                id="subtitle"
+                className="font-extralight"
+                style={{ fontSize: fontSize / 1.8, color }}
+              >
+                {subtitle}
+              </div>
+              <div className="my-[5px]" />
+            </>
+          )}
         </div>
       </div>
     </>

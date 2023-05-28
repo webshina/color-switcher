@@ -16,6 +16,11 @@ export const useScreenSize = () => {
 
     mediaQuery.addEventListener('change', handleMediaQueryChange);
 
+    // Dispatch initial event to set initial state
+    mediaQuery.dispatchEvent(
+      new MediaQueryListEvent('change', { matches: mediaQuery.matches })
+    );
+
     return () => {
       mediaQuery.removeEventListener('change', handleMediaQueryChange);
     };

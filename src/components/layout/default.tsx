@@ -1,4 +1,3 @@
-import { useScreenSize } from '@/hooks/utils/useScreenSize';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useState } from 'react';
 import { AiOutlineHome } from 'react-icons/ai';
@@ -11,16 +10,19 @@ import { Logo } from '../common/Logo';
 
 type Props = {
   children: ReactNode;
+  bgClassName?: string;
+  showLogo?: boolean;
 };
-const DefaultLayout: React.FC<Props> = ({ children }) => {
-  const screenSize = useScreenSize();
+const DefaultLayout: React.FC<Props> = (props) => {
   const [isShowSideNav, setIsShowSideNav] = useState(false);
   const stylesSideNav = useSpring({ width: isShowSideNav ? '300px' : '0px' });
   const router = useRouter();
 
   return (
     <>
-      <div className="flex flex-col min-h-screen w-screen">
+      <div
+        className={`flex flex-col min-h-screen w-screen ` + props.bgClassName}
+      >
         {/* Header */}
         <div className="sticky top-0 p-5 z-10 w-screen">
           <div className="relative h-12">
@@ -35,9 +37,11 @@ const DefaultLayout: React.FC<Props> = ({ children }) => {
             </button>
 
             {/* Logo */}
-            <div className="absolute top-0 right-1/2 translate-x-1/2">
-              <Logo />
-            </div>
+            {(props.showLogo ?? true) && (
+              <div className="absolute top-0 right-1/2 translate-x-1/2">
+                <Logo />
+              </div>
+            )}
 
             <div className="absolute top-0 right-0">
               {/* <Button
@@ -78,7 +82,7 @@ const DefaultLayout: React.FC<Props> = ({ children }) => {
 
           {/* Contents */}
           <div className="w-full p-3 lg:p-8 pb-48 md:pl-14 lg:pl-16">
-            {children}
+            {props.children}
           </div>
         </div>
 

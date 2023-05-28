@@ -4,10 +4,10 @@ const HeadComponent = () => {
   return (
     <>
       <Head>
-        <title>予約 | PERSONAL TRAINING STUDIO U</title>
+        <title>Discord Home</title>
         <meta
           name="description"
-          content="調布にあるパーソナルトレーニングジム『PERSONAL TRAINING STUDIO U 』調布駅より徒歩3分。調布でパーソナルトレーニングをお探しの方は、PERSONAL TRAINING STUDIO Uにご相談ください。"
+          content="Organize hard-to-see Discord server channels and members into a beautiful home page"
         />
         <meta
           name="viewport"

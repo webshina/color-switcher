@@ -1,6 +1,5 @@
 import { ActivityLevel } from '@/components/common/ActiveLevel';
 import { JumpChannelBtn } from '@/components/common/JumpChannelBtn';
-import { useServer } from '@/hooks/repository/useServer';
 import {
   Accordion,
   AccordionButton,
@@ -9,14 +8,15 @@ import {
   AccordionPanel,
   Box,
 } from '@chakra-ui/react';
+import { Category } from 'types/Category';
 
-type Props = {};
-export const Channels: React.FC<Props> = () => {
-  const server = useServer({ serverId: '1' });
-
+type Props = {
+  categories: Category[];
+};
+export const Channels: React.FC<Props> = (props) => {
   return (
     <Accordion defaultIndex={[0]} allowMultiple>
-      {server.categories.map((category) => (
+      {props.categories.map((category) => (
         <AccordionItem key={category.id}>
           <h2>
             <AccordionButton className="bg-slate-800">
@@ -26,12 +26,12 @@ export const Channels: React.FC<Props> = () => {
               <AccordionIcon />
             </AccordionButton>
           </h2>
-          <AccordionPanel pb={4}>
+          <AccordionPanel p={0} pb={4}>
             <div className="flex flex-wrap">
               {category.channels.map((channel) => (
                 <div
                   key={channel.id}
-                  className="relative m-2 p-3 h-[200px] w-[180px] bg-slate-700 rounded-xl text-xl"
+                  className="relative m-1 p-3 h-[200px] w-[170px] bg-slate-700 rounded-xl text-xl"
                 >
                   <div className="text-sm font-bold">{channel.name}</div>
                   <div className="h-3" />

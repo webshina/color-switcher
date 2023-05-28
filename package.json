@@ -8,10 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
-    "db:migrate:production": "dotenv -e .env.production.local -- npx prisma migrate dev",
     "db:migrate:reset": "dotenv -e .env.development.local -- npx prisma migrate reset",
     "db:seed": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts seeds/index.ts",
-    "db:seed:production": "dotenv -e .env.production -- dotenv -e .env.production.local -- ts-node --require ./ts-node-require.ts seeds/index.ts",
     "db:sample": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts seeds/sampleData/index.ts",
     "e2e:open": "dotenv -e .env.development -- dotenv -e .env.development.local -- npx cypress open",
     "e2e:run": "npx cypress run --record --key 699f1268-4456-4742-b055-bdf00cb1613b"
@@ -59,6 +57,7 @@
     "nextjs-cors": "^2.1.2",
     "node-fetch": "^3.3.1",
     "nookies": "^2.5.2",
+    "openai": "^3.2.1",
     "postcss": "^8.4.21",
     "prisma": "^4.8.0",
     "react": "18.2.0",
