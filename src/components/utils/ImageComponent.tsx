@@ -5,12 +5,14 @@ type Props = {
   imgSrc: string;
   height?: number;
   width?: number;
+  objectFit?: 'cover' | 'contain';
 };
 
 export const ImageComponent: React.FC<Props> = ({
   imgSrc,
   height = 160,
   width = 160,
+  objectFit = 'cover',
 }) => {
   return (
     <>
@@ -19,7 +21,7 @@ export const ImageComponent: React.FC<Props> = ({
           src={imgSrc ? imgSrc : '/images/noImage.jpeg'}
           alt="image"
           layout="fill"
-          objectFit="cover"
+          objectFit={objectFit}
           className="rounded-xl"
         />
       </div>
