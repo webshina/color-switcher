@@ -3,8 +3,8 @@ import React from 'react';
 
 type Props = {
   imgSrc: string;
-  height?: number;
-  width?: number;
+  height?: string | number;
+  width?: string | number;
   objectFit?: 'cover' | 'contain';
 };
 

@@ -1,6 +1,7 @@
 import { useScreenSize } from '@/hooks/utils/useScreenSize';
 import { useRouter } from 'next/router';
 import { Logo } from '../common/Logo';
+import { ExpandableImage } from '../utils/ExpandableImage';
 import { ImageComponent } from '../utils/ImageComponent';
 import { Discord3DModel } from './Discord3DModel';
 import MemberCard from './MemberCard';
@@ -54,9 +55,9 @@ export const LandingPage: React.FC<Props> = () => {
           'screenshotMembers.png',
         ].map((image) => {
           return (
-            <div className="m-2 lg:m-8">
-              <ImageComponent
-                imgSrc={`/images/landingPage/${image}`}
+            <div className="m-2">
+              <ExpandableImage
+                imgURL={`/images/landingPage/${image}`}
                 width={screenSize === 'lg' ? 240 : 160}
                 height={screenSize === 'lg' ? 500 : 340}
               />
