@@ -1,6 +1,5 @@
 import DefaultLayout from '@/components/layout/default';
 import { LoadingSpinner } from '@/components/utils/LoadingSpinner';
-import { useServer } from '@/hooks/repository/useServer';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -9,7 +8,6 @@ import { BsDiscord } from 'react-icons/bs';
 
 const Create: NextPage = () => {
   const router = useRouter();
-  const server = useServer({ serverId: '1' });
   const [loading, setLoading] = React.useState(false);
 
   const handleCreate = async () => {
