@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router';
 import React, { ReactNode, useState } from 'react';
-import { AiOutlineHome } from 'react-icons/ai';
+import { AiFillInfoCircle } from 'react-icons/ai';
+import { FaRobot } from 'react-icons/fa';
 import { FiMenu } from 'react-icons/fi';
 import { Menu, MenuItem, ProSidebar } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 import { animated, useSpring } from 'react-spring';
-import { CreateDiscordHomeBtn } from '../CreateDiscordHomeBtn';
 import { Logo } from '../common/Logo';
 
 type Props = {
@@ -66,14 +66,26 @@ const DefaultLayout: React.FC<Props> = (props) => {
               className="!fixed top-[78px]"
             >
               <Menu>
-                <MenuItem>
+                {/* <MenuItem>
                   <CreateDiscordHomeBtn />
+                </MenuItem> */}
+                <MenuItem
+                  icon={<AiFillInfoCircle />}
+                  onClick={() => router.push('/landing')}
+                >
+                  What is Discord HOME
                 </MenuItem>
                 <MenuItem
-                  icon={<AiOutlineHome />}
-                  onClick={() => router.push('/')}
+                  icon={<FaRobot />}
+                  onClick={() => router.push('/server/2')}
                 >
-                  HOME
+                  Demo
+                </MenuItem>
+                <MenuItem
+                  icon={<FaRobot />}
+                  onClick={() => router.push('/server/1')}
+                >
+                  Demo 🇯🇵
                 </MenuItem>
               </Menu>
             </ProSidebar>

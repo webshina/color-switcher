@@ -10,7 +10,7 @@ export const LandingPage: React.FC<Props> = () => {
   const router = useRouter();
   const screenSize = useScreenSize();
   const classHeading =
-    'flex justify-center text-5xl font-bold text-center leading-normal gradient-text-white-to-dark whitespace-pre-wrap ' +
+    'text-5xl font-bold text-center leading-normal gradient-text-white-to-dark whitespace-pre-wrap ' +
     (screenSize === 'sm' ? 'text-xl' : 'text-5xl');
   return (
     <>
@@ -22,22 +22,27 @@ export const LandingPage: React.FC<Props> = () => {
         <div className="flex flex-col items-center mt-[250px] lg:mt-[300px]">
           <div className="lg:h-[200px]" />
           <Logo size={80} twinkle />
-          <div className="h-[100px]" />
-          <div className="m-2 text-3xl text-center font-light text-shadow leading-10">
+          <div className="h-[50px] lg:h-[100px]" />
+          <div className="m-2 text-3xl text-center font-bold leading-10">
             Generate your
             <br />
             Discord home page
             <br />
-            in <span className="font-bold">ONE</span> click !
+            in{' '}
+            <span className="gradient-text-purple-to-pink font-bold">
+              ONE
+            </span>{' '}
+            click !
           </div>
         </div>
       </div>
 
       {/* Service Image */}
       <div className={classHeading}>
-        Organize hard-to-see Discord server channels
-        <br />
-        and members into a beautiful home page
+        Create a
+        <span className="gradient-text-purple-to-pink"> beautiful </span>
+        homepage for Discord using{' '}
+        <span className="gradient-text-purple-to-pink">AI</span>
       </div>
       <div className="h-8" />
       {/* ScreenShots */}
@@ -63,7 +68,9 @@ export const LandingPage: React.FC<Props> = () => {
 
       {/* How to use */}
       <div className={classHeading}>
-        All you need to do is install Bot to Discord
+        All you need to do is{' '}
+        <span className="gradient-text-purple-to-pink">ONLY</span> install Bot
+        to Discord
       </div>
       <div className="h-24" />
       <div className="flex justify-center">

@@ -15,7 +15,7 @@ body {
 }
 
 .pro-sidebar-inner {
-  @apply !bg-transparent text-white;
+  @apply !bg-transparent !bg-gradient-to-r !from-dark !to-transparent text-white;
 }
 
 /* Gradients */
