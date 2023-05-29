@@ -73,7 +73,7 @@ const DefaultLayout: React.FC<Props> = (props) => {
                   icon={<AiFillInfoCircle />}
                   onClick={() => router.push('/landing')}
                 >
-                  What is Discord HOME
+                  Discord HOME AI ?
                 </MenuItem>
                 <MenuItem
                   icon={<FaRobot />}

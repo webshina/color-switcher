@@ -24,11 +24,9 @@ export const ExpandableImage: React.FC<Props> = ({ imgURL, width, height }) => {
 
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <img
-            src={imgURL}
-            alt=""
-            className="max-w-90 max-h-90 transform-gpu"
-            style={{ maxWidth: '80%', maxHeight: '80%' }}
+          <button
+            className="absolute h-full w-full"
+            onClick={() => setIsOpen(false)}
           />
 
           <button
@@ -37,6 +35,13 @@ export const ExpandableImage: React.FC<Props> = ({ imgURL, width, height }) => {
           >
             <AiOutlineClose />
           </button>
+
+          <img
+            src={imgURL}
+            alt=""
+            className="max-w-90 max-h-90 transform-gpu z-10"
+            style={{ maxWidth: '80%', maxHeight: '80%' }}
+          />
         </div>
       )}
     </div>

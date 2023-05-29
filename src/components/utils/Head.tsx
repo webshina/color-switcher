@@ -4,7 +4,7 @@ const HeadComponent = () => {
   return (
     <>
       <Head>
-        <title>Discord Home</title>
+        <title>Discord Home AI</title>
         <meta
           name="description"
           content="Organize hard-to-see Discord server channels and members into a beautiful home page"

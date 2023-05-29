@@ -10,8 +10,8 @@ export const Logo: React.FC<Props> = (props) => {
         fontSize: props.size ?? 20,
       }}
     >
-      Di<span className={props.twinkle ? 'twinkle' : ''}>sc</span>ord H
-      <span className={props.twinkle ? 'twinkle' : ''}>O</span>ME
+      Di<span className={props.twinkle ? 'twinkle' : ''}>sc</span>ord HO
+      <span className={props.twinkle ? 'twinkle' : ''}>M</span>E AI
     </div>
   );
 };

@@ -45,7 +45,7 @@ export const LandingPage: React.FC<Props> = () => {
         homepage for Discord using{' '}
         <span className="gradient-text-purple-to-pink">AI</span>
       </div>
-      <div className="h-8" />
+      <div className="h-16" />
       {/* ScreenShots */}
       <div className="flex flex-wrap justify-center items-center">
         {[
@@ -120,7 +120,7 @@ export const LandingPage: React.FC<Props> = () => {
         </div>
       </div>
 
-      <div className="h-56" />
+      <div className="h-24" />
     </>
   );
 };
