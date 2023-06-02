@@ -7,6 +7,7 @@ import Title from '@/components/utils/Title';
 import { useServer } from '@/hooks/repository/useServer';
 import Image from 'next/image';
 import 'react-datepicker/dist/react-datepicker.css';
+import { ExpandableText } from '../utils/ExpandableText';
 
 type Props = {
   serverId: number;
@@ -41,8 +42,8 @@ export const ServerHomePage: React.FC<Props> = (props) => {
           <div className="h-8" />
 
           {/* Description */}
-          <div className="text-sm lg:text-md font-light">
-            {server.description}
+          <div className="bg-slate-800 p-5 rounded-xl text-sm lg:text-base font-light whitespace-pre-wrap">
+            <ExpandableText>{server.description}</ExpandableText>
           </div>
           <div className="h-8" />
 

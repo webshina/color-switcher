@@ -3,8 +3,16 @@ export const useServer = (props: { serverId: number }) => {
     {
       id: 1,
       name: 'web3.0 Engineer Community',
-      description:
-        'web3.0エンジニアのためのコミュニティです。勉強会やイベントを開催しています。',
+      description: `🌐 Web3.0エンジニアコミュニティへようこそ! 👨‍💻👩‍💻
+
+これは、Web 3.0の世界に深く潜り込む革新愛好家、開発者、ビジョナリーのためのグローバルな🌍空間です。ここでは、私たちは次のことを行います:
+
+🔗 ブロックチェーンの最先端のソリューションと分散型技術を共有します
+💡 インターネットの未来を形作る最新のアイデアとトレンドを議論します
+🚀 協力、メンターシップ、知識の交換を通じてお互いを強化します
+📚 新人からベテランまで、すべての人に学習リソースを提供します
+
+分散化された未来を形成するために、私たちと一緒に参加しましょう！🎯🛠️ 一緒に、ウェブの次世代を設計しましょう。🕸️🚀`,
       coverImgURL: '/images/mockup/shubham-s-web3-jrAru7fBwA8-unsplash.jpeg',
       iconImgURL: '/images/mockup/icon.jpeg',
       featuredChannels: [
@@ -278,8 +286,16 @@ export const useServer = (props: { serverId: number }) => {
     {
       id: 2,
       name: 'Web3.0 Engineer Community',
-      description:
-        'A community for web3.0 engineers. We organize study groups and events.',
+      description: `🌐 Welcome to the Web3.0 Engineer Community! 👨‍💻👩‍💻
+
+This is a global 🌍 space for innovation enthusiasts, developers, and visionaries diving deep into the world of Web 3.0. Here, we:
+
+🔗 Share cutting-edge blockchain solutions and decentralized technologies
+💡 Discuss the latest ideas and trends shaping the future of the internet
+🚀 Empower each other through collaborations, mentorship, and knowledge exchange
+📚 Provide learning resources for newbies and veterans alike
+
+Join us in shaping a decentralized future! 🎯🛠️ Together, we'll architect the next generation of the web. 🕸️🚀`,
       coverImgURL: '/images/mockup/shubham-s-web3-jrAru7fBwA8-unsplash.jpeg',
       iconImgURL: '/images/mockup/icon.jpeg',
       featuredChannels: [
