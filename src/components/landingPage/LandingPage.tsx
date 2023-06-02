@@ -90,14 +90,25 @@ export const LandingPage: React.FC<Props> = () => {
       </div>
       <div className="h-16" />
       <div className="flex justify-center">
-        <button
-          className="px-10 py-3 gradient-bg-purple-to-pink rounded-full text-2xl font-bold"
-          onClick={() => {
-            window.open('/server/2', '_blank');
-          }}
-        >
-          Check Demo
-        </button>
+        <div className="flex flex-col items-center">
+          <button
+            className="px-10 py-3 gradient-bg-purple-to-pink rounded-full text-2xl font-bold"
+            onClick={() => {
+              window.open('/server/2', '_blank');
+            }}
+          >
+            Check Demo
+          </button>
+          <div className="h-5" />
+          <button
+            className="underline"
+            onClick={() => {
+              window.open('/server/1', '_blank');
+            }}
+          >
+            Check Demo 🇯🇵
+          </button>
+        </div>
       </div>
       <div className="h-36" />
 
