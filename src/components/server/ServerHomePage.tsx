@@ -1,6 +1,5 @@
-import { CategoryCards } from '@/components/CategoryCards';
+import { TagCards } from '@/components/CategoryCards';
 import { Channels } from '@/components/Channels';
-import { FeaturedChannels } from '@/components/FeaturedChannels';
 import { Members } from '@/components/Members';
 import CircleImage from '@/components/utils/CircleImage';
 import Title from '@/components/utils/Title';
@@ -14,6 +13,7 @@ type Props = {
 };
 export const ServerHomePage: React.FC<Props> = (props) => {
   const server = useServer({ serverId: props.serverId });
+  console.log(server);
 
   return (
     <>
@@ -41,26 +41,20 @@ export const ServerHomePage: React.FC<Props> = (props) => {
           <div className="text-2xl lg:text-5xl font-bold">{server.name}</div>
           <div className="h-8" />
 
+          {/* Categories */}
+          <TagCards tags={server.tags} />
+          <div className="h-8" />
+
           {/* Description */}
           <div className="bg-slate-800 p-5 rounded-xl text-sm lg:text-base font-light whitespace-pre-wrap">
             <ExpandableText>{server.description}</ExpandableText>
           </div>
-          <div className="h-8" />
-
-          {/* Categories */}
-          <CategoryCards categories={server.categories} />
-          <div className="h-16" />
-
-          {/* Featured channels */}
-          <Title title={'Featured Channels'} />
-          <div className="h-8" />
-          <FeaturedChannels channels={server.featuredChannels} />
           <div className="h-16" />
 
           {/* Channel list */}
           <Title title={'Channels'} />
           <div className="h-8" />
-          <Channels categories={server.categories} />
+          <Channels channels={server.channels} />
           <div className="h-16" />
 
           {/* Member list */}

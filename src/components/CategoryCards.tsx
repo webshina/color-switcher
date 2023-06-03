@@ -1,12 +1,12 @@
 import { Tag } from '@chakra-ui/react';
 
 type Props = {
-  categories: any[];
+  tags: any[];
 };
-export const CategoryCards: React.FC<Props> = (props) => {
+export const TagCards: React.FC<Props> = (props) => {
   return (
     <div className="flex flex-wrap">
-      {props.categories.map((category) => (
+      {props.tags.map((category) => (
         <div key={category.id} className="m-1">
           <Tag colorScheme="gray">{category.name}</Tag>
         </div>

@@ -20,7 +20,7 @@ async function execute(prompt: string) {
   return response.data.data;
 }
 
-const prompt = 'Illustration of brain wave images issued as NFT';
+const prompt = '新メンバーが自己紹介を投稿する場';
 execute(prompt)
   .then((result) => {
     console.log('Summary:');

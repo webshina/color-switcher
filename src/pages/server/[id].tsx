@@ -6,7 +6,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const Home: NextPage = () => {
   const router = useRouter();
-  console.log(router.query.id);
   return (
     <DefaultLayout>
       <ServerHomePage serverId={Number(router.query.id)} />

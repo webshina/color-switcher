@@ -4,6 +4,7 @@ import React, { ReactNode } from 'react';
 type Props = {
   imgSrc: string;
   title: string;
+  subTitle?: string;
   children: ReactNode;
   width?: number;
   id?: string;
@@ -17,7 +18,7 @@ const ImageCard: React.FC<Props> = (props) => {
         style={{ width: props.width }}
       >
         <div className="relative">
-          <div className="relative h-[250px]">
+          <div className="relative h-[200px]">
             <Image
               src={props.imgSrc ? props.imgSrc : '/images/noImage.jpeg'}
               alt="image"
@@ -26,8 +27,11 @@ const ImageCard: React.FC<Props> = (props) => {
               className="rounded-t-xl"
             />
           </div>
-          <div className="absolute bottom-0 p-2 w-full bg-black/40 font-bold">
-            {props.title}
+          <div className="absolute bottom-0 p-2 w-full bg-black/40">
+            <div className="font-bold">{props.title}</div>
+            <div className="h-2" />
+            <div className="h-[30px] text-sm">{props.subTitle}</div>
+            <div className="h-2" />
           </div>
         </div>
         <div className="px-3 py-1">{props.children}</div>

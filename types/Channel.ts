@@ -6,4 +6,8 @@ export type ChannelItem = {
   activityLevel: number;
   conversationSummaries?: string[];
   inviteCode: string;
+  category: {
+    id: number;
+    name: string;
+  };
 };

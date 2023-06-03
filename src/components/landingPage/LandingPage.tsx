@@ -55,7 +55,7 @@ export const LandingPage: React.FC<Props> = () => {
           'screenshotMembers.png',
         ].map((image) => {
           return (
-            <div className="m-2">
+            <div key={image} className="m-2">
               <ExpandableImage
                 imgURL={`/images/landingPage/${image}`}
                 width={screenSize === 'lg' ? 240 : 160}
