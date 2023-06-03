@@ -13,7 +13,7 @@ export const UserProfile: React.FC<Props> = (props) => {
     <div id="user-profile" className="w-[320px] rounded-xl">
       <div className="flex flex-col items-center bg-gradient-to-br from-discord-purple to-pink-500 rounded-t-xl">
         <div className="h-6" />
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row justify-center items-start">
           {/* Name */}
           <div className="flex flex-col">
             <div className="text-base font-bold">
@@ -22,7 +22,7 @@ export const UserProfile: React.FC<Props> = (props) => {
             <div className="text-sm">{props.discordMember.userName}</div>
           </div>
 
-          <div className="w-3"></div>
+          <div className="w-3" />
 
           {/* Discord icon */}
           <button className="p-1 rounded-full bg-white">
@@ -34,6 +34,21 @@ export const UserProfile: React.FC<Props> = (props) => {
               />
             </div>
           </button>
+          <div className="w-1" />
+
+          {/* Social media icon */}
+          {props.discordMember.socialMedias.map((socialMedia) => (
+            <button className="p-1 rounded-full bg-white">
+              <div className="relative h-7 w-7">
+                <ImageComponent
+                  imgSrc={`/images/snsIcons/${socialMedia.name}.png`}
+                  height={28}
+                  width={28}
+                  objectFit="contain"
+                />
+              </div>
+            </button>
+          ))}
         </div>
         <div className="h-3" />
 

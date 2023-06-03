@@ -8,4 +8,5 @@ export type DiscordMemberItem = {
   roles: string[];
   description: string;
   isBot: boolean;
+  socialMedias: any[];
 };

@@ -325,6 +325,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             '東京で働いているデータサイエンティストです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 2,
@@ -337,6 +344,13 @@ export const useServer = (props: { serverId: number }) => {
           roles: ['admin', 'moderator'],
           description: '大阪で働いているデザイナーです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 3,
@@ -350,6 +364,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             '名古屋で働いているマーケティングマネージャーです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 4,
@@ -362,6 +383,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             '福岡で働いているビジネスアナリストです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 5,
@@ -374,6 +402,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             '札幌で働いているフロントエンドエンジニアです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 6,
@@ -386,6 +421,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             '京都で働いているプロダクトマネージャーです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 7,
@@ -399,6 +441,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             '神戸で働いているデータエンジニアです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 8,
@@ -411,6 +460,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             '広島で働いているQAエンジニアです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 9,
@@ -423,6 +479,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             '熊本で働いているバックエンドエンジニアです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 10,
@@ -435,6 +498,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             '仙台で働いているUXデザイナーです。よろしくお願いします。',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
       ],
     },
@@ -743,6 +813,13 @@ export const useServer = (props: { serverId: number }) => {
           roles: ['admin', 'moderator'],
           description: 'I am a designer working in Osaka. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 5,
@@ -755,6 +832,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             'I am a frontend engineer working in Sapporo. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 9,
@@ -767,6 +851,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             'I am a backend engineer working in Kumamoto. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 1,
@@ -779,6 +870,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             'I am a data scientist working in Tokyo. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 8,
@@ -791,6 +889,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             'I am a QA engineer working in Hiroshima. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 10,
@@ -803,6 +908,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             'I am a UX designer working in Sendai. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 4,
@@ -815,6 +927,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             'I am a business analyst working in Fukuoka. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 7,
@@ -828,6 +947,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             'I am a data engineer working in Kobe. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 3,
@@ -841,6 +967,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             'I am a marketing manager working in Nagoya. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
         {
           id: 6,
@@ -853,6 +986,13 @@ export const useServer = (props: { serverId: number }) => {
           description:
             'I am a product manager working in Kyoto. Nice to meet you.',
           isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
       ],
     },
