@@ -44,3 +44,5 @@ next.config.original.js
 # Cypress
 /cypress/videos/
 /cypress/screenshots/
+
+*.local
