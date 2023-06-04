@@ -17,7 +17,6 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "types": ["@types/node"],
     "typeRoots": ["./types", "./node_modules/@types"],
     "allowJs": true
   },
