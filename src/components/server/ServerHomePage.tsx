@@ -13,7 +13,6 @@ type Props = {
 };
 export const ServerHomePage: React.FC<Props> = (props) => {
   const server = useServer({ serverId: props.serverId });
-  console.log(server);
 
   return (
     <>

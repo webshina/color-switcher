@@ -5,13 +5,13 @@ services:
     build: ./docker/db
     environment:
       MYSQL_ROOT_PASSWORD: nft12345
-      MYSQL_DATABASE: discord-home
+      MYSQL_DATABASE: discord_home
     volumes:
       - ./docker/db/mysql_data:/var/lib/mysql
       - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./docker/db/sql:/docker-entrypoint-initdb.d
     ports:
-      - '3309:3306'
+      - '3310:3306'
     command: --innodb-use-native-aio=0
 volumes:
   mysql:
