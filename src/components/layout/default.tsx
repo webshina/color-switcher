@@ -1,3 +1,4 @@
+import { useScreenSize } from '@/hooks/utils/useScreenSize';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useState } from 'react';
 import { AiFillInfoCircle } from 'react-icons/ai';
@@ -6,6 +7,7 @@ import { FiMenu } from 'react-icons/fi';
 import { Menu, MenuItem, ProSidebar } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 import { animated, useSpring } from 'react-spring';
+import { DiscordConnectBtn } from '../common/DiscordConnectBtn';
 import { Logo } from '../common/Logo';
 
 type Props = {
@@ -17,6 +19,7 @@ const DefaultLayout: React.FC<Props> = (props) => {
   const [isShowSideNav, setIsShowSideNav] = useState(false);
   const stylesSideNav = useSpring({ width: isShowSideNav ? '300px' : '0px' });
   const router = useRouter();
+  const screenSize = useScreenSize();
 
   return (
     <>
@@ -37,22 +40,14 @@ const DefaultLayout: React.FC<Props> = (props) => {
             </button>
 
             {/* Logo */}
-            {(props.showLogo ?? true) && (
+            {(props.showLogo ?? true) && screenSize === 'lg' && (
               <div className="absolute top-0 right-1/2 translate-x-1/2">
                 <Logo />
               </div>
             )}
 
-            <div className="absolute top-0 right-0">
-              {/* <Button
-                colorScheme="purple"
-                onClick={() => {
-                  router.push('/login');
-                }}
-              >
-                <BiLogIn />
-                <div className="mx-2">ログイン</div>
-              </Button> */}
+            <div className="absolute top-0 right-3">
+              <DiscordConnectBtn />
             </div>
           </div>
         </div>

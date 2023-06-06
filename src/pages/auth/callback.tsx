@@ -10,7 +10,7 @@ const Home: NextPage = () => {
 
   const loginAPI = async (discordCode: string) => {
     await login(discordCode as string);
-    router.push('/');
+    router.push('/owner/dashboard');
   };
 
   useEffect(() => {
