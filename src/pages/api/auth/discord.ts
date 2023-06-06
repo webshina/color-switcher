@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { resError, resSuccess } from '@/pages/api/utils/responseHelper';
 import axios from 'axios';
+import { serialize } from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { stringify } from 'querystring';
 import { cors } from '../middleware/cors';
@@ -57,6 +58,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         update: savingUserData,
         create: savingUserData,
       });
+
+      // Create a new cookie
+      const cookie = serialize('access_token', tokenData.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        sameSite: 'strict',
+        path: '/',
+      });
+
+      // Set the cookie in the response header
+      res.setHeader('Set-Cookie', cookie);
 
       const data: DiscordAuthResponse = user;
 
