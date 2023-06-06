@@ -25,6 +25,9 @@ body {
 .gradient-bg-purple-to-pink {
   @apply bg-gradient-to-r from-purple-500 to-pink-300;
 }
+.gradient-bg-blue-to-purple {
+  @apply bg-gradient-to-r from-[#22D2FE] to-[#A136FF];
+}
 .gradient-bg-white-to-dark {
   @apply bg-gradient-to-b from-white to-[#615c6b];
 }
