@@ -5,12 +5,8 @@
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev -p 3004",
     "build": "next build",
-    "start": "ts-node src/server.ts && next start",
+    "start": "next start -p 3004",
     "lint": "next lint",
-    "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
-    "db:migrate:reset": "dotenv -e .env.development.local -- npx prisma migrate reset",
-    "db:seed": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts seeds/index.ts",
-    "db:sample": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts seeds/sampleData/index.ts",
     "e2e:open": "dotenv -e .env.development -- dotenv -e .env.development.local -- npx cypress open",
     "e2e:run": "npx cypress run --record --key 699f1268-4456-4742-b055-bdf00cb1613b"
   },

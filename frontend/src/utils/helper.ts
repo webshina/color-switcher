@@ -1,4 +1,4 @@
-import { UploadDirs } from 'types/UploadDirs';
+import { UploadDirs } from '#/types/UploadDirs';
 import { isObject } from './typeNarrower';
 
 export const generateRandomString = (n: number) => {

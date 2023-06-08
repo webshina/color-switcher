@@ -1,3 +1,4 @@
+import { DiscordMemberItem } from '#/types/DiscordMember';
 import {
   Modal,
   ModalBody,
@@ -7,7 +8,6 @@ import {
 } from '@chakra-ui/react';
 import Image from 'next/image';
 import React from 'react';
-import { DiscordMemberItem } from 'types/DiscordMember';
 import { UserProfile } from './UserProfile';
 import { ActivityLevel } from './common/ActiveLevel';
 

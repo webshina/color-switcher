@@ -1,6 +1,6 @@
+import { UserItem } from '#/types/User';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { UserItem } from 'types/User';
 import wildcardMatch from 'wildcard-match';
 
 export const useCheckAuthPath = (loadingUser: boolean, user?: UserItem) => {

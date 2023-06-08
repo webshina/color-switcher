@@ -1,3 +1,4 @@
+import { ChannelItem } from '#/types/Channel';
 import { ActivityLevel } from '@/components/common/ActiveLevel';
 import { JumpChannelBtn } from '@/components/common/JumpChannelBtn';
 import {
@@ -8,7 +9,6 @@ import {
   AccordionPanel,
   Box,
 } from '@chakra-ui/react';
-import { ChannelItem } from 'types/Channel';
 import ImageCard from './utils/ImageCard';
 
 type Props = {

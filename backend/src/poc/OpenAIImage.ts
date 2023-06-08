@@ -13,14 +13,14 @@ async function execute(prompt: string) {
 
   const response = await openai.createImage({
     prompt: prompt,
-    n: 4,
+    n: 1,
     size: '1024x1024',
   });
 
   return response.data.data;
 }
 
-const prompt = 'Generate Discord HOME';
+const prompt = '新メンバーが自己紹介を投稿する場';
 execute(prompt)
   .then((result) => {
     console.log('Summary:');

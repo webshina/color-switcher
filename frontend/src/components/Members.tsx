@@ -1,4 +1,4 @@
-import { DiscordMemberItem } from 'types/DiscordMember';
+import { DiscordMemberItem } from '#/types/DiscordMember';
 import { UserProfileCard } from './UserProfileCard';
 
 type Props = {

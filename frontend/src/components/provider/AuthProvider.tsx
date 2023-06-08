@@ -1,5 +1,5 @@
+import { UserItem } from '#/types/User';
 import { useCheckAuthPath } from '@/hooks/useCheckAuthPath';
-import { DiscordAuthResponse } from '@/pages/api/auth/discord';
 import { post } from '@/utils/apiHelper';
 import {
   Dispatch,
@@ -8,7 +8,6 @@ import {
   createContext,
   useState,
 } from 'react';
-import { UserItem } from 'types/User';
 
 export type AuthContextProps = {
   user?: UserItem;
@@ -32,7 +31,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
 
   const login = async (discordCode: string) => {
     const res = await post('/api/auth/discord', { code: discordCode });
-    const userData = res.data as DiscordAuthResponse;
+    const userData = res.data;
     setUser(userData);
   };
 

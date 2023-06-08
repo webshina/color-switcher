@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 
-const _baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+const _baseUrl = process.env.NEXT_PUBLIC_API_URL;
 type Response = {
   data: any;
   status: number;

@@ -1,7 +1,7 @@
+import { DiscordMemberItem } from '#/types/DiscordMember';
 import CircleImage from '@/components/utils/CircleImage';
 import { ImageComponent } from '@/components/utils/ImageComponent';
 import React from 'react';
-import { DiscordMemberItem } from 'types/DiscordMember';
 import { ActivityLevel } from './common/ActiveLevel';
 
 type Props = {

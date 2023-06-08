@@ -1,8 +1,8 @@
+import { UploadDirs } from '#/types/UploadDirs';
 import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import formidable from 'formidable';
 import fs from 'fs';
 import * as mime from 'mime-types';
-import { UploadDirs } from 'types/UploadDirs';
 
 // Define destination of saving file
 const destination = process.env.AWS_S3_BUCKET ? 's3' : 'local';

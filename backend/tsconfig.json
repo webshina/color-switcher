@@ -21,12 +21,6 @@
     "typeRoots": ["./types", "./node_modules/@types"],
     "allowJs": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "types/**/*",
-    "../backend/src/lib/prisma.ts"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "types/**/*"],
   "exclude": ["node_modules"]
 }

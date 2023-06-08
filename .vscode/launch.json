@@ -30,6 +30,20 @@
       "name": "Nextjs: Client",
       "url": "http://localhost:4",
       "webRoot": "${workspaceFolder}"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Express",
+      "runtimeExecutable": "nodemon",
+      "program": "${workspaceFolder}/backend/src/app.ts",
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "runtimeArgs": ["-r", "./backend/ts-node-require"],
+      "env": {
+        "TS_NODE_PROJECT": "./backend/tsconfig.json"
+      }
     }
   ]
 }
