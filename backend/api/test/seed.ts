@@ -1,9 +1,9 @@
+import { initSampleData } from '@/backend/prisma/seeds/sampleData/initSampleData';
 import { prisma } from '@/lib/prisma';
 import { resError, resSuccess } from '@/pages/api/utils/responseHelper';
 import { firebaseAdminAuth } from '@/utils/firebaseAdmin';
 import formidable from 'formidable';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { initSampleData } from 'seeds/sampleData/initSampleData';
 import { cors } from '../middleware/cors';
 import { withAuth } from '../middleware/withAuth';
 
