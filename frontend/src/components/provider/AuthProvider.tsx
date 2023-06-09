@@ -1,38 +1,37 @@
 import { UserItem } from '#/types/User';
+import { useMe } from '@/hooks/repository/useMe';
 import { useCheckAuthPath } from '@/hooks/useCheckAuthPath';
 import { post } from '@/utils/apiHelper';
-import {
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  createContext,
-  useState,
-} from 'react';
+import { ReactNode, createContext } from 'react';
+import { mutate } from 'swr';
 
 export type AuthContextProps = {
   user?: UserItem;
   loadingUser: boolean;
-  setLoadingUser: Dispatch<SetStateAction<boolean>>;
   login: (discordCode: string) => Promise<void>;
+  logout: () => Promise<void>;
 };
 const AuthContext = createContext<AuthContextProps>({
   user: undefined,
   loadingUser: true,
-  setLoadingUser: () => {},
   login: async () => {},
+  logout: async () => {},
 });
 
 type Props = {
   children: ReactNode;
 };
 const AuthProvider: React.FC<Props> = ({ children }) => {
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [user, setUser] = useState<UserItem>();
+  const { data: user, isValidating: loadingUser } = useMe();
 
   const login = async (discordCode: string) => {
-    const res = await post('/api/auth/discord', { code: discordCode });
-    const userData = res.data;
-    setUser(userData);
+    await post('/api/auth/discord', { code: discordCode });
+    mutate('useMe');
+  };
+
+  const logout = async () => {
+    await post('/api/auth/logout');
+    mutate('useMe');
   };
 
   // Check auth for route path
@@ -43,8 +42,8 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       value={{
         user,
         loadingUser,
-        setLoadingUser,
         login,
+        logout,
       }}
     >
       {children}

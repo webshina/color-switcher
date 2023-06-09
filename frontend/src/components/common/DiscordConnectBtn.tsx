@@ -5,13 +5,11 @@ import { BsDiscord } from 'react-icons/bs';
 type Props = {};
 export const DiscordConnectBtn: React.FC<Props> = (props) => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loadingUser } = useAuth();
   const redirect = () => {
-    router.push(
-      'https://discord.com/api/oauth2/authorize?client_id=1110729993228652574&redirect_uri=http%3A%2F%2Flocalhost%3A3004%2Fauth%2Fcallback&response_type=code&scope=identify'
-    );
+    router.push(process.env.NEXT_PUBLIC_DISCORD_OAUTH_URL!);
   };
-  return !user ? (
+  return !user && !loadingUser ? (
     <button
       className="flex justify-center items-center bg-discord-purple rounded-lg px-4 py-2"
       onClick={redirect}

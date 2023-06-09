@@ -11,7 +11,7 @@ export const useCheckAuthPath = (loadingUser: boolean, user?: UserItem) => {
     if (!loadingUser) {
       if (isIncludedOnlyLoginPaths(router.pathname)) {
         if (!user) {
-          router.push('/login');
+          router.push('/auth/login');
         }
       }
     }

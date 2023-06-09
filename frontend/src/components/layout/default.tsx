@@ -1,7 +1,9 @@
+import { useAuth } from '@/hooks/utils/useAuth';
 import { useScreenSize } from '@/hooks/utils/useScreenSize';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useState } from 'react';
 import { AiFillInfoCircle } from 'react-icons/ai';
+import { BiLogOut } from 'react-icons/bi';
 import { FaRobot } from 'react-icons/fa';
 import { FiMenu } from 'react-icons/fi';
 import { Menu, MenuItem, ProSidebar } from 'react-pro-sidebar';
@@ -20,6 +22,7 @@ const DefaultLayout: React.FC<Props> = (props) => {
   const stylesSideNav = useSpring({ width: isShowSideNav ? '300px' : '0px' });
   const router = useRouter();
   const screenSize = useScreenSize();
+  const { logout } = useAuth();
 
   return (
     <>
@@ -81,6 +84,9 @@ const DefaultLayout: React.FC<Props> = (props) => {
                   onClick={() => router.push('/server/1')}
                 >
                   Demo 🇯🇵
+                </MenuItem>
+                <MenuItem icon={<BiLogOut />} onClick={logout}>
+                  Logout
                 </MenuItem>
               </Menu>
             </ProSidebar>

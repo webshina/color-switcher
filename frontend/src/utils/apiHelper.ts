@@ -43,7 +43,9 @@ export const get = async (
     const fullUrl = `${(baseUrl ?? _baseUrl) + url}?${_convertObjectToQuery(
       params
     )}`;
-    const res = await axios.get(fullUrl);
+    const res = await axios.get(fullUrl, {
+      withCredentials: true,
+    });
     return response(res);
   } catch (error) {
     throw error;
@@ -56,36 +58,9 @@ export const post = async (
   baseUrl?: string
 ) => {
   try {
-    const res = await axios.post((baseUrl ?? _baseUrl) + url, params ?? {});
-    return response(res);
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const patch = async (
-  url: string,
-  params?: { [key: string]: any },
-  baseUrl?: string
-) => {
-  try {
-    const res = await axios.patch((baseUrl ?? _baseUrl) + url, params ?? {});
-    return response(res);
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const delete_ = async (
-  url: string,
-  params?: { [key: string]: any },
-  baseUrl?: string
-) => {
-  try {
-    const fullUrl = `${(baseUrl ?? _baseUrl) + url}?${_convertObjectToQuery(
-      params
-    )}`;
-    const res = await axios.delete(fullUrl);
+    const res = await axios.post((baseUrl ?? _baseUrl) + url, params ?? {}, {
+      withCredentials: true,
+    });
     return response(res);
   } catch (error) {
     throw error;

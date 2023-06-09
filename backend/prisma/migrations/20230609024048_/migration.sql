@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Guild` MODIFY `iconURL` VARCHAR(191) NULL;

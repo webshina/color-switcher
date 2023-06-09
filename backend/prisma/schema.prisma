@@ -21,11 +21,54 @@ model MailTemplate {
 
 // User model
 model User {
-  id                    Int      @id @default(autoincrement())
-  discordId             String   @unique
-  discordAccessToken    String
-  discordRefreshToken   String
-  discordTokenExpiresAt DateTime
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                    Int       @id @default(autoincrement())
+  discordId             String    @unique
+  discordAccessToken    String?   @unique
+  discordRefreshToken   String?   @unique
+  discordTokenExpiresAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Guilds
+  guilds Guild[]
+
+  // GuildMembers
+  guildMembers GuildMember[]
+}
+
+// Guild model
+enum GuildStatus {
+  provisional
+  private
+  published
+}
+
+model Guild {
+  id              Int         @id @default(autoincrement())
+  discordId       String      @unique
+  name            String
+  status          GuildStatus
+  iconURL         String?
+  createdByUser   User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdByUserId Int?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Members
+  members GuildMember[]
+}
+
+// GuildMember model
+model GuildMember {
+  id             Int      @id @default(autoincrement())
+  guild          Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId        Int
+  guildDiscordId String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         Int
+  isOwner        Boolean
+  permissions    Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
