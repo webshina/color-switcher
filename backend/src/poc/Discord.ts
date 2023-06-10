@@ -9,7 +9,6 @@ const bot = new Client({
     'MessageContent',
   ],
 });
-const token = process.env.DISCORD_TOKEN;
 
 bot.on('ready', async () => {
   console.log(`Logged in as ${bot.user?.tag}!`);
@@ -45,4 +44,4 @@ bot.on('ready', async () => {
   }
 });
 
-bot.login(token);
+bot.login(process.env.DISCORD_TOKEN);

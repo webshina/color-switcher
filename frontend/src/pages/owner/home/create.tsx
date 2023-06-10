@@ -1,7 +1,8 @@
 import DefaultLayout from '@/components/layout/default';
 import { ImageComponent } from '@/components/utils/ImageComponent';
 import { useAuth } from '@/hooks/utils/useAuth';
-import { Select } from '@chakra-ui/react';
+import useInputField from '@/hooks/utils/useInputField';
+import { post } from '@/utils/apiHelper';
 import type { NextPage } from 'next';
 import 'react-datepicker/dist/react-datepicker.css';
 import { HiCursorClick } from 'react-icons/hi';
@@ -11,7 +12,27 @@ const Home: NextPage = () => {
   const { user } = useAuth();
   const manageableGuilds = user?.guilds.filter((guild) => guild.manageable);
 
-  const generate = () => {};
+  const {
+    inputField: guildIdInputField,
+    valueState: guildId,
+    setValueState: setGuildId,
+  } = useInputField({
+    id: 'guild-id',
+    type: 'select',
+    options:
+      manageableGuilds?.map((guild) => ({
+        label: guild.name as string,
+        value: guild.discordId,
+      })) ?? [],
+    placeholder: 'Select server ...',
+  });
+
+  const generate = () => {
+    if (!guildId) return;
+    post('/api/guild/generate', {
+      discordId: guildId,
+    });
+  };
 
   return (
     <DefaultLayout>
@@ -59,17 +80,11 @@ const Home: NextPage = () => {
             <div className="">Generate your discord HOME !</div>
             <div className="h-8" />
             <div className="flex flex-col items-center">
-              <Select placeholder="Choose Server ...">
-                {manageableGuilds?.map((guild) => (
-                  <option key={guild.id} value={guild.id}>
-                    {guild.name}
-                  </option>
-                ))}
-              </Select>
+              {guildIdInputField}
               <div className="h-8" />
               <button
                 className="flex justify-center items-center px-8 py-4 gradient-bg-purple-to-pink rounded-xl border border-gray-600"
-                onClick={() => {}}
+                onClick={generate}
               >
                 <MdPrecisionManufacturing size={30} />
                 <div className="w-2" />

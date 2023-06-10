@@ -1,11 +1,13 @@
-import { discordConnect, logout } from '@/controllers/authController';
-import { getMe } from '@/controllers/userController';
+import authController from '@/controllers/authController';
+import guildController from '@/controllers/guildController';
+import userController from '@/controllers/userController';
 import { Router } from 'express';
 
 const router = Router();
 
-router.post('/api/auth/discord', discordConnect);
-router.post('/api/auth/logout', logout);
-router.get('/api/user/me', getMe);
+router.post('/api/auth/discord', authController.discordConnect);
+router.post('/api/auth/logout', authController.logout);
+router.get('/api/user/me', userController.getMe);
+router.post('/api/guild/generate', guildController.generate);
 
 export { router };

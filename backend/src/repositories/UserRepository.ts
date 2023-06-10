@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { User } from '@prisma/client';
+import { Request } from 'express';
 import { UserItem } from '../../../types/User';
 
 export class UserRepository {
@@ -57,5 +58,11 @@ export class UserRepository {
     if (!user) return null;
 
     return this.format(user);
+  }
+
+  static async getLoginUser(req: Request) {
+    const user = await this.getByAccessToken(req.cookies.accessToken);
+    if (!user) throw new Error('User not found');
+    return user;
   }
 }

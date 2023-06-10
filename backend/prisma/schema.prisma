@@ -57,6 +57,9 @@ model Guild {
 
   // Members
   members GuildMember[]
+
+  // Channels
+  channels Channel[]
 }
 
 // GuildMember model
@@ -71,4 +74,30 @@ model GuildMember {
   permissions    Int
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+// Channel model
+model Channel {
+  id        Int      @id @default(autoincrement())
+  discordId String
+  name      String
+  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Channel Summaries
+  channelSummaries ChannelSummary[]
+
+  @@unique([guildId, discordId])
+}
+
+// Channel Summary model
+model ChannelSummary {
+  id        Int      @id @default(autoincrement())
+  channelId Int
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  content   String   @db.LongText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

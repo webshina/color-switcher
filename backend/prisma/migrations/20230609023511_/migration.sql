@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `Guild` ALTER COLUMN `iconURL` DROP DEFAULT;

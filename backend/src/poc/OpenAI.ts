@@ -1,9 +1,10 @@
 import { Configuration, OpenAIApi } from 'openai';
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+const openAiApi = new OpenAIApi(
+  new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+  })
+);
 
 async function summarizeArticle(article: string) {
   // Check that the article isn't longer than the API's character limit
@@ -11,7 +12,7 @@ async function summarizeArticle(article: string) {
     throw new Error('Article exceeds character limit for API.');
   }
 
-  const response = await openai.createCompletion({
+  const response = await openAiApi.createCompletion({
     model: 'text-davinci-003',
     prompt: `Summarize the following article:\n\n${article}\n\nSummary:`,
     temperature: 0.7,

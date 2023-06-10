@@ -4,7 +4,7 @@ import { Request, Response, Router } from 'express';
 import { stringify } from 'querystring';
 const router = Router();
 
-export const discordConnect = async (req: Request, res: Response) => {
+const discordConnect = async (req: Request, res: Response) => {
   const { code } = req.body;
 
   const { data: tokenData } = await axios.post(
@@ -95,7 +95,7 @@ export const discordConnect = async (req: Request, res: Response) => {
   res.json({ user });
 };
 
-export const logout = async (req: Request, res: Response) => {
+const logout = async (req: Request, res: Response) => {
   const { accessToken } = req.cookies;
   if (accessToken) {
     await prisma.user.update({
@@ -112,3 +112,5 @@ export const logout = async (req: Request, res: Response) => {
   res.clearCookie('accessToken');
   res.json({ success: true });
 };
+
+export default { discordConnect, logout };
