@@ -78,16 +78,21 @@ model GuildMember {
 
 // Channel model
 model Channel {
-  id        Int      @id @default(autoincrement())
-  discordId String
-  name      String
-  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId   Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                    Int      @id @default(autoincrement())
+  discordId             String
+  name                  String
+  guild                 Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId               Int
+  messageFrequencyScore Int?
+  activityScore         Int?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   // Channel Summaries
   channelSummaries ChannelSummary[]
+
+  // Messages
+  messages Message[]
 
   @@unique([guildId, discordId])
 }
@@ -100,4 +105,18 @@ model ChannelSummary {
   content   String   @db.LongText
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Message model
+model Message {
+  id              Int      @id @default(autoincrement())
+  discordId       String
+  content         String   @db.LongText
+  authorDiscordId String
+  channel         Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channelId       Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([channelId, discordId])
 }
