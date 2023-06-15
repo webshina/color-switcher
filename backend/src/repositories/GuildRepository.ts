@@ -38,37 +38,10 @@ export class GuildRepository {
     if (!fetchedGuildAvailable.available) {
       throw new Error('Guild is not available');
     }
-    const guild = await GuildRepository.generateGuildData({
+    await GuildRepository.generateGuildData({
       guild: fetchedGuildAvailable,
       createdByUserId,
     });
-
-    const fetchedChannels = fetchedGuildAvailable.channels.cache.values();
-    // for (const fetchedChannel of fetchedChannels) {
-    //   if (fetchedChannel.isTextBased()) {
-    //   }
-    // }
-
-    // for (const channel of fetchedChannels) {
-    //   if (channel.isTextBased()) {
-    //     try {
-    //       const messages = await (channel as TextChannel).messages.fetch({
-    //         limit: 100,
-    //       });
-    //       messages.each((message) => {
-    //         console.log(message.content);
-    //       });
-    //     } catch (error) {
-    //       if (isDiscordError(error)) {
-    //         if (error.code === 50001) {
-    //           console.log('Missing access');
-    //         } else {
-    //           console.error(error);
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
   }
 
   static async generateGuildData(props: {
@@ -191,20 +164,24 @@ export class GuildRepository {
         }
       }
 
-      // Generate channel image
-      await GuildRepository.generateImageOfChannel(channelData.id);
-
       // Calculate number of messages per day
-      await GuildRepository.calculateNumOfMessagesPerDay(
+      const messagesPerDay = await GuildRepository.calculateNumOfMessagesPerDay(
         channelData.id,
         fetchedMessages
       );
+
+      // Generate channel image
+      if (messagesPerDay > 0) {
+        await GuildRepository.generateImageOfChannel(channelData.id);
+      }
 
       // Create summary
-      await GuildRepository.generateSummaryOfChannel(
-        channelData.id,
-        fetchedMessages
-      );
+      if (messagesPerDay > 0) {
+        await GuildRepository.generateSummaryOfChannel(
+          channelData.id,
+          fetchedMessages
+        );
+      }
     }
 
     // Calculate activity level of channel from 0 to 5
@@ -280,6 +257,8 @@ export class GuildRepository {
         messagesPerDay,
       },
     });
+
+    return messagesPerDay;
   }
 
   static async generateSummaryOfChannel(
