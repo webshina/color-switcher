@@ -1,8 +1,11 @@
 import { UploadDirs } from '#/types/UploadDirs';
 import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import axios from 'axios';
 import formidable from 'formidable';
 import fs from 'fs';
-import * as mime from 'mime-types';
+import * as Path from 'path';
+import { Readable, pipeline } from 'stream';
+import util from 'util';
 
 // Define destination of saving file
 const destination = process.env.AWS_S3_BUCKET ? 's3' : 'local';
@@ -16,23 +19,62 @@ const s3 =
         },
       })
     : undefined;
+const localUploadPath = '../../storage/uploads';
 
-export const getExtensionFromFormidable = async (
+export const getFileTypeAndExtension = (
+  buffer: Buffer
+): { mime: string; ext: string } | null => {
+  // check the first few bytes of the buffer for the file signature
+  const signature = buffer.toString('hex', 0, 4);
+
+  switch (signature) {
+    case 'ffd8ffe0':
+    case 'ffd8ffe1':
+    case 'ffd8ffe2':
+    case 'ffd8ffe3':
+    case 'ffd8ffe8':
+      return { mime: 'image/jpeg', ext: 'jpg' };
+    case '89504e47':
+      return { mime: 'image/png', ext: 'png' };
+    // add more cases as needed...
+    default:
+      return null;
+  }
+};
+
+export const getFileInfoFromBuffer = async (buffer: Buffer) => {
+  const type = getFileTypeAndExtension(buffer);
+  return {
+    buffer: buffer,
+    ext: type?.ext,
+    mimetype: type?.mime,
+  };
+};
+
+export const getFileInfoFromFormidable = async (
   formidableFile: formidable.File | formidable.File[]
 ) => {
   const file = formidableFile as formidable.File;
   const buffer = fs.readFileSync(file.filepath);
   fs.unlinkSync(file.filepath);
-  const mimetype = file.mimetype;
-  const ext = mime.extension(mimetype ?? '');
-  if (!mimetype || !ext) {
+
+  return getFileInfoFromBuffer(buffer);
+};
+
+export const saveFileFromUrl = async (props: {
+  url: string;
+  dir: UploadDirs;
+  fileName: string;
+}) => {
+  const response = await axios(props.url, {
+    responseType: 'arraybuffer',
+  });
+  const buffer = Buffer.from(response.data, 'binary');
+  const type = await getFileInfoFromBuffer(buffer);
+  if (!type.ext || !type.mimetype) {
     throw 'File type is invalid';
   }
-  return {
-    buffer,
-    ext,
-    mimetype,
-  };
+  await uploadFile(props.dir, buffer, props.fileName, type.ext, type.mimetype);
 };
 
 export const uploadFile = async (
@@ -42,7 +84,7 @@ export const uploadFile = async (
   extension: string,
   mimetype: string
 ) => {
-  const path = `uploads/${dir}/${fileName}.${extension}`;
+  const path = `${dir}/${fileName}.${extension}`;
 
   await _uploadToStorage(file, path, mimetype);
 
@@ -58,9 +100,7 @@ export const uploadJson = async (
   fileName: string
 ) => {
   const jsonString = Buffer.from(JSON.stringify(data));
-  const path = `uploads/${dir}/${fileName.split('.')[0]}.${
-    fileName.split('.')[1]
-  }`;
+  const path = `${dir}/${fileName.split('.')[0]}.${fileName.split('.')[1]}`;
 
   await _uploadToStorage(jsonString, path, 'application/json');
 
@@ -85,12 +125,15 @@ const _uploadToStorage = async (
     });
     await s3!.send(command);
   } else {
-    fs.writeFileSync('public/' + path, file);
+    await util.promisify(pipeline)(
+      Readable.from(file),
+      fs.createWriteStream(Path.join(__dirname, localUploadPath, path))
+    );
   }
 };
 
 export const deleteFile = (dir: UploadDirs, fileName: string) => {
-  const path = `uploads/${dir}/${fileName}`;
+  const path = `${dir}/${fileName}`;
 
   if (destination === 's3') {
     s3!.deleteObject(
@@ -98,6 +141,6 @@ export const deleteFile = (dir: UploadDirs, fileName: string) => {
       (err, data) => {}
     );
   } else {
-    fs.unlinkSync('public/' + path);
+    fs.unlinkSync(localUploadPath + '/' + path);
   }
 };

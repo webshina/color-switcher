@@ -43,7 +43,8 @@
       "runtimeArgs": ["-r", "./backend/ts-node-require"],
       "env": {
         "TS_NODE_PROJECT": "./backend/tsconfig.json"
-      }
+      },
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

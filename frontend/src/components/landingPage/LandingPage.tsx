@@ -94,7 +94,7 @@ export const LandingPage: React.FC<Props> = () => {
           <button
             className="px-10 py-3 gradient-bg-purple-to-pink rounded-full text-2xl font-bold"
             onClick={() => {
-              window.open('/server/2', '_blank');
+              window.open('/guild/2', '_blank');
             }}
           >
             Check Demo
@@ -103,7 +103,7 @@ export const LandingPage: React.FC<Props> = () => {
           <button
             className="underline"
             onClick={() => {
-              window.open('/server/1', '_blank');
+              window.open('/guild/1', '_blank');
             }}
           >
             Check Demo 🇯🇵

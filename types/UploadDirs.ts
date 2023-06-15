@@ -1,1 +1,1 @@
-export type UploadDirs = '';
+export type UploadDirs = 'channelImages';

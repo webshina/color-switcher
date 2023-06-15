@@ -20,7 +20,7 @@ async function execute(prompt: string) {
   return response.data.data;
 }
 
-const prompt = '新メンバーが自己紹介を投稿する場';
+const prompt = '千葉';
 execute(prompt)
   .then((result) => {
     console.log('Summary:');
@@ -28,5 +28,5 @@ execute(prompt)
   })
   .catch((error) => {
     console.log('Error:');
-    console.error(error);
+    console.error(error.response.data);
   });

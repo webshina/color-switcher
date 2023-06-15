@@ -12,7 +12,7 @@ const Home: NextPage = () => {
         <button
           className="flex items-center px-4 py-2 gradient-bg-purple-to-pink rounded-xl"
           onClick={() => {
-            router.push('/owner/home/create');
+            router.push('/guild/create');
           }}
         >
           <BsHouseAddFill />

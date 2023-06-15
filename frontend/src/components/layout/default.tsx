@@ -75,13 +75,13 @@ const DefaultLayout: React.FC<Props> = (props) => {
                 </MenuItem>
                 <MenuItem
                   icon={<FaRobot />}
-                  onClick={() => router.push('/server/2')}
+                  onClick={() => router.push('/guild/2')}
                 >
                   Demo
                 </MenuItem>
                 <MenuItem
                   icon={<FaRobot />}
-                  onClick={() => router.push('/server/1')}
+                  onClick={() => router.push('/guild/1')}
                 >
                   Demo 🇯🇵
                 </MenuItem>

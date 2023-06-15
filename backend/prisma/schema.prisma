@@ -78,15 +78,17 @@ model GuildMember {
 
 // Channel model
 model Channel {
-  id                    Int      @id @default(autoincrement())
-  discordId             String
-  name                  String
-  guild                 Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId               Int
-  messageFrequencyScore Int?
-  activityScore         Int?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  discordId      String
+  name           String
+  topic          String?
+  image          String?
+  guild          Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId        Int
+  messagesPerDay Float?
+  activityScore  Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // Channel Summaries
   channelSummaries ChannelSummary[]
