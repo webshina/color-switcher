@@ -97,7 +97,7 @@ export const LandingPage: React.FC<Props> = () => {
               window.open('/guild/2', '_blank');
             }}
           >
-            Check Demo
+            Check Sample Page
           </button>
           <div className="h-5" />
           <button
@@ -106,7 +106,7 @@ export const LandingPage: React.FC<Props> = () => {
               window.open('/guild/1', '_blank');
             }}
           >
-            Check Demo 🇯🇵
+            Check Sample Page 🇯🇵
           </button>
         </div>
       </div>

@@ -64,8 +64,11 @@ const DefaultLayout: React.FC<Props> = (props) => {
               className="!fixed top-[78px]"
             >
               <Menu>
-                {/* <MenuItem>
-                  <CreateDiscordHomeBtn />
+                {/* <MenuItem
+                  icon={<MdDashboardCustomize />}
+                  onClick={() => router.push('/owner/dashboard')}
+                >
+                  Dashboard
                 </MenuItem> */}
                 <MenuItem
                   icon={<AiFillInfoCircle />}
@@ -77,13 +80,13 @@ const DefaultLayout: React.FC<Props> = (props) => {
                   icon={<FaRobot />}
                   onClick={() => router.push('/guild/2')}
                 >
-                  Demo
+                  Sample Page
                 </MenuItem>
                 <MenuItem
                   icon={<FaRobot />}
                   onClick={() => router.push('/guild/1')}
                 >
-                  Demo 🇯🇵
+                  Sample Page 🇯🇵
                 </MenuItem>
                 <MenuItem icon={<BiLogOut />} onClick={logout}>
                   Logout
