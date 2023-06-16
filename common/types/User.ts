@@ -1,4 +1,4 @@
-import { GuildStatus, User } from '../backend/node_modules/.prisma/client';
+import { User } from '../../backend/node_modules/.prisma/client';
 
 export type UserItem = Omit<
   User,
@@ -8,7 +8,6 @@ export type UserItem = Omit<
     id: number;
     discordId: String;
     name: String;
-    status: GuildStatus;
     iconURL: String | null;
     isOwner: boolean;
     permissions: number;

@@ -6,6 +6,7 @@ import { AiFillInfoCircle } from 'react-icons/ai';
 import { BiLogOut } from 'react-icons/bi';
 import { FaRobot } from 'react-icons/fa';
 import { FiMenu } from 'react-icons/fi';
+import { MdDashboardCustomize } from 'react-icons/md';
 import { Menu, MenuItem, ProSidebar } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 import { animated, useSpring } from 'react-spring';
@@ -64,12 +65,12 @@ const DefaultLayout: React.FC<Props> = (props) => {
               className="!fixed top-[78px]"
             >
               <Menu>
-                {/* <MenuItem
+                <MenuItem
                   icon={<MdDashboardCustomize />}
                   onClick={() => router.push('/owner/dashboard')}
                 >
                   Dashboard
-                </MenuItem> */}
+                </MenuItem>
                 <MenuItem
                   icon={<AiFillInfoCircle />}
                   onClick={() => router.push('/landing')}

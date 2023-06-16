@@ -1,4 +1,4 @@
-import { UploadDirs } from '#/types/UploadDirs';
+import { UploadDirs } from '#/common/types/UploadDirs';
 import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import axios from 'axios';
 import formidable from 'formidable';
@@ -143,4 +143,8 @@ export const deleteFile = (dir: UploadDirs, fileName: string) => {
   } else {
     fs.unlinkSync(localUploadPath + '/' + path);
   }
+};
+
+export const getImageUrl = (path: UploadDirs, imageName: string) => {
+  return `${process.env.IMG_BASE_URL}/uploads/${path}/${imageName}`;
 };

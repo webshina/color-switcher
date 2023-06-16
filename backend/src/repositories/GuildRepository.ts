@@ -1,8 +1,10 @@
+import { messages } from '#/common/constants/messages';
+import { GuildItem } from '#/common/types/Guild';
 import { prisma } from '@/lib/prisma';
 import { addToDate } from '@/utils/dateHelper';
 import { saveFileFromUrl } from '@/utils/fileHelper';
 import { isDiscordError } from '@/utils/typeNarrower';
-import { GuildStatus } from '@prisma/client';
+import { Guild as GuildData } from '@prisma/client';
 import axios from 'axios';
 import { loadModule } from 'cld3-asm';
 import {
@@ -15,8 +17,45 @@ import {
 } from 'discord.js';
 import ISO6391 from 'iso-639-1';
 import { Configuration, OpenAIApi } from 'openai';
+import { ChannelRepository } from './ChannelRepository';
 
 export class GuildRepository {
+  static async format(guildData: GuildData) {
+    const channelItems = await ChannelRepository.getByGuildId(guildData.id);
+    const guildItem: GuildItem = {
+      id: guildData.id,
+      discordId: guildData.discordId,
+      name: guildData.name,
+      isPrivate: guildData.isPrivate,
+      inProgress: guildData.inProgress,
+      iconURL: guildData.iconURL,
+      createdByUserId: guildData.createdByUserId,
+      availableChannelCnt: guildData.availableChannelCnt ?? 0,
+      createdChannelCnt: channelItems.length,
+      lastSyncedAt: guildData.lastSyncedAt,
+      channels: channelItems,
+    };
+    return guildItem;
+  }
+
+  static async getById(guildId: number) {
+    const guildData = await prisma.guild.findUnique({
+      where: {
+        id: guildId,
+      },
+      include: {
+        channels: {
+          include: {
+            channelSummaries: true,
+          },
+        },
+      },
+    });
+    if (!guildData) throw new Error('Guild not found');
+
+    return await this.format(guildData);
+  }
+
   static async fetchInfo(discordId: string, createdByUserId: number) {
     const bot = new Client({
       intents: [
@@ -33,29 +72,31 @@ export class GuildRepository {
     const cachedGuilds = bot.guilds.cache;
     const fetchedGuildAvailable = await cachedGuilds.get(discordId)?.fetch();
     if (!fetchedGuildAvailable) {
-      throw new Error('Bot cannot find guild');
-    }
-    if (!fetchedGuildAvailable.available) {
+      throw new Error(messages.botNotInstalled);
+    } else if (!fetchedGuildAvailable.available) {
       throw new Error('Guild is not available');
     }
-    await GuildRepository.generateGuildData({
+    const guildId = await this.generateGuildData({
       guild: fetchedGuildAvailable,
       createdByUserId,
     });
+
+    return guildId;
   }
 
   static async generateGuildData(props: {
     guild: Guild;
     createdByUserId: number;
   }) {
-    const guild = await prisma.guild.upsert({
+    const guildData = await prisma.guild.upsert({
       where: {
         discordId: props.guild.id,
       },
       create: {
         discordId: props.guild.id,
         name: props.guild.name,
-        status: 'published' as GuildStatus,
+        isPrivate: false,
+        inProgress: true,
         iconURL: props.guild.iconURL(),
         createdByUser: {
           connect: {
@@ -73,17 +114,18 @@ export class GuildRepository {
 
     const fetchedChannels = await props.guild.channels.fetch();
     this.generateChannelsData({
-      guildId: guild.id,
+      guildId: guildData.id,
       channels: fetchedChannels.values(),
     });
 
-    return guild;
+    return guildData.id;
   }
 
   static async generateChannelsData(props: {
     guildId: number;
     channels: IterableIterator<NonThreadGuildBasedChannel | null>;
   }) {
+    const availableChannels: TextChannel[] = [];
     for (const channel of props.channels) {
       if (
         !channel ||
@@ -94,21 +136,31 @@ export class GuildRepository {
       ) {
         continue;
       }
-
       const textChannel = channel as TextChannel;
+      availableChannels.push(textChannel);
+    }
+    await prisma.guild.update({
+      where: {
+        id: props.guildId,
+      },
+      data: {
+        availableChannelCnt: availableChannels.length,
+      },
+    });
 
+    for (const channel of availableChannels) {
       // Save channel data to database
       const data = {
-        discordId: textChannel.id,
-        name: textChannel.name,
-        topic: textChannel.topic,
+        discordId: channel.id,
+        name: channel.name,
+        topic: channel.topic,
         guildId: props.guildId,
       };
       const channelData = await prisma.channel.upsert({
         where: {
           guildId_discordId: {
             guildId: props.guildId,
-            discordId: textChannel.id,
+            discordId: channel.id,
           },
         },
         create: {
@@ -122,7 +174,7 @@ export class GuildRepository {
       // Fetch messages
       let fetchedMessages: Collection<string, Message<true>>;
       try {
-        fetchedMessages = await textChannel.messages.fetch({
+        fetchedMessages = await channel.messages.fetch({
           limit: 100,
         });
       } catch (error) {
@@ -170,22 +222,26 @@ export class GuildRepository {
         fetchedMessages
       );
 
-      // Generate channel image
       if (messagesPerDay > 0) {
-        await GuildRepository.generateImageOfChannel(channelData.id);
-      }
+        // Generate channel image
+        await this.generateImageOfChannel(channelData.id);
 
-      // Create summary
-      if (messagesPerDay > 0) {
-        await GuildRepository.generateSummaryOfChannel(
-          channelData.id,
-          fetchedMessages
-        );
+        // Create summary
+        await this.generateSummaryOfChannel(channelData.id, fetchedMessages);
       }
     }
 
     // Calculate activity level of channel from 0 to 5
-    await GuildRepository.calculateActivityLevel(props.guildId);
+    await this.calculateActivityLevel(props.guildId);
+
+    await prisma.guild.update({
+      where: {
+        id: props.guildId,
+      },
+      data: {
+        inProgress: false,
+      },
+    });
   }
 
   static async generateImageOfChannel(channelId: number) {

@@ -9,5 +9,6 @@ router.post('/api/auth/discord', authController.discordConnect);
 router.post('/api/auth/logout', authController.logout);
 router.get('/api/user/me', userController.getMe);
 router.post('/api/guild/generate', guildController.generate);
+router.get('/api/guild/:id', guildController.get);
 
 export { router };

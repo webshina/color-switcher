@@ -1,4 +1,4 @@
-import { UserItem } from '#/types/User';
+import { UserItem } from '#/common/types/User';
 import { get } from '@/utils/apiHelper';
 import useSWR from 'swr';
 

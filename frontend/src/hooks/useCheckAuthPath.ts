@@ -1,4 +1,4 @@
-import { UserItem } from '#/types/User';
+import { UserItem } from '#/common/types/User';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import wildcardMatch from 'wildcard-match';

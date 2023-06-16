@@ -142,7 +142,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
             id={props.id}
             value={props.value ?? ''}
             disabled={props.disabled}
-            placeholder="指定なし"
+            placeholder="Select ..."
             onChange={(e) => {
               props.setValueState && props.setValueState(e.target.value);
               props.onChange && props.onChange(e);

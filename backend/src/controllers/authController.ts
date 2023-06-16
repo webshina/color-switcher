@@ -71,7 +71,8 @@ const discordConnect = async (req: Request, res: Response) => {
       create: {
         discordId: guildData.id,
         name: guildData.name,
-        status: 'provisional',
+        isPrivate: true,
+        inProgress: false,
       },
     });
     await prisma.guildMember.create({

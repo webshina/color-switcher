@@ -1,4 +1,4 @@
-import { DiscordMemberItem } from '#/types/DiscordMember';
+import { DiscordMemberItem } from '#/common/types/DiscordMember';
 import {
   Modal,
   ModalBody,

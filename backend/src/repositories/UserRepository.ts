@@ -1,7 +1,7 @@
+import { UserItem } from '#/common/types/User';
 import { prisma } from '@/lib/prisma';
 import { User } from '@prisma/client';
 import { Request } from 'express';
-import { UserItem } from '../../../types/User';
 
 export class UserRepository {
   static async format(user: User) {
@@ -22,7 +22,8 @@ export class UserRepository {
         id: guildMember.guild.id,
         discordId: guildMember.guild.discordId,
         name: guildMember.guild.name,
-        status: guildMember.guild.status,
+        isPrivate: guildMember.guild.isPrivate,
+        inProgress: guildMember.guild.inProgress,
         iconURL: guildMember.guild.iconURL,
         isOwner: guildMember.isOwner,
         permissions: guildMember.permissions,

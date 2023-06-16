@@ -8,7 +8,7 @@ const { withSentryConfig } = require('@sentry/nextjs');
 
 module.exports = {
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'cdn.discordapp.com'],
   },
 };
 
