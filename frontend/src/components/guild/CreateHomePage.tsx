@@ -47,7 +47,6 @@ export const CreateHomePage: React.FC<Props> = (props) => {
       router.push(`/guild/${createdGuildId}`);
     } catch (error) {
       if (isAxiosError(error)) {
-        console.log(error.response?.data);
         if (error.response?.data === messages.botNotInstalled) {
           onOpenInstallBotModal();
         }

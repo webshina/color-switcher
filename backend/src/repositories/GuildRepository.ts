@@ -3,10 +3,10 @@ import { GuildItem } from '#/common/types/Guild';
 import { prisma } from '@/lib/prisma';
 import { addToDate } from '@/utils/dateHelper';
 import { saveFileFromUrl } from '@/utils/fileHelper';
+import { detectLanguage } from '@/utils/languageHelper';
 import { isDiscordError } from '@/utils/typeNarrower';
 import { Guild as GuildData } from '@prisma/client';
 import axios from 'axios';
-import { loadModule } from 'cld3-asm';
 import {
   Client,
   Collection,
@@ -15,7 +15,6 @@ import {
   NonThreadGuildBasedChannel,
   TextChannel,
 } from 'discord.js';
-import ISO6391 from 'iso-639-1';
 import { Configuration, OpenAIApi } from 'openai';
 import { ChannelRepository } from './ChannelRepository';
 
@@ -56,6 +55,30 @@ export class GuildRepository {
     return await this.format(guildData);
   }
 
+  static async getByUserId(userId: number) {
+    const guildDataList = await prisma.guild.findMany({
+      where: {
+        createdByUserId: userId,
+      },
+      include: {
+        channels: {
+          include: {
+            channelSummaries: true,
+          },
+        },
+      },
+    });
+    if (guildDataList.length === 0)
+      throw new Error('Guild associated to user not found');
+
+    const guildItems = await Promise.all(
+      guildDataList.map(async (guildData) => {
+        return await this.format(guildData);
+      })
+    );
+    return guildItems;
+  }
+
   static async fetchInfo(discordId: string, createdByUserId: number) {
     const bot = new Client({
       intents: [
@@ -70,55 +93,111 @@ export class GuildRepository {
 
     // Fetch Guild Info
     const cachedGuilds = bot.guilds.cache;
-    const fetchedGuildAvailable = await cachedGuilds.get(discordId)?.fetch();
-    if (!fetchedGuildAvailable) {
+    const fetchedGuild = await cachedGuilds.get(discordId)?.fetch();
+    if (!fetchedGuild) {
       throw new Error(messages.botNotInstalled);
-    } else if (!fetchedGuildAvailable.available) {
+    } else if (!fetchedGuild.available) {
       throw new Error('Guild is not available');
     }
-    const guildId = await this.generateGuildData({
-      guild: fetchedGuildAvailable,
+
+    const guildData = await prisma.guild.upsert({
+      where: {
+        discordId: fetchedGuild.id,
+      },
+      create: {
+        discordId: fetchedGuild.id,
+        name: fetchedGuild.name,
+        isPrivate: false,
+        inProgress: true,
+        iconURL: fetchedGuild.iconURL(),
+        createdByUser: {
+          connect: {
+            id: createdByUserId,
+          },
+        },
+      },
+      update: {
+        name: fetchedGuild.name,
+        iconURL: fetchedGuild.iconURL(),
+      },
+    });
+
+    // Execute async tasks
+    this.generateGuildData({
+      fetchedGuild: fetchedGuild,
+      guildData: guildData,
       createdByUserId,
     });
 
-    return guildId;
+    return guildData.id;
   }
 
   static async generateGuildData(props: {
-    guild: Guild;
+    fetchedGuild: Guild;
+    guildData: GuildData;
     createdByUserId: number;
   }) {
-    const guildData = await prisma.guild.upsert({
-      where: {
-        discordId: props.guild.id,
-      },
-      create: {
-        discordId: props.guild.id,
-        name: props.guild.name,
-        isPrivate: false,
-        inProgress: true,
-        iconURL: props.guild.iconURL(),
-        createdByUser: {
-          connect: {
-            id: props.createdByUserId,
-          },
-        },
-        lastSyncedAt: new Date(),
-      },
-      update: {
-        name: props.guild.name,
-        iconURL: props.guild.iconURL(),
-        lastSyncedAt: new Date(),
-      },
-    });
+    const openAiApi = new OpenAIApi(
+      new Configuration({
+        apiKey: process.env.OPENAI_API_KEY,
+      })
+    );
 
-    const fetchedChannels = await props.guild.channels.fetch();
-    this.generateChannelsData({
-      guildId: guildData.id,
+    // Generate channels data
+    const fetchedChannels = await props.fetchedGuild.channels.fetch();
+    await this.generateChannelsData({
+      guildId: props.guildData.id,
       channels: fetchedChannels.values(),
     });
 
-    return guildData.id;
+    // Generate description
+    const channels = await prisma.channel.findMany({
+      where: {
+        guildId: props.guildData.id,
+      },
+      include: {
+        channelSummaries: true,
+      },
+    });
+    const materialsForDescription = JSON.stringify(
+      channels.map((channel) => {
+        return {
+          name: channel.name,
+          summary: channel.channelSummaries.map((summary) => {
+            return summary.content;
+          }),
+        };
+      })
+    );
+    const languageName = await detectLanguage(materialsForDescription);
+    const prompt = `-Create description of Discord server using following channel data. 
+-Describe in bullet points.
+-Describe only in ${languageName}.
+-Describe in 100 words at most.
+
+Channel data:
+${materialsForDescription}
+
+Description:
+`;
+    const openAiResponse = await openAiApi.createCompletion({
+      model: 'text-davinci-003',
+      prompt,
+      temperature: 0.2,
+      max_tokens: 1024,
+    });
+    const summary = openAiResponse.data.choices[0].text;
+    if (!summary) return;
+
+    await prisma.guild.update({
+      where: {
+        id: props.guildData.id,
+      },
+      data: {
+        inProgress: false,
+        lastSyncedAt: new Date(),
+      },
+    });
   }
 
   static async generateChannelsData(props: {
@@ -233,15 +312,6 @@ export class GuildRepository {
 
     // Calculate activity level of channel from 0 to 5
     await this.calculateActivityLevel(props.guildId);
-
-    await prisma.guild.update({
-      where: {
-        id: props.guildId,
-      },
-      data: {
-        inProgress: false,
-      },
-    });
   }
 
   static async generateImageOfChannel(channelId: number) {
@@ -253,7 +323,10 @@ export class GuildRepository {
     if (!channelData) {
       throw new Error('Channel not found');
     }
-    if (!channelData.image) {
+    if (channelData.image) return;
+
+    let imageUrl: string;
+    try {
       const res = await axios(
         `https://api.unsplash.com/search/photos?query=${channelData.name}&page=1&per_page=1`,
         {
@@ -264,13 +337,16 @@ export class GuildRepository {
           },
         }
       );
-      const imageUrl = res.data.results[0]?.urls.small;
-      await saveFileFromUrl({
-        url: imageUrl,
-        dir: 'channelImages',
-        fileName: `${channelData.guildId}-${channelData.id}`,
-      });
+      imageUrl = res.data.results[0]?.urls.small;
+    } catch (error) {
+      console.log(error);
+      imageUrl = 'https://source.unsplash.com/random/800x600';
     }
+    await saveFileFromUrl({
+      url: imageUrl,
+      dir: 'channelImages',
+      fileName: `${channelData.guildId}-${channelData.id}`,
+    });
   }
 
   static async calculateNumOfMessagesPerDay(
@@ -340,16 +416,9 @@ export class GuildRepository {
       .slice(0, 12)
       .reverse();
     if (messagesForSummary.length === 0) return;
-    //// Detect language
-    const cldFactory = await loadModule();
-    const langId = cldFactory.create(0, 700);
-    const languageCode = langId.findMostFrequentLanguages(
-      JSON.stringify(messagesForSummary),
-      3
-    )[0].language;
-    //// Convert language code to language name
-    const languageName = ISO6391.getName(languageCode);
+
     //// Summary by OpenAI
+    const languageName = await detectLanguage(messagesForSummary.join('\n'));
     const prompt = `-Summarize following chat in bullet points.
 -Summarize only in ${languageName}.
 -Summarize in 20 words at most and if the word count is going to be high, old conversations can be ignored.

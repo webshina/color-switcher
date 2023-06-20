@@ -11,17 +11,12 @@ const bot = new Client({
 });
 
 bot.on('ready', async () => {
-  console.log(`Logged in as ${bot.user?.tag}!`);
-
   const guilds = bot.guilds.cache;
 
   for (const guild of guilds.values()) {
-    console.log(`Guild name: ${guild.name}`);
-
     const channels = guild.channels.cache;
 
     for (const channel of channels.values()) {
-      console.log(`Channel name: ${channel.name}`);
       if (channel.isTextBased()) {
         try {
           const messages = await (channel as TextChannel).messages.fetch({

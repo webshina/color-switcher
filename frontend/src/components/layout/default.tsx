@@ -23,7 +23,7 @@ const DefaultLayout: React.FC<Props> = (props) => {
   const stylesSideNav = useSpring({ width: isShowSideNav ? '300px' : '0px' });
   const router = useRouter();
   const screenSize = useScreenSize();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <>
@@ -89,9 +89,11 @@ const DefaultLayout: React.FC<Props> = (props) => {
                 >
                   Sample Page 🇯🇵
                 </MenuItem>
-                <MenuItem icon={<BiLogOut />} onClick={logout}>
-                  Logout
-                </MenuItem>
+                {user && (
+                  <MenuItem icon={<BiLogOut />} onClick={logout}>
+                    Logout
+                  </MenuItem>
+                )}
               </Menu>
             </ProSidebar>
           </div>

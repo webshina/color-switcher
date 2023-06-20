@@ -3,14 +3,14 @@ import React from 'react';
 
 type Props = {
   imgSrc: string;
-  height?: string;
-  width?: string;
+  height?: number;
+  width?: number;
 };
 
 const RoundedImage: React.FC<Props> = ({
   imgSrc,
-  width = '240px',
-  height = '240px',
+  width = 240,
+  height = 240,
 }) => {
   return (
     <>

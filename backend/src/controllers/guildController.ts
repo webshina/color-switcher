@@ -9,7 +9,6 @@ import { Request, Response } from 'express';
 
 const get = async (req: Request, res: Response) => {
   const { id } = req.params;
-  console.log(id);
 
   const result = await GuildRepository.getById(Number(id));
 
@@ -38,4 +37,14 @@ const generate = async (req: Request, res: Response) => {
   }
 };
 
-export default { generate, get };
+const getMine = async (req: Request, res: Response) => {
+  const user = await UserRepository.getLoginUser(req);
+
+  const responseData: FetchGuildResponse[] = await GuildRepository.getByUserId(
+    user.id
+  );
+
+  return res.json(responseData);
+};
+
+export default { generate, get, getMine };
