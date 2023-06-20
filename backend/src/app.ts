@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
+import { localStoragePath } from './config/config';
 import { startDiscordBot } from './eventListeners/discord';
 import { router } from './routes';
 
@@ -18,7 +19,7 @@ const app = express();
 const port = 3005;
 
 // Static files
-app.use(express.static(path.join(__dirname, '../storage')));
+app.use(express.static(localStoragePath));
 
 // Middleware
 app.use(express.json());

@@ -1,4 +1,5 @@
 import { UploadDirs } from '#/common/types/UploadDirs';
+import { localStoragePath } from '@/config/config';
 import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import axios from 'axios';
 import formidable from 'formidable';
@@ -147,4 +148,19 @@ export const deleteFile = (dir: UploadDirs, fileName: string) => {
 
 export const getImageUrl = (path: UploadDirs, imageName: string) => {
   return `${process.env.IMG_BASE_URL}/uploads/${path}/${imageName}`;
+};
+
+export const copyFile = async (
+  fromFilePath: string,
+  toDir: string,
+  toFileName: string
+) => {
+  const copyFile = util.promisify(fs.copyFile);
+
+  // Define the source and destination directories
+  const srcFile = Path.resolve(__dirname, localStoragePath, fromFilePath);
+  const destFile = Path.resolve(__dirname, localStoragePath, toDir, toFileName);
+
+  // Copy the file
+  await copyFile(srcFile, destFile);
 };

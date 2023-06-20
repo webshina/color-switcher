@@ -1,12 +1,13 @@
 import { messages } from '#/common/constants/messages';
 import { GuildItem } from '#/common/types/Guild';
+import { UploadDirs } from '#/common/types/UploadDirs';
 import { prisma } from '@/lib/prisma';
 import { addToDate } from '@/utils/dateHelper';
-import { saveFileFromUrl } from '@/utils/fileHelper';
+import { copyFile, saveFileFromUrl } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
 import { isDiscordError } from '@/utils/typeNarrower';
 import { Guild as GuildData } from '@prisma/client';
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 import {
   Client,
   Collection,
@@ -325,7 +326,6 @@ Description:
     }
     if (channelData.image) return;
 
-    let imageUrl: string;
     try {
       const res = await axios(
         `https://api.unsplash.com/search/photos?query=${channelData.name}&page=1&per_page=1`,
@@ -337,16 +337,20 @@ Description:
           },
         }
       );
-      imageUrl = res.data.results[0]?.urls.small;
+      const imageUrl = res.data.results[0]?.urls.small;
+      await saveFileFromUrl({
+        url: imageUrl,
+        dir: 'channelImages',
+        fileName: `${channelData.guildId}-${channelData.id}`,
+      });
     } catch (error) {
-      console.log(error);
-      imageUrl = 'https://source.unsplash.com/random/800x600';
+      if (isAxiosError(error)) {
+        await this.copyRandomImage(
+          'channelImages',
+          `${channelData.guildId}-${channelData.id}.jpg`
+        );
+      }
     }
-    await saveFileFromUrl({
-      url: imageUrl,
-      dir: 'channelImages',
-      fileName: `${channelData.guildId}-${channelData.id}`,
-    });
   }
 
   static async calculateNumOfMessagesPerDay(
@@ -498,5 +502,17 @@ Summary:
         },
       });
     }
+  }
+
+  static async copyRandomImage(toDir: UploadDirs, toFileName: string) {
+    const fromDir = 'randomImages';
+    // Generate random number of 1-10
+    const randomNum = Math.floor(Math.random() * 10) + 1;
+    const fromFileName = `${randomNum}.jpeg`;
+    await copyFile(
+      `${fromDir}/${fromFileName}`,
+      `uploads/${toDir}`,
+      toFileName
+    );
   }
 }
