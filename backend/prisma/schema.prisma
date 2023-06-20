@@ -55,7 +55,8 @@ model Guild {
   members GuildMember[]
 
   // Channels
-  channels Channel[]
+  channels        Channel[]
+  ChannelCategory ChannelCategory[]
 }
 
 // GuildMember model
@@ -74,17 +75,19 @@ model GuildMember {
 
 // Channel model
 model Channel {
-  id             Int      @id @default(autoincrement())
+  id             Int              @id @default(autoincrement())
   discordId      String
   name           String
   topic          String?
   image          String?
-  guild          Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guild          Guild            @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId        Int
+  category       ChannelCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId     Int?
   messagesPerDay Float?
   activityScore  Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   // Channel Summaries
   channelSummaries ChannelSummary[]
@@ -103,6 +106,22 @@ model ChannelSummary {
   content   String   @db.LongText
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Channel Category model
+model ChannelCategory {
+  id        Int      @id @default(autoincrement())
+  discordId String
+  name      String
+  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Channels
+  channels Channel[]
+
+  @@unique([guildId, discordId])
 }
 
 // Message model

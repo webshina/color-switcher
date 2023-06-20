@@ -6,7 +6,7 @@ import { addToDate } from '@/utils/dateHelper';
 import { copyFile, saveFileFromUrl } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
 import { isDiscordError } from '@/utils/typeNarrower';
-import { Guild as GuildData } from '@prisma/client';
+import { ChannelCategory, Guild as GuildData } from '@prisma/client';
 import axios, { isAxiosError } from 'axios';
 import {
   Client,
@@ -229,12 +229,34 @@ Description:
     });
 
     for (const channel of availableChannels) {
+      // Save category data to database
+      let categoryData: ChannelCategory | null = null;
+      if (channel.parent) {
+        categoryData = await prisma.channelCategory.upsert({
+          where: {
+            guildId_discordId: {
+              guildId: props.guildId,
+              discordId: channel.parent.id,
+            },
+          },
+          create: {
+            discordId: channel.parent.id,
+            name: channel.parent.name,
+            guildId: props.guildId,
+          },
+          update: {
+            name: channel.parent.name,
+          },
+        });
+      }
+
       // Save channel data to database
-      const data = {
+      const creatingChannelData = {
         discordId: channel.id,
         name: channel.name,
         topic: channel.topic,
         guildId: props.guildId,
+        categoryId: categoryData?.id,
       };
       const channelData = await prisma.channel.upsert({
         where: {
@@ -243,12 +265,8 @@ Description:
             discordId: channel.id,
           },
         },
-        create: {
-          ...data,
-        },
-        update: {
-          ...data,
-        },
+        create: creatingChannelData,
+        update: creatingChannelData,
       });
 
       // Fetch messages

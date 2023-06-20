@@ -2,7 +2,9 @@ import { useGuild } from '@/hooks/repository/useGuild';
 import { Progress } from '@chakra-ui/react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { mutate } from 'swr';
+import { Channels } from '../Channels';
 import CircleImage from '../utils/CircleImage';
+import Title from '../utils/Title';
 
 type Props = {
   guildId: number;
@@ -66,10 +68,10 @@ export const GuildHomePage: React.FC<Props> = (props) => {
   <div className="h-16" /> */}
 
               {/* Channel list */}
-              {/* <Title title={'Channels'} />
-  <div className="h-8" />
-  <Channels channels={guild.channels} />
-  <div className="h-16" /> */}
+              <Title title={'Channels'} />
+              <div className="h-8" />
+              <Channels channels={guild.channels} />
+              <div className="h-16" />
 
               {/* Member list */}
               {/* <Title title={'Members'} />

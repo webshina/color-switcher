@@ -11,6 +11,7 @@ export class ChannelRepository {
       name: channel.name,
       topic: channel.topic,
       guildId: channel.guildId,
+      categoryId: channel.categoryId,
       imageURL: channel.image && getImageUrl('channelImages', channel.image),
       activityScore: channel.activityScore,
       messagesPerDay: channel.messagesPerDay,
