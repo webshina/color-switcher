@@ -159,9 +159,9 @@ export class GuildRepository {
 
     this.generateDescription(props.guildData.id);
 
-    this.generateTags(props.guildData.id);
-
-    this.generateGuildImage(props.guildData.id);
+    this.generateTags(props.guildData.id).then(() => {
+      this.generateGuildImage(props.guildData.id);
+    });
 
     await prisma.guild.update({
       where: {
@@ -251,21 +251,22 @@ Description:
     const materialsForTags = JSON.stringify(
       channels.map((channel) => {
         return {
-          name: channel.name,
-          summaries: channel.channelSummaries.map((summary) => {
+          channelName: channel.name,
+          channelSummaries: channel.channelSummaries.map((summary) => {
             return summary.content;
           }),
         };
       })
     );
     const languageName = await detectLanguage(materialsForTags);
-    const prompt = `-Create keywords of Discord server using following channel data.
+    const prompt = `-Create keywords of this Discord server using following channel data.
 -Comma-separated output.
 -Only in ${languageName}.
 -List at most 5.
+-In order of relevance.
 
 Channel data:
-"[{\"name\":\"一般\",\"summaries\":[\"ABC、こんにちは、暗号通貨について質問。\",\"ビットコイン、イーサリアムの違い。\",\"取引所選択から始めることを勧める。\"]},{\"name\":\"ブロックチェーン基本理論\",\"summaries\":[\"ブロックチェーンの分散型ネットワークについて学びました。\",\"ビットコインで取引記録を参加者全員で共有することで改ざんを防ぐ。\"]},{\"name\":\"ビットコイントーク\",\"summaries\":[\" ビットコイン価格の予測は難しい：経済状況・政策・マーケットセンチメントなどに影響。\",\" 高リスク・高リターン：ビットコインの投資について。\"]},{\"name\":\"イーサリアムとスマートコントラクト\",\"summaries\":[\"スマートコントラクトの良い例：DeFi、NFT\",\"DeFi：貸借、取引を自動化\",\"NFT：スマートコントラクトを活用\"]},{\"name\":\"アルトコイン情報交換\",\"summaries\":[\"ADA（Cardano）が注目されている。\",\"プロジェクトは興味深いが、投資はリスクを理解して行うべき。\",\"新プロジェクトが出てきているため、情報収集も大切。\"]},{\"name\":\"暗号資産税法\",\"summaries\":[\"暗号資産の利益は、日本では所得税の一部として課税される。\",\"詳細は専門家に相談することを推奨。\",\"取引だけでなくマイニングなども税務上の影響を受ける。\"]}]"
+${materialsForTags}
 
 Keywords:
     
