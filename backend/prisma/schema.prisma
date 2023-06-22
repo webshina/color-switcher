@@ -41,6 +41,8 @@ model Guild {
   id                  Int       @id @default(autoincrement())
   discordId           String    @unique
   name                String
+  description         String?   @db.LongText
+  coverImage          String?
   isPrivate           Boolean
   inProgress          Boolean
   iconURL             String?
@@ -53,6 +55,9 @@ model Guild {
 
   // Members
   members GuildMember[]
+
+  // Tags
+  tags GuildTag[]
 
   // Channels
   channels        Channel[]
@@ -71,6 +76,16 @@ model GuildMember {
   permissions    Int
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+// GuildTags model
+model GuildTag {
+  id        Int      @id @default(autoincrement())
+  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId   Int
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Channel model

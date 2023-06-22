@@ -1,31 +1,37 @@
 import { messages } from '#/common/constants/messages';
 import { GuildItem } from '#/common/types/Guild';
-import { UploadDirs } from '#/common/types/UploadDirs';
 import { prisma } from '@/lib/prisma';
-import { addToDate } from '@/utils/dateHelper';
-import { copyFile, saveFileFromUrl } from '@/utils/fileHelper';
-import { detectLanguage } from '@/utils/languageHelper';
-import { isDiscordError } from '@/utils/typeNarrower';
-import { ChannelCategory, Guild as GuildData } from '@prisma/client';
-import axios, { isAxiosError } from 'axios';
 import {
-  Client,
-  Collection,
-  Guild,
-  Message,
-  NonThreadGuildBasedChannel,
-  TextChannel,
-} from 'discord.js';
+  copyRandomImage,
+  getImageUrl,
+  saveFileFromUrl,
+} from '@/utils/fileHelper';
+import { detectLanguage } from '@/utils/languageHelper';
+import { Guild as GuildData } from '@prisma/client';
+import axios, { isAxiosError } from 'axios';
+import { Client, Guild } from 'discord.js';
 import { Configuration, OpenAIApi } from 'openai';
 import { ChannelRepository } from './ChannelRepository';
 
 export class GuildRepository {
   static async format(guildData: GuildData) {
     const channelItems = await ChannelRepository.getByGuildId(guildData.id);
+
+    // Fetch tags
+    const guildTags = await prisma.guildTag.findMany({
+      where: {
+        guildId: guildData.id,
+      },
+    });
+
     const guildItem: GuildItem = {
       id: guildData.id,
       discordId: guildData.discordId,
       name: guildData.name,
+      description: guildData.description,
+      coverImageUrl:
+        guildData.coverImage &&
+        getImageUrl('guildImages', guildData.coverImage),
       isPrivate: guildData.isPrivate,
       inProgress: guildData.inProgress,
       iconURL: guildData.iconURL,
@@ -34,6 +40,11 @@ export class GuildRepository {
       createdChannelCnt: channelItems.length,
       lastSyncedAt: guildData.lastSyncedAt,
       channels: channelItems,
+      tags: guildTags.map((guildTag) => ({
+        id: guildTag.id,
+        name: guildTag.name,
+        guildId: guildTag.guildId,
+      })),
     };
     return guildItem;
   }
@@ -69,8 +80,9 @@ export class GuildRepository {
         },
       },
     });
-    if (guildDataList.length === 0)
-      throw new Error('Guild associated to user not found');
+    if (guildDataList.length === 0) {
+      return [];
+    }
 
     const guildItems = await Promise.all(
       guildDataList.map(async (guildData) => {
@@ -138,57 +150,18 @@ export class GuildRepository {
     guildData: GuildData;
     createdByUserId: number;
   }) {
-    const openAiApi = new OpenAIApi(
-      new Configuration({
-        apiKey: process.env.OPENAI_API_KEY,
-      })
-    );
-
     // Generate channels data
     const fetchedChannels = await props.fetchedGuild.channels.fetch();
-    await this.generateChannelsData({
+    await ChannelRepository.generateChannelsData({
       guildId: props.guildData.id,
       channels: fetchedChannels.values(),
     });
 
-    // Generate description
-    const channels = await prisma.channel.findMany({
-      where: {
-        guildId: props.guildData.id,
-      },
-      include: {
-        channelSummaries: true,
-      },
-    });
-    const materialsForDescription = JSON.stringify(
-      channels.map((channel) => {
-        return {
-          name: channel.name,
-          summary: channel.channelSummaries.map((summary) => {
-            return summary.content;
-          }),
-        };
-      })
-    );
-    const languageName = await detectLanguage(materialsForDescription);
-    const prompt = `-Create description of Discord server using following channel data. 
--Describe in bullet points.
--Describe only in ${languageName}.
--Describe in 100 words at most.
+    this.generateDescription(props.guildData.id);
 
-Channel data:
-${materialsForDescription}
+    this.generateTags(props.guildData.id);
 
-Description:
-`;
-    const openAiResponse = await openAiApi.createCompletion({
-      model: 'text-davinci-003',
-      prompt,
-      temperature: 0.2,
-      max_tokens: 1024,
-    });
-    const summary = openAiResponse.data.choices[0].text;
-    if (!summary) return;
+    this.generateGuildImage(props.guildData.id);
 
     await prisma.guild.update({
       where: {
@@ -201,336 +174,188 @@ Description:
     });
   }
 
-  static async generateChannelsData(props: {
-    guildId: number;
-    channels: IterableIterator<NonThreadGuildBasedChannel | null>;
-  }) {
-    const availableChannels: TextChannel[] = [];
-    for (const channel of props.channels) {
-      if (
-        !channel ||
-        !channel.isTextBased() ||
-        channel.isThread() ||
-        channel.isVoiceBased() ||
-        !channel.viewable
-      ) {
-        continue;
-      }
-      const textChannel = channel as TextChannel;
-      availableChannels.push(textChannel);
-    }
-    await prisma.guild.update({
-      where: {
-        id: props.guildId,
-      },
-      data: {
-        availableChannelCnt: availableChannels.length,
-      },
-    });
-
-    for (const channel of availableChannels) {
-      // Save category data to database
-      let categoryData: ChannelCategory | null = null;
-      if (channel.parent) {
-        categoryData = await prisma.channelCategory.upsert({
-          where: {
-            guildId_discordId: {
-              guildId: props.guildId,
-              discordId: channel.parent.id,
-            },
-          },
-          create: {
-            discordId: channel.parent.id,
-            name: channel.parent.name,
-            guildId: props.guildId,
-          },
-          update: {
-            name: channel.parent.name,
-          },
-        });
-      }
-
-      // Save channel data to database
-      const creatingChannelData = {
-        discordId: channel.id,
-        name: channel.name,
-        topic: channel.topic,
-        guildId: props.guildId,
-        categoryId: categoryData?.id,
-      };
-      const channelData = await prisma.channel.upsert({
-        where: {
-          guildId_discordId: {
-            guildId: props.guildId,
-            discordId: channel.id,
-          },
-        },
-        create: creatingChannelData,
-        update: creatingChannelData,
-      });
-
-      // Fetch messages
-      let fetchedMessages: Collection<string, Message<true>>;
-      try {
-        fetchedMessages = await channel.messages.fetch({
-          limit: 100,
-        });
-      } catch (error) {
-        if (isDiscordError(error)) {
-          if (error.code === 50001) {
-            // Bot doesn't have permission to access this channel
-            continue;
-          } else {
-            throw error;
-          }
-        } else {
-          throw error;
-        }
-      }
-
-      // Save messages to database
-      for (const fetchedMessage of fetchedMessages.values()) {
-        if (
-          fetchedMessage.content &&
-          !fetchedMessage.author.bot &&
-          fetchedMessage.content !== ''
-        ) {
-          await prisma.message.upsert({
-            where: {
-              channelId_discordId: {
-                channelId: channelData.id,
-                discordId: fetchedMessage.id,
-              },
-            },
-            create: {
-              discordId: fetchedMessage.id,
-              content: fetchedMessage.content,
-              authorDiscordId: fetchedMessage.author.id,
-              channelId: channelData.id,
-              createdAt: fetchedMessage.createdAt,
-            },
-            update: {},
-          });
-        }
-      }
-
-      // Calculate number of messages per day
-      const messagesPerDay = await GuildRepository.calculateNumOfMessagesPerDay(
-        channelData.id,
-        fetchedMessages
-      );
-
-      if (messagesPerDay > 0) {
-        // Generate channel image
-        await this.generateImageOfChannel(channelData.id);
-
-        // Create summary
-        await this.generateSummaryOfChannel(channelData.id, fetchedMessages);
-      }
-    }
-
-    // Calculate activity level of channel from 0 to 5
-    await this.calculateActivityLevel(props.guildId);
-  }
-
-  static async generateImageOfChannel(channelId: number) {
-    const channelData = await prisma.channel.findUnique({
-      where: {
-        id: channelId,
-      },
-    });
-    if (!channelData) {
-      throw new Error('Channel not found');
-    }
-    if (channelData.image) return;
-
-    try {
-      const res = await axios(
-        `https://api.unsplash.com/search/photos?query=${channelData.name}&page=1&per_page=1`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept-Version': 'v1',
-            Authorization: `Client-ID ${process.env.UNSPLASH_API_ACCESS_KEY}`,
-          },
-        }
-      );
-      const imageUrl = res.data.results[0]?.urls.small;
-      await saveFileFromUrl({
-        url: imageUrl,
-        dir: 'channelImages',
-        fileName: `${channelData.guildId}-${channelData.id}`,
-      });
-    } catch (error) {
-      if (isAxiosError(error)) {
-        await this.copyRandomImage(
-          'channelImages',
-          `${channelData.guildId}-${channelData.id}.jpg`
-        );
-      }
-    }
-  }
-
-  static async calculateNumOfMessagesPerDay(
-    channelId: number,
-    fetchedMessages: Collection<string, Message<true>>
-  ) {
-    const now = new Date();
-    let messagesPerDay = 0;
-    const oneWeekAgo = addToDate(now, { date: -7 });
-    const firstMessageCreatedAt =
-      fetchedMessages.last()?.createdAt ?? new Date();
-    const lastMessageCreatedAt =
-      fetchedMessages.first()?.createdAt ?? new Date();
-    const daysElapsedSinceFirstMessageCreated =
-      (now.getTime() - firstMessageCreatedAt.getTime()) / (1000 * 60 * 60 * 24);
-
-    if (fetchedMessages.size === 0 || lastMessageCreatedAt < oneWeekAgo) {
-      // No messages in the last week, set score to 0
-      messagesPerDay = 0;
-    } else {
-      // Calculate score
-      let cnt = 0;
-      for (const fetchedMessage of fetchedMessages.values()) {
-        if (
-          fetchedMessage.content &&
-          fetchedMessage.content !== '' &&
-          !fetchedMessage.author.bot
-        ) {
-          cnt++;
-        }
-      }
-      messagesPerDay = cnt / daysElapsedSinceFirstMessageCreated;
-    }
-
-    await prisma.channel.update({
-      where: {
-        id: channelId,
-      },
-      data: {
-        messagesPerDay,
-      },
-    });
-
-    return messagesPerDay;
-  }
-
-  static async generateSummaryOfChannel(
-    channelId: number,
-    fetchedMessages: Collection<string, Message<true>>
-  ) {
+  static async generateDescription(guildId: number) {
     const openAiApi = new OpenAIApi(
       new Configuration({
         apiKey: process.env.OPENAI_API_KEY,
       })
     );
-    const messagesForSummary = fetchedMessages
-      .filter((fetchedMessage) => {
-        if (
-          fetchedMessage.content &&
-          !fetchedMessage.author.bot &&
-          fetchedMessage.content !== ''
-        ) {
-          return true;
-        }
+
+    const channels = await prisma.channel.findMany({
+      where: {
+        guildId,
+      },
+      include: {
+        channelSummaries: true,
+      },
+    });
+    const materialsForDescription = JSON.stringify(
+      channels.map((channel) => {
+        return {
+          name: channel.name,
+          summaries: channel.channelSummaries.map((summary) => {
+            return summary.content;
+          }),
+        };
       })
-      .map((fetchedMessage) => fetchedMessage.content)
-      .slice(0, 12)
-      .reverse();
-    if (messagesForSummary.length === 0) return;
+    );
+    const languageName = await detectLanguage(materialsForDescription);
+    const prompt = `-Create description of Discord server using following channel data. 
+-Describe in bullet points.
+-Describe only in ${languageName}.
+-Describe in 300 characters or less.
+-Format it for easy viewing.
+-Include purpose of the server.
 
-    //// Summary by OpenAI
-    const languageName = await detectLanguage(messagesForSummary.join('\n'));
-    const prompt = `-Summarize following chat in bullet points.
--Summarize only in ${languageName}.
--Summarize in 20 words at most and if the word count is going to be high, old conversations can be ignored.
+Channel data:
+${materialsForDescription}
 
-Chat:
-${JSON.stringify(messagesForSummary)}
+Description:
 
-Summary:
 `;
+
     const openAiResponse = await openAiApi.createCompletion({
       model: 'text-davinci-003',
       prompt,
-      temperature: 0.2,
-      max_tokens: 516,
+      temperature: 0.8,
+      max_tokens: 1024,
     });
     const summary = openAiResponse.data.choices[0].text;
-    if (!summary) return;
-
-    // Save summary to database
-    await prisma.channelSummary.create({
-      data: {
-        channelId,
-        content: summary,
-      },
-    });
-  }
-
-  static async calculateActivityLevel(guildId: number) {
-    const channels = await prisma.channel.findMany({
-      where: {
-        guildId: guildId,
-      },
-    });
-    const messagesPerDays = channels
-      // Filter out channels that don't have messagesPerDay
-      .filter((channel) => {
-        if (channel.messagesPerDay !== null) {
-          return true;
-        }
-      })
-      .map((channel) => channel.messagesPerDay!);
-    const maxMessagesPerDay = Math.max(...messagesPerDays);
-    const minMessagesPerDay = Math.min(...messagesPerDays);
-    let activityScore = 0;
-    for (const channel of channels) {
-      if (channels.length <= 5) {
-        // If number of channels is a little, evaluate activityScore on an absolute scale
-        const messagesPerDay = channels[0].messagesPerDay!;
-        if (messagesPerDay === 0) {
-          activityScore = 0;
-        } else if (messagesPerDay < 0.1) {
-          activityScore = 1;
-        } else if (messagesPerDay < 1) {
-          activityScore = 2;
-        } else if (messagesPerDay < 3) {
-          activityScore = 3;
-        } else if (messagesPerDay < 10) {
-          activityScore = 4;
-        } else if (messagesPerDay >= 10) {
-          activityScore = 5;
-        }
-      } else {
-        activityScore =
-          maxMessagesPerDay === 0 && minMessagesPerDay === 0
-            ? 0
-            : Math.round(
-                (channel.messagesPerDay! - minMessagesPerDay) /
-                  (maxMessagesPerDay - minMessagesPerDay)
-              ) * 5;
-      }
-      await prisma.channel.update({
+    if (summary) {
+      await prisma.guild.update({
         where: {
-          id: channel.id,
+          id: guildId,
         },
         data: {
-          activityScore,
+          description: summary,
         },
       });
     }
   }
 
-  static async copyRandomImage(toDir: UploadDirs, toFileName: string) {
-    const fromDir = 'randomImages';
-    // Generate random number of 1-10
-    const randomNum = Math.floor(Math.random() * 10) + 1;
-    const fromFileName = `${randomNum}.jpeg`;
-    await copyFile(
-      `${fromDir}/${fromFileName}`,
-      `uploads/${toDir}`,
-      toFileName
+  static async generateTags(guildId: number) {
+    const openAiApi = new OpenAIApi(
+      new Configuration({
+        apiKey: process.env.OPENAI_API_KEY,
+      })
     );
+
+    const channels = await prisma.channel.findMany({
+      where: {
+        guildId,
+      },
+      include: {
+        channelSummaries: true,
+      },
+    });
+    const materialsForTags = JSON.stringify(
+      channels.map((channel) => {
+        return {
+          name: channel.name,
+          summaries: channel.channelSummaries.map((summary) => {
+            return summary.content;
+          }),
+        };
+      })
+    );
+    const languageName = await detectLanguage(materialsForTags);
+    const prompt = `-Create keywords of Discord server using following channel data.
+-Comma-separated output.
+-Only in ${languageName}.
+-List at most 5.
+
+Channel data:
+"[{\"name\":\"一般\",\"summaries\":[\"ABC、こんにちは、暗号通貨について質問。\",\"ビットコイン、イーサリアムの違い。\",\"取引所選択から始めることを勧める。\"]},{\"name\":\"ブロックチェーン基本理論\",\"summaries\":[\"ブロックチェーンの分散型ネットワークについて学びました。\",\"ビットコインで取引記録を参加者全員で共有することで改ざんを防ぐ。\"]},{\"name\":\"ビットコイントーク\",\"summaries\":[\" ビットコイン価格の予測は難しい：経済状況・政策・マーケットセンチメントなどに影響。\",\" 高リスク・高リターン：ビットコインの投資について。\"]},{\"name\":\"イーサリアムとスマートコントラクト\",\"summaries\":[\"スマートコントラクトの良い例：DeFi、NFT\",\"DeFi：貸借、取引を自動化\",\"NFT：スマートコントラクトを活用\"]},{\"name\":\"アルトコイン情報交換\",\"summaries\":[\"ADA（Cardano）が注目されている。\",\"プロジェクトは興味深いが、投資はリスクを理解して行うべき。\",\"新プロジェクトが出てきているため、情報収集も大切。\"]},{\"name\":\"暗号資産税法\",\"summaries\":[\"暗号資産の利益は、日本では所得税の一部として課税される。\",\"詳細は専門家に相談することを推奨。\",\"取引だけでなくマイニングなども税務上の影響を受ける。\"]}]"
+
+Keywords:
+    
+`;
+
+    const openAiResponse = await openAiApi.createCompletion({
+      model: 'text-davinci-003',
+      prompt,
+      temperature: 0.8,
+      max_tokens: 1024,
+    });
+    const tags = openAiResponse.data.choices[0].text;
+    if (tags) {
+      await prisma.guildTag.deleteMany({
+        where: {
+          guildId,
+        },
+      });
+      const tagsArray = tags.split(',').map((tag) => tag.trim());
+      await Promise.all(
+        tagsArray.map(async (tag) => {
+          await prisma.guildTag.create({
+            data: {
+              guildId,
+              name: tag,
+            },
+          });
+        })
+      );
+    }
+  }
+
+  static async generateGuildImage(guildId: number) {
+    const guild = await prisma.guild.findUnique({
+      where: {
+        id: guildId,
+      },
+      include: {
+        tags: true,
+      },
+    });
+    if (!guild) {
+      throw new Error('Guild not found');
+    }
+    if (guild.coverImage) {
+      return;
+    }
+
+    let imageName: string | null = null;
+    for (const tag of guild?.tags) {
+      try {
+        const res = await axios(
+          `https://api.unsplash.com/search/photos?query=${tag.name}&page=1&per_page=1`,
+          {
+            method: 'GET',
+            headers: {
+              'Accept-Version': 'v1',
+              Authorization: `Client-ID ${process.env.UNSPLASH_API_ACCESS_KEY}`,
+            },
+          }
+        );
+        const imageUrl = res.data.results[0]?.urls.regular;
+        if (imageUrl) {
+          const { fileName: savedImageName } = await saveFileFromUrl({
+            url: imageUrl,
+            dir: 'guildImages',
+            fileName: `${guild.id}`,
+          });
+          imageName = savedImageName;
+          break;
+        }
+      } catch (error) {
+        if (isAxiosError(error)) {
+          continue;
+        }
+      }
+    }
+
+    if (!imageName) {
+      imageName = `${guild.id}`;
+      await copyRandomImage('guildImages', `${guild.id}.jpg`);
+    }
+
+    await prisma.guild.update({
+      where: {
+        id: guildId,
+      },
+      data: {
+        coverImage: imageName,
+      },
+    });
   }
 }

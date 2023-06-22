@@ -1,1 +1,1 @@
-export type UploadDirs = 'channelImages';
+export type UploadDirs = 'guildImages' | 'channelImages';

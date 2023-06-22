@@ -4,7 +4,7 @@ import React, { ReactNode } from 'react';
 type Props = {
   imgSrc: string;
   title: string;
-  subTitle?: string;
+  subTitle?: string | null;
   children: ReactNode;
   width?: number;
   id?: string;
@@ -29,9 +29,11 @@ const ImageCard: React.FC<Props> = (props) => {
           </div>
           <div className="absolute bottom-0 p-2 w-full bg-black/40">
             <div className="font-bold">{props.title}</div>
-            <div className="h-2" />
-            <div className="h-[30px] text-sm">{props.subTitle}</div>
-            <div className="h-2" />
+            {props.subTitle && (
+              <>
+                <div className="h-[30px] my-2 text-sm">{props.subTitle}</div>
+              </>
+            )}
           </div>
         </div>
         <div className="px-3 py-1">{props.children}</div>

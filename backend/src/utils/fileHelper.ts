@@ -76,6 +76,10 @@ export const saveFileFromUrl = async (props: {
     throw 'File type is invalid';
   }
   await uploadFile(props.dir, buffer, props.fileName, type.ext, type.mimetype);
+
+  return {
+    fileName: `${props.fileName}.${type.ext}`,
+  };
 };
 
 export const uploadFile = async (
@@ -163,4 +167,15 @@ export const copyFile = async (
 
   // Copy the file
   await copyFile(srcFile, destFile);
+};
+
+export const copyRandomImage = async (
+  toDir: UploadDirs,
+  toFileName: string
+) => {
+  const fromDir = 'randomImages';
+  // Generate random number of 1-10
+  const randomNum = Math.floor(Math.random() * 10) + 1;
+  const fromFileName = `${randomNum}.jpeg`;
+  await copyFile(`${fromDir}/${fromFileName}`, `uploads/${toDir}`, toFileName);
 };

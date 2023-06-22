@@ -1,4 +1,4 @@
-import { ChannelItem } from '#/common/types/Channel';
+import { ChannelCategoryItem, ChannelItem } from '#/common/types/Channel';
 import {
   Accordion,
   AccordionButton,
@@ -8,29 +8,32 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { ActivityLevel } from './common/ActiveLevel';
-import { JumpChannelBtn } from './common/JumpChannelBtn';
 import ImageCard from './utils/ImageCard';
 
 type Props = {
   channels: ChannelItem[];
 };
 export const Channels: React.FC<Props> = (props) => {
-  console.log(props.channels);
-  const categories: any[] = [];
+  const categories: (ChannelCategoryItem & {
+    channels: ChannelItem[];
+  })[] = [];
   props.channels.map((channel) => {
-    if (!categories.some((category) => category.id === channel.category.id)) {
-      categories.push(channel.category);
+    if (!categories.some((category) => category.id === channel.categoryId)) {
+      categories.push({
+        ...channel.category!,
+        channels: [],
+      });
     }
   });
-  // // Add channels to each category
-  // categories.map((category) => {
-  //   category.channels = [];
-  //   props.channels.map((channel) => {
-  //     if (channel.category.id === category.id) {
-  //       category.channels.push(channel);
-  //     }
-  //   });
-  // });
+  // Add channels to each category
+  categories.map((category) => {
+    category.channels = [];
+    props.channels.map((channel) => {
+      if (channel.categoryId === category.id) {
+        category.channels.push(channel);
+      }
+    });
+  });
   return (
     <Accordion defaultIndex={[0]} allowMultiple>
       {categories.map((category) => (
@@ -45,21 +48,21 @@ export const Channels: React.FC<Props> = (props) => {
           </h2>
           <AccordionPanel p={0} pb={4}>
             <div className="flex flex-wrap">
-              {category.channels.map((channel: any) => (
-                <>
-                  {channel.activityLevel > 3 ? (
+              {category.channels.map((channel) => (
+                <div key={channel.id}>
+                  {channel.activityScore! > 3 ? (
                     // High activity level
                     <>
                       <div key={channel.id} className="m-1">
                         <ImageCard
-                          imgSrc={channel.imageUrl}
+                          imgSrc={channel.imageURL!}
                           title={channel.name}
-                          subTitle={channel.description}
+                          subTitle={channel.topic}
                           width={350}
                         >
                           <div className="mx-1 my-3">
                             {/* Active level */}
-                            <ActivityLevel level={channel.activityLevel} />
+                            <ActivityLevel level={channel.activityScore!} />
                             <div className="h-5" />
                             {/* Conversation Summary */}
                             <div className="text-sm font-semibold">
@@ -67,26 +70,21 @@ export const Channels: React.FC<Props> = (props) => {
                             </div>
                             <div className="h-3" />
                             <div className="p-4 h-48 overflow-auto rounded-md bg-slate-800">
-                              {channel.conversationSummaries.map(
-                                (summary: string, index: number) => {
-                                  return (
-                                    <div key={index}>
-                                      <li
-                                        key={index}
-                                        className="p-3 rounded-md bg-white/10 text-sm"
-                                      >
-                                        {summary}
-                                      </li>
-                                      <div className="h-1" />
-                                    </div>
-                                  );
-                                }
-                              )}
+                              {channel.summaries.map((summary) => {
+                                return (
+                                  <div
+                                    key={summary.id}
+                                    className="my-1 p-3 rounded-md bg-white/10 text-sm"
+                                  >
+                                    {summary.content}
+                                  </div>
+                                );
+                              })}
                             </div>
                             <div className="h-5" />
                             {/* Go to channel */}
                             <div className="flex justify-end">
-                              <JumpChannelBtn inviteCode={channel.inviteCode} />
+                              {/* <JumpChannelBtn inviteCode={channel.inviteCode} /> */}
                             </div>
                             <div className="h-3" />
                           </div>
@@ -103,18 +101,18 @@ export const Channels: React.FC<Props> = (props) => {
                         <div className="text-sm font-bold">{channel.name}</div>
                         <div className="h-3" />
                         <div className="h-[40px] overflow-auto text-xs">
-                          {channel.description}
+                          {channel.topic}
                         </div>
                         <div className="h-3" />
-                        <ActivityLevel level={channel.activityLevel} />
+                        <ActivityLevel level={channel.activityScore!} />
                         <div className="h-3" />
                         <div className="absolute bottom-4 right-5">
-                          <JumpChannelBtn inviteCode={channel.inviteCode} />
+                          {/* <JumpChannelBtn inviteCode={channel.inviteCode} /> */}
                         </div>
                       </div>
                     </>
                   )}
-                </>
+                </div>
               ))}
             </div>
           </AccordionPanel>

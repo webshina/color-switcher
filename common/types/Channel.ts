@@ -1,5 +1,21 @@
-import { Channel } from '../../backend/node_modules/.prisma/client';
+import {
+  Channel,
+  ChannelCategory,
+  ChannelSummary,
+} from '../../backend/node_modules/.prisma/client';
+
+export type ChannelCategoryItem = Omit<
+  ChannelCategory,
+  'createdAt' | 'updatedAt'
+>;
+
+export type ChannelSummaryItem = Omit<
+  ChannelSummary,
+  'createdAt' | 'updatedAt'
+>;
 
 export type ChannelItem = Omit<Channel, 'image' | 'createdAt' | 'updatedAt'> & {
   imageURL: string | null;
+  category: ChannelCategoryItem | null;
+  summaries: ChannelSummaryItem[];
 };

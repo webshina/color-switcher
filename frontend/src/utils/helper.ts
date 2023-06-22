@@ -1,4 +1,3 @@
-import { UploadDirs } from '#/common/types/UploadDirs';
 import { isObject } from './typeNarrower';
 
 export const generateRandomString = (n: number) => {
@@ -28,11 +27,6 @@ export const shortenString = (str: string, length: number) => {
   const result =
     str.slice(0, halfLength) + '...' + str.slice(-halfLength - 1, str.length);
   return result;
-};
-
-export const getImageUrl = (dir: UploadDirs, fileName: string) => {
-  const url = `${process.env.NEXT_PUBLIC_IMG_BASE_URL}/uploads/${dir}/${fileName}`;
-  return url;
 };
 
 export const formatDate = (date: Date, format: string) => {

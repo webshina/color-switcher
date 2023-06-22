@@ -1,0 +1,13 @@
+-- CreateTable
+CREATE TABLE `GuildTag` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `guildId` INTEGER NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `GuildTag` ADD CONSTRAINT `GuildTag_guildId_fkey` FOREIGN KEY (`guildId`) REFERENCES `Guild`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
