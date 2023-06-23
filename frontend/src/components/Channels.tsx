@@ -35,7 +35,10 @@ export const Channels: React.FC<Props> = (props) => {
     });
   });
   return (
-    <Accordion defaultIndex={[0]} allowMultiple>
+    <Accordion
+      defaultIndex={Array.from({ length: categories.length }, (v, k) => k)} // Open all accordions
+      allowMultiple
+    >
       {categories.map((category) => (
         <AccordionItem key={category.id}>
           <h2>
@@ -47,6 +50,7 @@ export const Channels: React.FC<Props> = (props) => {
             </AccordionButton>
           </h2>
           <AccordionPanel p={0} pb={4}>
+            <div className="h-1" />
             <div className="flex flex-wrap">
               {category.channels.map((channel) => (
                 <div key={channel.id}>
