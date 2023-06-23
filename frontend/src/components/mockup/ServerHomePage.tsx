@@ -1,7 +1,6 @@
 import CircleImage from '@/components/utils/CircleImage';
 import Image from 'next/image';
 import 'react-datepicker/dist/react-datepicker.css';
-import { ExpandableText } from '../utils/ExpandableText';
 import Title from '../utils/Title';
 import { Channels } from './Channels';
 import { Members } from './Members';
@@ -13,7 +12,6 @@ type Props = {
 };
 export const ServerHomePage: React.FC<Props> = (props) => {
   const server = useServer({ serverId: props.serverId });
-  console.log(server);
 
   return (
     <>
@@ -47,9 +45,15 @@ export const ServerHomePage: React.FC<Props> = (props) => {
 
           {/* Description */}
           <div className="bg-slate-800 p-5 rounded-xl text-sm lg:text-base font-light whitespace-pre-wrap">
-            <ExpandableText>{server.description}</ExpandableText>
+            {server.description}
           </div>
           <div className="h-16" />
+
+          {/* Management Team */}
+          <Title title={'Management Team'} />
+          <div className="h-8" />
+          <Members discordMembers={server.managementMembers} />
+          <div className="h-8" />
 
           {/* Channel list */}
           <Title title={'Channels'} />

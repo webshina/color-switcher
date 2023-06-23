@@ -313,6 +313,66 @@ export const useServer = (props: { serverId: number }) => {
           },
         },
       ],
+      managementMembers: [
+        {
+          id: 1,
+          displayName: 'Alex',
+          userName: 'Alex#1234',
+          imgURL: '/images/mockup/art-hauntington-jzY0KRJopEI-unsplash.jpeg',
+          activityLevel: 4,
+          joinedAtServer: '2022-03-14',
+          roles: ['moderator'],
+          description:
+            '東京で働いているデータサイエンティストです。よろしくお願いします。',
+          isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
+        },
+        {
+          id: 2,
+          displayName: 'Jessica',
+          userName: 'Jessica#4567',
+          imgURL:
+            '/images/mockup/christian-velitchkov-mXz64B8-3h0-unsplash.jpeg',
+          activityLevel: 5,
+          joinedAtServer: '2021-05-22',
+          roles: ['admin', 'moderator'],
+          description: '大阪で働いているデザイナーです。よろしくお願いします。',
+          isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
+        },
+        {
+          id: 3,
+          displayName: 'Brian',
+          userName: 'Brian#7890',
+          imgURL:
+            '/images/mockup/christopher-campbell-rDEOVtE7vOs-unsplash.jpeg',
+          activityLevel: 2,
+          joinedAtServer: '2022-07-18',
+          roles: ['crew'],
+          description:
+            '名古屋で働いているマーケティングマネージャーです。よろしくお願いします。',
+          isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
+        },
+      ],
       members: [
         {
           id: 1,
@@ -799,6 +859,65 @@ export const useServer = (props: { serverId: number }) => {
             id: 3,
             name: 'Community',
           },
+        },
+      ],
+      managementMembers: [
+        {
+          id: 1,
+          displayName: 'Alex',
+          userName: 'Alex#1234',
+          imgURL: '/images/mockup/art-hauntington-jzY0KRJopEI-unsplash.jpeg',
+          activityLevel: 4,
+          joinedAtServer: '2022-03-14',
+          roles: ['moderator'],
+          description:
+            'I am a data scientist working in Tokyo. Nice to meet you.',
+          isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
+        },
+        {
+          id: 8,
+          displayName: 'Grace',
+          userName: 'Grace#1235',
+          imgURL: '/images/mockup/jeffery-erhunse-Z9lbmEjyYjU-unsplash.jpeg',
+          activityLevel: 4,
+          joinedAtServer: '2022-06-17',
+          roles: ['crew'],
+          description:
+            'I am a QA engineer working in Hiroshima. Nice to meet you.',
+          isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
+        },
+        {
+          id: 10,
+          displayName: 'Olivia',
+          userName: 'Olivia#7892',
+          imgURL: '/images/mockup/svetlana-pochatun-DgCaEOnfBdo-unsplash.jpeg',
+          activityLevel: 3,
+          joinedAtServer: '2023-05-01',
+          roles: ['admin', 'crew'],
+          description:
+            'I am a UX designer working in Sendai. Nice to meet you.',
+          isBot: false,
+          socialMedias: [
+            {
+              id: 1,
+              name: 'Twitter',
+              url: 'https://twitter.com/',
+            },
+          ],
         },
       ],
       members: [
