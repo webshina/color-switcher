@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import React, { ReactNode, useState } from 'react';
 import { AiFillInfoCircle } from 'react-icons/ai';
 import { BiLogOut } from 'react-icons/bi';
-import { FaRobot } from 'react-icons/fa';
 import { FiMenu } from 'react-icons/fi';
 import { MdDashboardCustomize } from 'react-icons/md';
 import { Menu, MenuItem, ProSidebar } from 'react-pro-sidebar';
@@ -75,19 +74,7 @@ const DefaultLayout: React.FC<Props> = (props) => {
                   icon={<AiFillInfoCircle />}
                   onClick={() => router.push('/landing')}
                 >
-                  Discord HOME AI ?
-                </MenuItem>
-                <MenuItem
-                  icon={<FaRobot />}
-                  onClick={() => router.push('/guild/2')}
-                >
-                  Sample Page
-                </MenuItem>
-                <MenuItem
-                  icon={<FaRobot />}
-                  onClick={() => router.push('/guild/1')}
-                >
-                  Sample Page 🇯🇵
+                  About
                 </MenuItem>
                 {user && (
                   <MenuItem icon={<BiLogOut />} onClick={logout}>
