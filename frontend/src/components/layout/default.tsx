@@ -2,14 +2,14 @@ import { useAuth } from '@/hooks/utils/useAuth';
 import { useScreenSize } from '@/hooks/utils/useScreenSize';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useState } from 'react';
-import { AiFillInfoCircle } from 'react-icons/ai';
-import { BiLogOut } from 'react-icons/bi';
+import {
+  AiFillInfoCircle,
+  AiOutlineFundProjectionScreen,
+} from 'react-icons/ai';
 import { FiMenu } from 'react-icons/fi';
-import { MdDashboardCustomize } from 'react-icons/md';
 import { Menu, MenuItem, ProSidebar } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 import { animated, useSpring } from 'react-spring';
-import { DiscordConnectBtn } from '../common/DiscordConnectBtn';
 import { Logo } from '../common/Logo';
 
 type Props = {
@@ -49,9 +49,9 @@ const DefaultLayout: React.FC<Props> = (props) => {
               </div>
             )}
 
-            <div className="absolute top-0 right-3">
+            {/* <div className="absolute top-0 right-3">
               <DiscordConnectBtn />
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -64,23 +64,29 @@ const DefaultLayout: React.FC<Props> = (props) => {
               className="!fixed top-[78px]"
             >
               <Menu>
-                <MenuItem
+                {/* <MenuItem
                   icon={<MdDashboardCustomize />}
                   onClick={() => router.push('/owner/dashboard')}
                 >
                   Dashboard
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem
                   icon={<AiFillInfoCircle />}
                   onClick={() => router.push('/landing')}
                 >
                   About
                 </MenuItem>
-                {user && (
+                <MenuItem
+                  icon={<AiOutlineFundProjectionScreen />}
+                  onClick={() => router.push('/mockup/top')}
+                >
+                  Sample
+                </MenuItem>
+                {/* {user && (
                   <MenuItem icon={<BiLogOut />} onClick={logout}>
                     Logout
                   </MenuItem>
-                )}
+                )} */}
               </Menu>
             </ProSidebar>
           </div>
