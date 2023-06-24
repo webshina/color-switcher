@@ -94,19 +94,10 @@ export const LandingPage: React.FC<Props> = () => {
           <button
             className="px-10 py-3 gradient-bg-purple-to-pink rounded-full text-2xl font-bold"
             onClick={() => {
-              window.open('/mockup/server/2', '_blank');
+              window.open('/mockup/top', '_blank');
             }}
           >
-            Check Sample Page
-          </button>
-          <div className="h-5" />
-          <button
-            className="underline"
-            onClick={() => {
-              window.open('/mockup/server/1', '_blank');
-            }}
-          >
-            Check Sample Page 🇯🇵
+            🖥 SAMPLE
           </button>
         </div>
       </div>
