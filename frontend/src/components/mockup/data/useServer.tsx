@@ -37,9 +37,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/vladislav-klapin-SymZoeE8quA-unsplash.jpeg',
           activityLevel: 5,
           conversationSummaries: [
-            `議論の中心: 新メンバーの自己紹介と歓迎のメッセージ等\n`,
-            `リソース共有: メンバーのスキルセット、プロジェクト、興味等\n`,
-            `技術の進展: メンバーの個々の貢献と進行中の作業等\n`,
+            `新入メンバー、ブロックチェーン専門家自己紹介。\n`,
+            `キャリアと共にパーソナルプロジェクト共有。\n`,
+            `語学好きで、5ヶ国語を話せると語った。\n`,
           ],
           inviteCode: '',
           category: {
@@ -54,9 +54,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/jason-leung-HM6TMmevbZQ-unsplash.jpeg',
           activityLevel: 0,
           conversationSummaries: [
-            `議論の中心: コミュニティの行動規範、利用規約等\n`,
-            `リソース共有: ガイドラインの文書、参考リンク等\n`,
-            `技術の進展: ルールの改訂とアップデート情報等\n`,
+            `コミュニティのルールと行動規範を議論。\n`,
+            `不適切な行動に対する制裁措置を説明。\n`,
+            `新メンバーへの入門ガイドを提供。\n`,
           ],
           inviteCode: '',
           category: {
@@ -71,9 +71,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/joshua-earle-s0IZZ8vgRbM-unsplash.jpeg',
           activityLevel: 0,
           conversationSummaries: [
-            `議論の中心: コミュニティのナビゲーション、チャンネルの使い方等\n`,
-            `リソース共有: 初心者向けのリソース、チュートリアル等\n`,
-            `技術の進展: プラットフォームやツールの更新情報等\n`,
+            `新規メンバーへの歓迎と基本的なガイドライン。\n`,
+            `登録やログインに関する質問が答えられた。\n`,
+            `サーバー機能と規則についての詳細な説明。\n`,
           ],
           inviteCode: '',
           category: {
@@ -88,9 +88,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/shubham-dhage-V7OKG7WAlV0-unsplash.jpeg',
           activityLevel: 5,
           conversationSummaries: [
-            `議論の中心: DeFiプロジェクトのレビューと解析\n`,
-            `リソース共有: DeFi関連のコース、ブログ、プロジェクトソースコード等\n`,
-            `技術の進展: クロスチェーンDeFi、自動化された市場メーカー等\n`,
+            `DeFiの新技術について議論が行われた。\n`,
+            `スマートコントラクトの利用例について学んだ。\n`,
+            `流動性マイニングについて詳しく説明された。\n`,
           ],
           inviteCode: '',
           category: {
@@ -106,9 +106,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/scott-webb-yekGLpc3vro-unsplash.jpeg',
           activityLevel: 4,
           conversationSummaries: [
-            `議論の中心: Smart Contractsのセキュリティ、ハッキング防止策\n`,
-            `リソース共有: Solidityセキュリティガイド、EthereumセキュリティTips等\n`,
-            `技術の進展: DeFiプロジェクトにおけるセキュリティ問題の解決策\n`,
+            `ウェブ3.0セキュリティ課題について議論。\n`,
+            `新たな暗号化技術の活用方法を学んだ。\n`,
+            `ディフィのセキュリティ対策について質問した。\n`,
           ],
           inviteCode: '',
           category: {
@@ -124,9 +124,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/marvin-meyer-SYTO3xs06fU-unsplash.jpeg',
           activityLevel: 4,
           conversationSummaries: [
-            `議論の中心: DApp開発のベストプラクティスとチャレンジ\n`,
-            `リソース共有: DApp開発ツール、フレームワーク、チュートリアル等\n`,
-            `技術の進展: Layer-2ソリューション、分散ストレージ等\n`,
+            `スマートコントラクトの最新技術を議論。\n`,
+            `Ethereumと他のブロックチェーンの比較。\n`,
+            `ディフィプロジェクトのセキュリティ課題を解決。\n`,
           ],
           inviteCode: '',
           category: {
@@ -141,9 +141,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/anniespratt-Hddo2x6e0Dg-unsplash.jpeg',
           activityLevel: 3,
           conversationSummaries: [
-            `議論の中心: NFTプロジェクトのレビューとトレンド\n`,
-            `リソース共有: NFT作成とマーケットプレイスのチュートリアル、リソース等\n`,
-            `技術の進展: NFTのスケーラビリティ、新たなユースケース等\n`,
+            `NFTの新作品発表、フィードバック多数。\n`,
+            `デジタルアートの価値について議論した。\n`,
+            `NFT市場の最新動向を共有した。\n`,
           ],
           inviteCode: '',
           category: {
@@ -159,9 +159,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/emily-morter-8xAA0f9yQnE-unsplash.jpeg',
           activityLevel: 1,
           conversationSummaries: [
-            'Smart Contractの最適なテスト方法についての議論',
-            'EthereumとPolkadotの比較に関する情報共有',
-            'Web3.0関連のAPIとライブラリの使用についての質問と答え',
+            `Web3.0の開発における問題と解決策を議論。\n`,
+            `Smart Contractの設定方法を尋ねた。\n`,
+            `dApp開発でのデータ保管とプライバシーについて学んだ。\n`,
           ],
           inviteCode: '',
           category: {
@@ -177,9 +177,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/dylan-calluy-PQXMUyOYarU-unsplash.jpeg',
           activityLevel: 4,
           conversationSummaries: [
-            `議論の中心: トークンエコノミーの設計と分析、暗号資産の価格動向等\n`,
-            `リソース共有: トークンエコノミクスに関するコース、ブログ、レポート等\n`,
-            `技術の進展: DeFiの経済モデル、NFTの価格決定メカニズム等\n`,
+            `トークンエコノミーの進化について議論した。\n`,
+            `暗号通貨の価値を理解するための指標提案。\n`,
+            `デフィのセキュリティ問題、それぞれの見解を共有。\n`,
           ],
           inviteCode: '',
           category: {
@@ -196,9 +196,9 @@ export const useServer = (props: { serverId: number }) => {
             '/images/mockup/tingey-injury-law-firm-nCJ5kiPzBH4-unsplash.jpeg',
           activityLevel: 3,
           conversationSummaries: [
-            `議論の中心: 暗号規制の最新情報、法律的な問題と解決策\n`,
-            `リソース共有: 暗号資産関連の法律ガイド、レポート等\n`,
-            `技術の進展: ブロックチェーンの法規制、KYC/AMLプロセス等\n`,
+            `法規制と暗号資産の関係を議論した。\n`,
+            `ブロックチェーンの法的問題点について論じた。\n`,
+            `各国の暗号資産法律を比較検討した。\n`,
           ],
           inviteCode: '',
           category: {
@@ -214,9 +214,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/marvin-meyer-SYTO3xs06fU-unsplash.jpeg',
           activityLevel: 3,
           conversationSummaries: [
-            '新しいDecentralized Application (DApp)のデモとフィードバック',
-            '最近のWeb3.0関連のハッカソンの結果と経験の共有',
-            '個々のコードと設計のレビューと改善提案',
+            `AI技術を用いた新アプリ開発成功。\n`,
+            `ゲームデザインの進捗状況を報告。\n`,
+            `ロボット工学の最新研究結果を共有。\n`,
           ],
           inviteCode: '',
           category: {
@@ -267,9 +267,9 @@ export const useServer = (props: { serverId: number }) => {
             '/images/mockup/cytonn-photography-n95VMLxqM2I-unsplash.jpeg',
           activityLevel: 4,
           conversationSummaries: [
-            `議論の中心: ジョブオープニング、インターンシップの機会等\n`,
-            `リソース共有: 履歴書のヒント、インタビューのアドバイス、採用情報等\n`,
-            `技術の進展: ブロックチェーンとWeb3.0の分野で求められるスキル等\n`,
+            `Web3.0技術についての詳細な議論が進行中。\n`,
+            `データプライバシーとブロックチェーンの相互作用について。\n`,
+            `エンジニア間での最新DApp開発戦略の共有。\n`,
           ],
           inviteCode: '',
           category: {
@@ -284,9 +284,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/joel-muniz-D6bos5R_ckc-unsplash.jpeg',
           activityLevel: 3,
           conversationSummaries: [
-            `議論の中心: 効果的なプレゼンテーションの方法、スピーチの練習等\n`,
-            `リソース共有: プレゼンテーションのチュートリアル、リソース、テンプレート等\n`,
-            `技術の進展: Web3.0テクノロジーを説明するための効果的なストーリーテリング等\n`,
+            `プレゼンテーション技巧の意義について語った。\n`,
+            `公開スピーチの克服法を共有した。\n`,
+            `実践的なプレゼンテーションヒントを提供。\n`,
           ],
           inviteCode: '',
           category: {
@@ -302,9 +302,9 @@ export const useServer = (props: { serverId: number }) => {
             '/images/mockup/priscilla-du-preez-XkKCui44iM0-unsplash.jpeg',
           activityLevel: 3,
           conversationSummaries: [
-            `議論の中心: Proof Of Stake Blockchain実装とゼロ知識証明学習の優先順位\n`,
-            `リソース共有: 学習リソースとしてのUdemyコース、Zero-Knowledge University、GitHubリポジトリ等\n`,
-            `技術の進展: wagmiからviemへの移行、ゼロ知識証明の実用例等についての情報交換\n`,
+            `Web3.0の基本概念を共有しました。\n`,
+            `エンジニアとしてのスキルアップ方法を討論。\n`,
+            `具体的なプロジェクトでのWeb3.0の活用事例を紹介。\n`,
           ],
           inviteCode: '',
           category: {
@@ -598,9 +598,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/vladislav-klapin-SymZoeE8quA-unsplash.jpeg',
           activityLevel: 5,
           conversationSummaries: [
-            'Central discussions: Introductions and welcome messages for new members\n',
-            'Resource sharing: Member skills, projects, interests, etc.\n',
-            'Technical progress: Individual contributions and ongoing work of members\n',
+            `New member shares Blockchain knowledge.\n`,
+            `Questions about practical transaction use.\n`,
+            `Discussion on Bitcoin's fraud prevention.\n`,
           ],
           inviteCode: '',
           category: {
@@ -615,9 +615,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/jason-leung-HM6TMmevbZQ-unsplash.jpeg',
           activityLevel: 0,
           conversationSummaries: [
-            'Central discussions: Community code of conduct, terms of service, etc.\n',
-            'Resource sharing: Documented guidelines, reference links, etc.\n',
-            'Technical progress: Rule revisions and update information, etc.\n',
+            `Detailed overview of community conduct.\n`,
+            `Questions about guidelines clarified.\n`,
+            `Discussion on rule amendments and updates.\n`,
           ],
           inviteCode: '',
           category: {
@@ -632,9 +632,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/joshua-earle-s0IZZ8vgRbM-unsplash.jpeg',
           activityLevel: 0,
           conversationSummaries: [
-            'Central discussions: Community navigation, channel usage, etc.\n',
-            'Resource sharing: Beginner-friendly resources, tutorials, etc.\n',
-            'Technical progress: Platform and tool updates, etc.\n',
+            `Explored the basics of getting started.\n`,
+            `Discussed roles and server rules.\n`,
+            `Clarified doubts about channel functionality.\n`,
           ],
           inviteCode: '',
           category: {
@@ -650,9 +650,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/shubham-dhage-V7OKG7WAlV0-unsplash.jpeg',
           activityLevel: 5,
           conversationSummaries: [
-            'Central discussions: Reviews and analysis of DeFi projects\n',
-            'Resource sharing: DeFi-related courses, blogs, project source code, etc.\n',
-            'Technical progress: Cross-chain DeFi, automated market makers, etc.\n',
+            `Discussed Ethereum's potential in DeFi.\n`,
+            `Shared latest Yield Farming strategies.\n`,
+            `Debated over security concerns in DeFi.\n`,
           ],
           inviteCode: '',
           category: {
@@ -668,9 +668,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/scott-webb-yekGLpc3vro-unsplash.jpeg',
           activityLevel: 4,
           conversationSummaries: [
-            'Central discussions: Smart contract security, hacking prevention measures\n',
-            'Resource sharing: Solidity security guides, Ethereum security tips, etc.\n',
-            'Technical progress: Security solutions for DeFi projects, etc.\n',
+            `Explored blockchain's distributed networks.\n`,
+            `Inquired about practical transaction uses.\n`,
+            `Discussed Bitcoin's tamper-proof shared transaction records.\n`,
           ],
           inviteCode: '',
           category: {
@@ -686,9 +686,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/marvin-meyer-SYTO3xs06fU-unsplash.jpeg',
           activityLevel: 4,
           conversationSummaries: [
-            'Central discussions: Best practices and challenges in DApp development\n',
-            'Resource sharing: DApp development tools, frameworks, tutorials, etc.\n',
-            'Technical progress: Layer-2 solutions, decentralized storage, etc.\n',
+            `Deep dive into Ethereum smart contracts.\n`,
+            `Discussed the use of IPFS for DApp storage.\n`,
+            `Exploring security aspects of blockchain coding.\n`,
           ],
           inviteCode: '',
           category: {
@@ -704,9 +704,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/anniespratt-Hddo2x6e0Dg-unsplash.jpeg',
           activityLevel: 3,
           conversationSummaries: [
-            'Central discussions: Reviews and trends of NFT projects\n',
-            'Resource sharing: Tutorials and resources for NFT creation and marketplaces, etc.\n',
-            'Technical progress: NFT scalability, new use cases, etc.\n',
+            `Discussed the workings of decentralized networks.`,
+            `Explored practical applications of NFTs in transactions.`,
+            `Explored the concept of shared transaction records in Bitcoin.`,
           ],
           inviteCode: '',
           category: {
@@ -722,9 +722,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/emily-morter-8xAA0f9yQnE-unsplash.jpeg',
           activityLevel: 1,
           conversationSummaries: [
-            'Discussion on optimal testing methods for Smart Contracts\n',
-            'Information sharing on Ethereum and Polkadot comparison\n',
-            'Questions and answers about using web3.0-related APIs and libraries\n',
+            `Explored advanced techniques for smart contract development.\n`,
+            `Asked about integrating decentralized identity solutions.\n`,
+            `Discussed the benefits of using IPFS for data storage.\n`,
           ],
           inviteCode: '',
           category: {
@@ -740,9 +740,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/dylan-calluy-PQXMUyOYarU-unsplash.jpeg',
           activityLevel: 4,
           conversationSummaries: [
-            'Central discussions: Design and analysis of token economies, cryptocurrency price trends, etc.\n',
-            'Resource sharing: Courses, blogs, reports on token economics, etc.\n',
-            'Technical progress: Economic models of DeFi, pricing mechanisms of NFTs, etc.\n',
+            `Discussed the mechanics of decentralized blockchain networks.`,
+            `Explored practical applications of cryptocurrencies in transactions.`,
+            `Examined how Bitcoin enables shared transaction records among participants.`,
           ],
           inviteCode: '',
           category: {
@@ -759,9 +759,9 @@ export const useServer = (props: { serverId: number }) => {
             '/images/mockup/tingey-injury-law-firm-nCJ5kiPzBH4-unsplash.jpeg',
           activityLevel: 3,
           conversationSummaries: [
-            'Central discussions: Latest information on crypto regulations, legal issues and solutions\n',
-            'Resource sharing: Legal guides, reports related to cryptocurrencies, etc.\n',
-            'Technical progress: Blockchain regulations, KYC/AML processes, etc.\n',
+            `Explored the intricacies of decentralized networks.`,
+            `Inquired about practical applications in transactions.`,
+            `Discussed how Bitcoin shares transaction records among participants to prevent tampering.`,
           ],
           inviteCode: '',
           category: {
@@ -777,9 +777,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/marvin-meyer-SYTO3xs06fU-unsplash.jpeg',
           activityLevel: 3,
           conversationSummaries: [
-            'Demo and feedback on new Decentralized Applications (DApps)\n',
-            'Sharing results and experiences from recent Web3.0-related hackathons\n',
-            'Code and design reviews and improvement suggestions\n',
+            'Explored deeper understanding of decentralized networks.',
+            'Inquired about practical applications in transactions.',
+            'Discussed how Bitcoin shares transaction records among all participants to prevent tampering.',
           ],
           inviteCode: '',
           category: {
@@ -796,9 +796,9 @@ export const useServer = (props: { serverId: number }) => {
             '/images/mockup/cytonn-photography-n95VMLxqM2I-unsplash.jpeg',
           activityLevel: 2,
           conversationSummaries: [
-            'Sharing job openings and internship opportunities from new blockchain startups\n',
-            'Information exchange about freelancing projects in Web3.0 engineering\n',
-            'Questions and answers about career advice and interview preparation\n',
+            `Discussed decentralized network in blockchain.\n`,
+            `Inquired about practical applications in transactions.\n`,
+            `For example, Bitcoin shares transaction records with all participants for tamper resistance.\n`,
           ],
           inviteCode: '',
           category: {
@@ -814,9 +814,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/akson-1K8pIbIrhkQ-unsplash.jpeg',
           activityLevel: 2,
           conversationSummaries: [
-            'Central discussions: Finding collaborators and partners for Web3.0 projects\n',
-            'Resource sharing: Events, conferences, and webinars related to the Web3.0 industry\n',
-            'Technical progress: Cross-country projects, collaborations, and opportunities\n',
+            `Deepened understanding of decentralized networks in blockchain.`,
+            `Asked how to utilize it in real transactions.`,
+            `For example, in Bitcoin, transaction records are shared by all participants for tamper resistance.`,
           ],
           inviteCode: '',
           category: {
@@ -832,9 +832,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/marvin-meyer-SYTO3xs06fU-unsplash.jpeg',
           activityLevel: 1,
           conversationSummaries: [
-            'Central discussions: General updates, news, and announcements\n',
-            'Resource sharing: Non-technical books, podcasts, movies, etc.\n',
-            'Technical progress: Sharing personal achievements and goals\n',
+            `Discussed the fundamentals of decentralized networks like blockchain.`,
+            `Inquired about practical applications of blockchain in real transactions.`,
+            `Explored how Bitcoin ensures tamper-proof transaction records through shared consensus.`,
           ],
           inviteCode: '',
           category: {
@@ -850,9 +850,9 @@ export const useServer = (props: { serverId: number }) => {
           imageUrl: '/images/mockup/david-marcu-2l3vELgKYlQ-unsplash.jpeg',
           activityLevel: 1,
           conversationSummaries: [
-            'Discussion on finding partners for blockchain projects\n',
-            'Information sharing about startup incubation and acceleration programs\n',
-            'Questions and answers about funding opportunities for Web3.0 startups\n',
+            `Explored decentralized networks in blockchain.\n`,
+            `Asked about real-world applications in transactions.\n`,
+            `For example, Bitcoin shares transaction records among all participants to prevent tampering.\n`,
           ],
           inviteCode: '',
           category: {

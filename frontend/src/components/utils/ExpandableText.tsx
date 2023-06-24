@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 
 type Props = {
   children: string;
+  maxLength?: number;
 };
-export const ExpandableText: React.FC<Props> = ({ children: text }) => {
+export const ExpandableText: React.FC<Props> = ({ children, maxLength }) => {
   const [isTruncated, setIsTruncated] = useState(true);
 
   const truncateText = (text: string, limit: number) => {
@@ -18,7 +19,7 @@ export const ExpandableText: React.FC<Props> = ({ children: text }) => {
     <>
       {isTruncated ? (
         <>
-          {truncateText(text, 100)}
+          {truncateText(children, maxLength ?? 100)}
           <button
             className="text-blue-700"
             onClick={() => setIsTruncated(!isTruncated)}
@@ -28,7 +29,7 @@ export const ExpandableText: React.FC<Props> = ({ children: text }) => {
           </button>
         </>
       ) : (
-        text
+        children
       )}
     </>
   );

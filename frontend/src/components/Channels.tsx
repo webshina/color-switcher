@@ -70,7 +70,7 @@ export const Channels: React.FC<Props> = (props) => {
                             <div className="h-5" />
                             {/* Conversation Summary */}
                             <div className="text-sm font-semibold">
-                              Conversation Summary
+                              AI Summary
                             </div>
                             <div className="h-3" />
                             <div className="p-4 h-48 overflow-auto rounded-md bg-slate-800">

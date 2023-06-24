@@ -65,7 +65,7 @@ export const Channels: React.FC<Props> = (props) => {
 
                             {/* Conversation Summary */}
                             <div className="text-sm font-semibold">
-                              Conversation Summary
+                              AI Summary
                             </div>
                             <div className="h-3" />
                             <div className="p-4 h-48 overflow-auto rounded-md bg-slate-800">
@@ -73,12 +73,9 @@ export const Channels: React.FC<Props> = (props) => {
                                 (summary: string, index: number) => {
                                   return (
                                     <div key={index}>
-                                      <li
-                                        key={index}
-                                        className="p-3 rounded-md bg-white/10 text-sm"
-                                      >
+                                      <div className="p-3 rounded-md bg-white/10 text-sm">
                                         {summary}
-                                      </li>
+                                      </div>
                                       <div className="h-1" />
                                     </div>
                                   );
