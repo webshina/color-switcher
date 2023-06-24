@@ -33,7 +33,7 @@ export const Channels: React.FC<Props> = (props) => {
   });
 
   return (
-    <Accordion defaultIndex={[0]} allowMultiple>
+    <Accordion defaultIndex={[0, 1, 2]} allowMultiple>
       {categories.map((category) => (
         <AccordionItem key={category.id}>
           <h2>
