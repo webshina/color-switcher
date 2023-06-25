@@ -18,7 +18,7 @@ export const Top: React.FC<Props> = (props) => {
 
       {/* Header */}
       <div className="flex flex-col items-center">
-        <div className="text-3xl font-bold text-center gradient-text-purple-to-pink">
+        <div className="text-2xl lg:text-3xl font-bold text-center gradient-text-purple-to-pink">
           Find a community you like !
         </div>
         <ImageComponent
