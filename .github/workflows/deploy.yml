@@ -19,4 +19,4 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: 'cd /var/app/discord-home && git pull origin main && npm install && npm run build && pm2 restart discord-home'
+          script: 'cd /var/app/discord-home/frontend && git pull origin main && npm install && npm run build && pm2 restart discord-home'
