@@ -136,7 +136,7 @@ export class GuildRepository {
     });
 
     // Execute async tasks
-    this.generateGuildData({
+    this.generateGuild({
       fetchedGuild: fetchedGuild,
       guildData: guildData,
       createdByUserId,
@@ -145,7 +145,7 @@ export class GuildRepository {
     return guildData.id;
   }
 
-  static async generateGuildData(props: {
+  static async generateGuild(props: {
     fetchedGuild: Guild;
     guildData: GuildData;
     createdByUserId: number;
@@ -161,6 +161,11 @@ export class GuildRepository {
 
     this.generateTags(props.guildData.id).then(() => {
       this.generateGuildImage(props.guildData.id);
+    });
+
+    this.generateMember({
+      fetchedGuild: props.fetchedGuild,
+      guildId: props.guildData.id,
     });
 
     await prisma.guild.update({
@@ -358,5 +363,36 @@ Keywords:
         coverImage: imageName,
       },
     });
+  }
+
+  static async generateMember(props: { fetchedGuild: Guild; guildId: number }) {
+    const guildData = await prisma.guild.findUnique({
+      where: {
+        id: props.guildId,
+      },
+    });
+    if (!guildData) {
+      throw new Error('Guild not found');
+    }
+
+    const fetchedMembers = await props.fetchedGuild.members.fetch();
+    await Promise.all(
+      fetchedMembers.map(async (member) => {
+        const data = {
+          discordId: member.id,
+          guildId: props.guildId,
+          guildDiscordId: props.fetchedGuild.id,
+          isOwner: member.id === props.fetchedGuild.ownerId,
+          permissions: Number(member.permissions),
+        };
+        await prisma.guildMember.upsert({
+          where: {
+            discordId: member.id,
+          },
+          update: data,
+          create: data,
+        });
+      })
+    );
   }
 }

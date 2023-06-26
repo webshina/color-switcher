@@ -1,5 +1,5 @@
 import { messages } from '#/common/constants/messages';
-import { useAuth } from '@/hooks/utils/useAuth';
+import { useMyAdminGuilds } from '@/hooks/repository/useMyAdminGuilds';
 import useInputField from '@/hooks/utils/useInputField';
 import { post } from '@/utils/apiHelper';
 import { isAxiosError } from '@/utils/typeNarrower';
@@ -15,9 +15,8 @@ import { InstallBotModal } from './InstallBotModal';
 type Props = {};
 export const CreateHomePage: React.FC<Props> = (props) => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { data: adminGuilds } = useMyAdminGuilds();
   const [loading, setLoading] = useState(false);
-  const manageableGuilds = user?.guilds.filter((guild) => guild.manageable);
 
   const {
     inputField: guildIdInputField,
@@ -27,12 +26,12 @@ export const CreateHomePage: React.FC<Props> = (props) => {
     id: 'guild-id',
     type: 'select',
     options:
-      manageableGuilds?.map((guild) => ({
+      adminGuilds?.map((guild) => ({
         label: guild.name as string,
         value: guild.discordId,
       })) ?? [],
     value:
-      manageableGuilds?.[0]?.discordId ??
+      adminGuilds?.[0]?.discordId ??
       'There is no server for which you have administrative privileges',
   });
 

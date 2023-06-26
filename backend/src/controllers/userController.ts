@@ -1,3 +1,4 @@
+import { MyAdminGuildsResponse } from '#/common/types/apiResponses/UserControllerResponse';
 import { UserRepository } from '@/repositories/UserRepository';
 import { Request, Response } from 'express';
 
@@ -9,4 +10,17 @@ const getMe = async (req: Request, res: Response) => {
   res.json(user);
 };
 
-export default { getMe };
+const fetchAdminGuilds = async (req: Request, res: Response) => {
+  const { accessToken } = req.cookies;
+
+  const user = await UserRepository.getByAccessToken(accessToken);
+  if (!user) throw new Error('User not found');
+
+  const response = (await UserRepository.fetchAdminGuilds(
+    user.id
+  )) as MyAdminGuildsResponse;
+
+  return res.json(response);
+};
+
+export default { getMe, fetchAdminGuilds };
