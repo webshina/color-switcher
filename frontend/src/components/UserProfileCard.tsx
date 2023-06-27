@@ -1,4 +1,4 @@
-import { DiscordMemberItem } from '#/common/types/DiscordMember';
+import { GuildMemberItem } from '#/common/types/GuildMember';
 import {
   Modal,
   ModalBody,
@@ -12,7 +12,7 @@ import { UserProfile } from './UserProfile';
 import { ActivityLevel } from './common/ActiveLevel';
 
 type Props = {
-  discordMember: DiscordMemberItem;
+  discordMember: GuildMemberItem;
 };
 
 export const UserProfileCard: React.FC<Props> = (props) => {

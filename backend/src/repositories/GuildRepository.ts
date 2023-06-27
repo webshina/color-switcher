@@ -24,6 +24,25 @@ export class GuildRepository {
       },
     });
 
+    // Fetch members
+    const guildMembersData = await prisma.guildMember.findMany({
+      where: {
+        guildId: guildData.id,
+      },
+    });
+    // const guildMembers: GuildMemberItem[] = guildMembersData.map(
+    //   (guildMember) => ({
+    //     id: guildMember.id,
+    //     displayName: guildMember.
+    //     userName: string;
+    //     imgURL: string;
+    //     activityLevel: number;
+    //     joinedAtServer: string;
+    //     roles: string[];
+    //     description: string;
+    //   })
+    // );
+
     const guildItem: GuildItem = {
       id: guildData.id,
       discordId: guildData.discordId,
@@ -45,6 +64,7 @@ export class GuildRepository {
         name: guildTag.name,
         guildId: guildTag.guildId,
       })),
+      members: [],
     };
     return guildItem;
   }
@@ -152,16 +172,17 @@ export class GuildRepository {
   }) {
     // Generate channels data
     const fetchedChannels = await props.fetchedGuild.channels.fetch();
-    await ChannelRepository.generateChannelsData({
-      guildId: props.guildData.id,
-      channels: fetchedChannels.values(),
-    });
 
-    this.generateDescription(props.guildData.id);
+    // await ChannelRepository.generateChannelsData({
+    //   guildId: props.guildData.id,
+    //   channels: fetchedChannels.values(),
+    // });
 
-    this.generateTags(props.guildData.id).then(() => {
-      this.generateGuildImage(props.guildData.id);
-    });
+    // this.generateDescription(props.guildData.id);
+
+    // this.generateTags(props.guildData.id).then(() => {
+    //   this.generateGuildImage(props.guildData.id);
+    // });
 
     this.generateMember({
       fetchedGuild: props.fetchedGuild,
@@ -375,19 +396,23 @@ Keywords:
       throw new Error('Guild not found');
     }
 
-    const fetchedMembers = await props.fetchedGuild.members.fetch();
+    const fetchedMembers = props.fetchedGuild.members.cache;
     await Promise.all(
       fetchedMembers.map(async (member) => {
+        const fetchedMember = await member.fetch();
         const data = {
-          discordId: member.id,
+          discordId: fetchedMember.id,
           guildId: props.guildId,
           guildDiscordId: props.fetchedGuild.id,
-          isOwner: member.id === props.fetchedGuild.ownerId,
-          permissions: Number(member.permissions),
+          isOwner: fetchedMember.id === props.fetchedGuild.ownerId,
+          permissions: Number(fetchedMember.permissions),
+          displayName: fetchedMember.displayName,
+          avatarURL: fetchedMember.user.avatarURL(),
+          joinedAt: fetchedMember.joinedAt,
         };
         await prisma.guildMember.upsert({
           where: {
-            discordId: member.id,
+            discordId: fetchedMember.id,
           },
           update: data,
           create: data,

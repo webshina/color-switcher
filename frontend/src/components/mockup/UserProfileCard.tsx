@@ -9,10 +9,10 @@ import Image from 'next/image';
 import React from 'react';
 import { ActivityLevel } from '../common/ActiveLevel';
 import { UserProfile } from './UserProfile';
-import { DiscordMemberItem } from './types/DiscordMember';
+import { GuildMemberItem } from './types/GuildMember';
 
 type Props = {
-  discordMember: DiscordMemberItem;
+  discordMember: GuildMemberItem;
 };
 
 export const UserProfileCard: React.FC<Props> = (props) => {

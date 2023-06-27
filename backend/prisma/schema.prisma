@@ -66,17 +66,21 @@ model Guild {
 
 // GuildMember model
 model GuildMember {
-  id             Int      @id @default(autoincrement())
-  discordId      String   @unique
-  guild          Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  id             Int       @id @default(autoincrement())
+  discordId      String    @unique
+  guild          Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId        Int
   guildDiscordId String
-  User           User?    @relation(fields: [userId], references: [id])
+  User           User?     @relation(fields: [userId], references: [id])
   userId         Int?
   isOwner        Boolean
-  permissions    Int
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  permissions    BigInt
+  displayName    String?
+  avatarURL      String?
+  activityScore  Int?
+  joinedAt       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 // GuildTags model

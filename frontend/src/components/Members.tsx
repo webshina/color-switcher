@@ -1,8 +1,8 @@
-import { DiscordMemberItem } from '#/common/types/DiscordMember';
+import { GuildMemberItem } from '#/common/types/GuildMember';
 import { UserProfileCard } from './UserProfileCard';
 
 type Props = {
-  discordMembers: DiscordMemberItem[];
+  discordMembers: GuildMemberItem[];
 };
 export const Members: React.FC<Props> = (props) => {
   return (

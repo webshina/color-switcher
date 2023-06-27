@@ -4,6 +4,7 @@ import Image from 'next/image';
 import 'react-datepicker/dist/react-datepicker.css';
 import { mutate } from 'swr';
 import { Channels } from '../Channels';
+import { Members } from '../Members';
 import { TagCards } from '../TagCards';
 import CircleImage from '../utils/CircleImage';
 import { ExpandableText } from '../utils/ExpandableText';
@@ -80,10 +81,10 @@ export const GuildHomePage: React.FC<Props> = (props) => {
               <div className="h-16" />
 
               {/* Member list */}
-              {/* <Title title={'Members'} />
-  <div className="h-8" />
-  <Members discordMembers={guild.members} />
-  <div className="h-8" /> */}
+              <Title title={'Members'} />
+              <div className="h-8" />
+              <Members discordMembers={guild.members} />
+              <div className="h-8" />
 
               <div className="h-16" />
             </>

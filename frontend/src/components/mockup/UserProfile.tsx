@@ -2,10 +2,10 @@ import CircleImage from '@/components/utils/CircleImage';
 import { ImageComponent } from '@/components/utils/ImageComponent';
 import React from 'react';
 import { ActivityLevel } from './ActiveLevel';
-import { DiscordMemberItem } from './types/DiscordMember';
+import { GuildMemberItem } from './types/GuildMember';
 
 type Props = {
-  discordMember: DiscordMemberItem;
+  discordMember: GuildMemberItem;
 };
 
 export const UserProfile: React.FC<Props> = (props) => {

@@ -26,10 +26,10 @@ export class UserRepository {
         inProgress: guildMember.guild.inProgress,
         iconURL: guildMember.guild.iconURL,
         isOwner: guildMember.isOwner,
-        permissions: guildMember.permissions,
+        permissions: Number(guildMember.permissions),
         manageable:
           guildMember.isOwner ||
-          this.hasPermission(guildMember.permissions, 'MANAGE_GUILD'),
+          this.hasPermission(Number(guildMember.permissions), 'MANAGE_GUILD'),
       })),
     };
 

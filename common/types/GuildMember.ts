@@ -1,4 +1,4 @@
-export type DiscordMemberItem = {
+export type GuildMemberItem = {
   id: number;
   displayName: string;
   userName: string;
@@ -7,6 +7,4 @@ export type DiscordMemberItem = {
   joinedAtServer: string;
   roles: string[];
   description: string;
-  isBot: boolean;
-  socialMedias: any[];
 };

@@ -1,11 +1,11 @@
-import { DiscordMemberItem } from '#/common/types/DiscordMember';
+import { GuildMemberItem } from '#/common/types/GuildMember';
 import CircleImage from '@/components/utils/CircleImage';
 import { ImageComponent } from '@/components/utils/ImageComponent';
 import React from 'react';
 import { ActivityLevel } from './common/ActiveLevel';
 
 type Props = {
-  discordMember: DiscordMemberItem;
+  discordMember: GuildMemberItem;
 };
 
 export const UserProfile: React.FC<Props> = (props) => {
