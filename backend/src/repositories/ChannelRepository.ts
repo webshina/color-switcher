@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { addToDate } from '@/utils/dateHelper';
 import {
   copyRandomImage,
+  deleteFile,
   getImageUrl,
   saveFileFromUrl,
 } from '@/utils/fileHelper';
@@ -13,7 +14,7 @@ import {
   ChannelCategory,
   Message as MessageModel,
 } from '@prisma/client';
-import axios, { isAxiosError } from 'axios';
+import axios from 'axios';
 import {
   Collection,
   Message,
@@ -235,44 +236,42 @@ export class ChannelRepository {
   }
 
   static async generateImageOfChannel(channelId: number) {
-    const channelData = await prisma.channel.findUnique({
+    const existingChannelData = await prisma.channel.findUnique({
       where: {
         id: channelId,
       },
     });
-    if (!channelData) {
+    if (!existingChannelData) {
       throw new Error('Channel not found');
     }
-    if (channelData.image) return;
+    if (existingChannelData.image) return;
 
     let imageName: string | null = null;
-    try {
-      const res = await axios(
-        `https://api.unsplash.com/search/photos?query=${channelData.name}&page=1&per_page=1`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept-Version': 'v1',
-            Authorization: `Client-ID ${process.env.UNSPLASH_API_ACCESS_KEY}`,
-          },
-        }
-      );
-      const imageUrl = res.data.results[0]?.urls.small;
+    const res = await axios(
+      `https://api.unsplash.com/search/photos?query=${existingChannelData.name}&page=1&per_page=1`,
+      {
+        method: 'GET',
+        headers: {
+          'Accept-Version': 'v1',
+          Authorization: `Client-ID ${process.env.UNSPLASH_API_ACCESS_KEY}`,
+        },
+      }
+    );
+
+    // delete existing image
+    const imageUrl = res.data.results[0]?.urls.small;
+    if (imageUrl) {
       const { fileName: savedImageName } = await saveFileFromUrl({
         url: imageUrl,
         dir: 'channelImages',
-        fileName: `${channelData.guildId}-${channelData.id}`, // TODO: UUID
+        fileName: uuid(),
       });
       imageName = savedImageName;
-    } catch (error) {
-      if (isAxiosError(error)) {
-        imageName = `${channelData.guildId}-${channelData.id}.jpg`;
-        await copyRandomImage(
-          'channelImages',
-          `${channelData.guildId}-${channelData.id}.jpg`
-        );
-      }
+    } else {
+      imageName = `${uuid()}.jpg`;
+      await copyRandomImage('channelImages', imageName);
     }
+
     await prisma.channel.update({
       where: {
         id: channelId,
@@ -281,6 +280,10 @@ export class ChannelRepository {
         image: imageName,
       },
     });
+
+    if (existingChannelData.image) {
+      deleteFile('guildImages', existingChannelData.image);
+    }
   }
 
   static async calculateNumOfMessagesPerDay(

@@ -146,7 +146,7 @@ export const deleteFile = (dir: UploadDirs, fileName: string) => {
       (err, data) => {}
     );
   } else {
-    fs.unlinkSync(localUploadPath + '/' + path);
+    fs.unlinkSync(Path.join(__dirname, localUploadPath, path));
   }
 };
 

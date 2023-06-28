@@ -3,6 +3,7 @@ import { GuildItem, GuildMemberItem } from '#/common/types/Guild';
 import { prisma } from '@/lib/prisma';
 import {
   copyRandomImage,
+  deleteFile,
   getImageUrl,
   saveFileFromUrl,
 } from '@/utils/fileHelper';
@@ -198,16 +199,16 @@ export class GuildRepository {
     // Generate channels data
     const fetchedChannels = await props.fetchedGuild.channels.fetch();
 
-    // await ChannelRepository.generateChannelsData({
-    //   guildId: props.guildData.id,
-    //   channels: fetchedChannels.values(),
-    // });
+    await ChannelRepository.generateChannelsData({
+      guildId: props.guildData.id,
+      channels: fetchedChannels.values(),
+    });
 
-    // this.generateDescription(props.guildData.id);
+    this.generateDescription(props.guildData.id);
 
-    // this.generateTags(props.guildData.id).then(() => {
-    //   this.generateGuildImage(props.guildData.id);
-    // });
+    this.generateTags(props.guildData.id).then(() => {
+      this.generateGuildImage(props.guildData.id);
+    });
 
     GuildMemberRepository.generateMember({
       fetchedGuild: props.fetchedGuild,
@@ -351,7 +352,7 @@ Keywords:
   }
 
   static async generateGuildImage(guildId: number) {
-    const guild = await prisma.guild.findUnique({
+    const existingGuildData = await prisma.guild.findUnique({
       where: {
         id: guildId,
       },
@@ -359,15 +360,14 @@ Keywords:
         tags: true,
       },
     });
-    if (!guild) {
+    if (!existingGuildData) {
       throw new Error('Guild not found');
     }
-    if (guild.coverImage) {
+    if (existingGuildData.coverImage) {
       return;
     }
-
     let imageName: string | null = null;
-    for (const tag of guild?.tags) {
+    for (const tag of existingGuildData?.tags) {
       try {
         const res = await axios(
           `https://api.unsplash.com/search/photos?query=${tag.name}&page=1&per_page=1`,
@@ -379,12 +379,13 @@ Keywords:
             },
           }
         );
+
         const imageUrl = res.data.results[0]?.urls.regular;
         if (imageUrl) {
           const { fileName: savedImageName } = await saveFileFromUrl({
             url: imageUrl,
             dir: 'guildImages',
-            fileName: `${guild.id}`, // TODO: UUID
+            fileName: uuid(),
           });
           imageName = savedImageName;
           break;
@@ -397,8 +398,8 @@ Keywords:
     }
 
     if (!imageName) {
-      imageName = `${guild.id}`;
-      await copyRandomImage('guildImages', `${guild.id}.jpg`);
+      imageName = `${existingGuildData.id}`;
+      await copyRandomImage('guildImages', `${uuid()}.jpg`);
     }
 
     await prisma.guild.update({
@@ -409,5 +410,9 @@ Keywords:
         coverImage: imageName,
       },
     });
+
+    if (existingGuildData.coverImage) {
+      deleteFile('guildImages', existingGuildData.coverImage);
+    }
   }
 }
