@@ -8,7 +8,11 @@ import {
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
 import { isDiscordError } from '@/utils/typeNarrower';
-import { Channel, ChannelCategory } from '@prisma/client';
+import {
+  Channel,
+  ChannelCategory,
+  Message as MessageModel,
+} from '@prisma/client';
 import axios, { isAxiosError } from 'axios';
 import {
   Collection,
@@ -17,6 +21,7 @@ import {
   TextChannel,
 } from 'discord.js';
 import { Configuration, OpenAIApi } from 'openai';
+import { v4 as uuid } from 'uuid';
 
 export class ChannelRepository {
   static async format(channel: Channel) {
@@ -120,6 +125,7 @@ export class ChannelRepository {
       },
     });
 
+    const lotId = uuid();
     for (const channel of availableChannels) {
       // Save category data to database
       let categoryData: ChannelCategory | null = null;
@@ -181,27 +187,30 @@ export class ChannelRepository {
       }
 
       // Save messages to database
+      let messagesData: MessageModel;
       for (const fetchedMessage of fetchedMessages.values()) {
         if (
           fetchedMessage.content &&
           !fetchedMessage.author.bot &&
           fetchedMessage.content !== ''
         ) {
-          await prisma.message.upsert({
+          const data = {
+            discordId: fetchedMessage.id,
+            content: fetchedMessage.content,
+            authorDiscordId: fetchedMessage.author.id,
+            channelId: channelData.id,
+            lotId: lotId,
+            createdAt: fetchedMessage.createdAt,
+          };
+          messagesData = await prisma.message.upsert({
             where: {
               channelId_discordId: {
                 channelId: channelData.id,
                 discordId: fetchedMessage.id,
               },
             },
-            create: {
-              discordId: fetchedMessage.id,
-              content: fetchedMessage.content,
-              authorDiscordId: fetchedMessage.author.id,
-              channelId: channelData.id,
-              createdAt: fetchedMessage.createdAt,
-            },
-            update: {},
+            create: data,
+            update: data,
           });
         }
       }
@@ -252,7 +261,7 @@ export class ChannelRepository {
       const { fileName: savedImageName } = await saveFileFromUrl({
         url: imageUrl,
         dir: 'channelImages',
-        fileName: `${channelData.guildId}-${channelData.id}`,
+        fileName: `${channelData.guildId}-${channelData.id}`, // TODO: UUID
       });
       imageName = savedImageName;
     } catch (error) {
@@ -405,7 +414,7 @@ Summary:
     for (const channel of channels) {
       if (channels.length <= 5) {
         // If number of channels is a little, evaluate activityScore on an absolute scale
-        const messagesPerDay = channels[0].messagesPerDay!;
+        const messagesPerDay = channel.messagesPerDay!;
         if (messagesPerDay === 0) {
           activityScore = 0;
         } else if (messagesPerDay < 0.1) {

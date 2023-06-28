@@ -1,4 +1,4 @@
-import { GuildMemberItem } from '#/common/types/GuildMember';
+import { GuildMemberItem } from '#/common/types/Guild';
 import {
   Modal,
   ModalBody,
@@ -45,7 +45,7 @@ export const UserProfileCard: React.FC<Props> = (props) => {
             {/* User image */}
             <div className="relative w-[150px]">
               <Image
-                src={props.discordMember.imgURL}
+                src={props.discordMember.avatarURL ?? '/images/no_image.jpeg'}
                 alt="image"
                 layout="fill"
                 objectFit="cover"
@@ -56,17 +56,13 @@ export const UserProfileCard: React.FC<Props> = (props) => {
               <div className="text-base font-bold">
                 {props.discordMember.displayName}{' '}
                 <span className="text-xs font-light">
-                  {props.discordMember.userName}
+                  {props.discordMember.name}
                 </span>
-              </div>
-              <div className="h-1" />
-              <div className="text-[12px] text-start">
-                {props.discordMember.description}
               </div>
               <div className="h-2" />
 
               {/* Active */}
-              <ActivityLevel level={props.discordMember.activityLevel} />
+              <ActivityLevel level={props.discordMember.activityScore ?? 0} />
             </div>
           </div>
         </div>
