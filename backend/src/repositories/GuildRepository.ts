@@ -76,7 +76,6 @@ export class GuildRepository {
         guildData.coverImage &&
         getImageUrl('guildImages', guildData.coverImage),
       isPrivate: guildData.isPrivate,
-      inProgress: guildData.inProgress,
       iconURL: guildData.iconURL,
       createdByUserId: guildData.createdByUserId,
       availableChannelCnt: guildData.availableChannelCnt ?? 0,
@@ -165,7 +164,6 @@ export class GuildRepository {
         discordId: fetchedGuild.id,
         name: fetchedGuild.name,
         isPrivate: false,
-        inProgress: true,
         iconURL: fetchedGuild.iconURL(),
         createdByUser: {
           connect: {
@@ -194,25 +192,43 @@ export class GuildRepository {
     guildData: GuildData;
     createdByUserId: number;
   }) {
-    const lotId = uuid();
+    const guildBatch = await prisma.guildBatch.create({
+      data: {
+        guildId: props.guildData.id,
+      },
+    });
 
     // Generate channels data
     const fetchedChannels = await props.fetchedGuild.channels.fetch();
-
     await ChannelRepository.generateChannelsData({
       guildId: props.guildData.id,
       channels: fetchedChannels.values(),
+      batchId: guildBatch.id,
     });
 
-    this.generateDescription(props.guildData.id);
-
-    this.generateTags(props.guildData.id).then(() => {
-      this.generateGuildImage(props.guildData.id);
+    // Generate Description data
+    this.generateDescription({
+      guildId: props.guildData.id,
+      batchId: guildBatch.id,
     });
 
+    // Generate Tags data
+    this.generateTags({
+      guildId: props.guildData.id,
+      batchId: guildBatch.id,
+    }).then(() => {
+      // Generate GuildImage data
+      this.generateGuildImage({
+        guildId: props.guildData.id,
+        batchId: guildBatch.id,
+      });
+    });
+
+    // Generate Member data
     GuildMemberRepository.generateMember({
       fetchedGuild: props.fetchedGuild,
       guildId: props.guildData.id,
+      batchId: guildBatch.id,
     });
 
     await prisma.guild.update({
@@ -220,13 +236,15 @@ export class GuildRepository {
         id: props.guildData.id,
       },
       data: {
-        inProgress: false,
         lastSyncedAt: new Date(),
       },
     });
   }
 
-  static async generateDescription(guildId: number) {
+  static async generateDescription(props: {
+    guildId: number;
+    batchId: number;
+  }) {
     const openAiApi = new OpenAIApi(
       new Configuration({
         apiKey: process.env.OPENAI_API_KEY,
@@ -235,7 +253,7 @@ export class GuildRepository {
 
     const channels = await prisma.channel.findMany({
       where: {
-        guildId,
+        guildId: props.guildId,
       },
       include: {
         channelSummaries: true,
@@ -276,7 +294,7 @@ Description:
     if (summary) {
       await prisma.guild.update({
         where: {
-          id: guildId,
+          id: props.guildId,
         },
         data: {
           description: summary,
@@ -285,7 +303,7 @@ Description:
     }
   }
 
-  static async generateTags(guildId: number) {
+  static async generateTags(props: { guildId: number; batchId: number }) {
     const openAiApi = new OpenAIApi(
       new Configuration({
         apiKey: process.env.OPENAI_API_KEY,
@@ -294,7 +312,7 @@ Description:
 
     const channels = await prisma.channel.findMany({
       where: {
-        guildId,
+        guildId: props.guildId,
       },
       include: {
         channelSummaries: true,
@@ -334,7 +352,7 @@ Keywords:
     if (tags) {
       await prisma.guildTag.deleteMany({
         where: {
-          guildId,
+          guildId: props.guildId,
         },
       });
       const tagsArray = tags.split(',').map((tag) => tag.trim());
@@ -342,7 +360,7 @@ Keywords:
         tagsArray.map(async (tag) => {
           await prisma.guildTag.create({
             data: {
-              guildId,
+              guildId: props.guildId,
               name: tag,
             },
           });
@@ -351,10 +369,10 @@ Keywords:
     }
   }
 
-  static async generateGuildImage(guildId: number) {
+  static async generateGuildImage(props: { guildId: number; batchId: number }) {
     const existingGuildData = await prisma.guild.findUnique({
       where: {
-        id: guildId,
+        id: props.guildId,
       },
       include: {
         tags: true,
@@ -404,7 +422,7 @@ Keywords:
 
     await prisma.guild.update({
       where: {
-        id: guildId,
+        id: props.guildId,
       },
       data: {
         coverImage: imageName,

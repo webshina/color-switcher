@@ -23,7 +23,6 @@ export class UserRepository {
         discordId: guildMember.guild.discordId,
         name: guildMember.guild.name,
         isPrivate: guildMember.guild.isPrivate,
-        inProgress: guildMember.guild.inProgress,
         iconURL: guildMember.guild.iconURL,
         isOwner: guildMember.isOwner,
         permissions: Number(guildMember.permissions),

@@ -3,7 +3,11 @@ import { addToDate } from '@/utils/dateHelper';
 import { Guild } from 'discord.js';
 
 export class GuildMemberRepository {
-  static async generateMember(props: { fetchedGuild: Guild; guildId: number }) {
+  static async generateMember(props: {
+    fetchedGuild: Guild;
+    guildId: number;
+    batchId: number;
+  }) {
     const guildData = await prisma.guild.findUnique({
       where: {
         id: props.guildId,
@@ -91,7 +95,7 @@ export class GuildMemberRepository {
     });
     const messagesData = await prisma.message.findMany({
       where: {
-        lotId: lastMessage?.lotId,
+        batchId: lastMessage?.batchId,
       },
       orderBy: {
         createdAt: 'asc',

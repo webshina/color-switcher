@@ -102,6 +102,7 @@ export class ChannelRepository {
   static async generateChannelsData(props: {
     guildId: number;
     channels: IterableIterator<NonThreadGuildBasedChannel | null>;
+    batchId: number;
   }) {
     const availableChannels: TextChannel[] = [];
     for (const channel of props.channels) {
@@ -126,7 +127,6 @@ export class ChannelRepository {
       },
     });
 
-    const lotId = uuid();
     for (const channel of availableChannels) {
       // Save category data to database
       let categoryData: ChannelCategory | null = null;
@@ -200,7 +200,7 @@ export class ChannelRepository {
             content: fetchedMessage.content,
             authorDiscordId: fetchedMessage.author.id,
             channelId: channelData.id,
-            lotId: lotId,
+            batchId: props.batchId,
             createdAt: fetchedMessage.createdAt,
           };
           messagesData = await prisma.message.upsert({

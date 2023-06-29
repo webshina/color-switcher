@@ -44,7 +44,6 @@ model Guild {
   description         String?   @db.LongText
   coverImage          String?
   isPrivate           Boolean
-  inProgress          Boolean
   iconURL             String?
   createdByUser       User?     @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
   createdByUserId     Int?
@@ -64,7 +63,9 @@ model Guild {
 
   // Channels
   channels        Channel[]
-  ChannelCategory ChannelCategory[]
+  channelCategory ChannelCategory[]
+
+  guildBatches GuildBatch[]
 }
 
 // GuildMember model
@@ -183,15 +184,34 @@ model ChannelCategory {
 
 // Message model
 model Message {
-  id              Int      @id @default(autoincrement())
+  id              Int        @id @default(autoincrement())
   discordId       String
-  content         String   @db.LongText
+  content         String     @db.LongText
   authorDiscordId String
-  channel         Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channel         Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId       Int
-  lotId           String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  batchId         Int
+  batch           GuildBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
   @@unique([channelId, discordId])
+}
+
+model GuildBatch {
+  id                                    Int      @id @default(autoincrement())
+  guild                                 Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId                               Int      @unique
+  isChannelGenerateCompleted            Boolean  @default(false)
+  totalChannelCnt                       Int?
+  completedChannelCnt                   Int?
+  isChannelGenerationCompleted          Boolean  @default(false)
+  isGuildDescriptionGenerationCompleted Boolean  @default(false)
+  isGuildTagGenerationCompleted         Boolean  @default(false)
+  isGuildMemberGenerationCompleted      Boolean  @default(false)
+  createdAt                             DateTime @default(now())
+  updatedAt                             DateTime @updatedAt
+
+  // Messages
+  messages Message[]
 }
