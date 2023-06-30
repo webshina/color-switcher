@@ -325,9 +325,12 @@ export class ChannelRepository {
     let messagesPerDay = 0;
     const firstMessageCreatedAt =
       fetchedMessages.last()?.createdAt ?? new Date();
-    const daysElapsedSinceFirstMessageCreated =
-      (now.getTime() - firstMessageCreatedAt.getTime()) / (1000 * 60 * 60 * 24);
-
+    const timesElapsedSinceFirstMessageCreated =
+      now.getTime() - firstMessageCreatedAt.getTime();
+    const daysElapsedSinceFirstMessageCreated = Math.max(
+      timesElapsedSinceFirstMessageCreated / (1000 * 60 * 60 * 24),
+      1
+    );
     if (fetchedMessages.size === 0) {
       // No messages in the last week, set score to 0
       messagesPerDay = 0;
@@ -423,21 +426,31 @@ Summary:
         guildId: guildId,
       },
     });
-    const messagesPerDays = channels
+    let channelMessageScores = channels
       // Filter out channels that don't have messagesPerDay
       .filter((channel) => {
         if (channel.messagesPerDay !== null) {
           return true;
         }
       })
-      .map((channel) => channel.messagesPerDay!);
-    const maxMessagesPerDay = Math.max(...messagesPerDays);
-    const minMessagesPerDay = Math.min(...messagesPerDays);
+      .map((channel) => ({
+        id: channel.id,
+        // Logarithmically scale messagesPerDay
+        score: Math.log10(channel.messagesPerDay!),
+      }));
+    const channelMessageScoresArray = channelMessageScores.map(
+      (channelMessageScore) => channelMessageScore.score
+    );
+    const maxScore = Math.max(...channelMessageScoresArray);
+    const minScore = Math.min(...channelMessageScoresArray);
     let activityScore = 0;
-    for (const channel of channels) {
+    for (const channelMessageScore of channelMessageScores) {
       if (channels.length <= 5) {
         // If number of channels is a little, evaluate activityScore on an absolute scale
-        const messagesPerDay = channel.messagesPerDay!;
+        const channel = channels.find(
+          (channel) => channel.id === channelMessageScore.id
+        );
+        const messagesPerDay = channel!.messagesPerDay!;
         if (messagesPerDay === 0) {
           activityScore = 0;
         } else if (messagesPerDay < 0.1) {
@@ -452,17 +465,19 @@ Summary:
           activityScore = 5;
         }
       } else {
+        // Standardize activityScore on a scale of 0 to 5
         activityScore =
-          maxMessagesPerDay === 0 && minMessagesPerDay === 0
+          maxScore === 0 && minScore === 0
             ? 0
             : Math.round(
-                (channel.messagesPerDay! - minMessagesPerDay) /
-                  (maxMessagesPerDay - minMessagesPerDay)
-              ) * 5;
+                ((channelMessageScore.score! - minScore) /
+                  (maxScore - minScore)) *
+                  5
+              );
       }
       await prisma.channel.update({
         where: {
-          id: channel.id,
+          id: channelMessageScore.id,
         },
         data: {
           activityScore,
