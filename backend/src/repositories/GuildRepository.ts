@@ -245,11 +245,11 @@ export class GuildRepository {
     );
     const languageName = await detectLanguage(materialsForDescription);
     const prompt = `Create description of Discord server using following channel data. 
--Describe only in ${languageName}.
--Describe in 300 characters or less.
--Format it for easy viewing.
--Include purpose, main topic and hot topic of the server.
--No need to explain individual channels.
+-Describe only in Japanese.
+-Be sure to write within 300 characters or less.
+-Include purpose of the server and characteristics of participants.
+-Never describe individual channels.
+-Use some emojis for easy viewing.
 
 Channel data:
 ${materialsForDescription}

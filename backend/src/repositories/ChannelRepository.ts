@@ -83,6 +83,9 @@ export class ChannelRepository {
       where: {
         guildId: guildId,
       },
+      orderBy: {
+        messagesPerDay: 'desc',
+      },
     });
     if (!channels) throw new Error('Channel not found');
 
