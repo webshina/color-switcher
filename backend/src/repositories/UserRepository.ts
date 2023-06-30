@@ -61,7 +61,6 @@ export class UserRepository {
 
   static async getLoginUser(req: Request) {
     const user = await this.getByAccessToken(req.cookies.accessToken);
-    if (!user) throw new Error('User not found');
     return user;
   }
 

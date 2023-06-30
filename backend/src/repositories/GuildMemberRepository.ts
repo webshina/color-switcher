@@ -77,6 +77,16 @@ export class GuildMemberRepository {
 
     // calculate active score
     this.calculateActivityLevel(props.guildId);
+
+    // Update batch progress
+    await prisma.guildBatch.update({
+      where: {
+        id: props.batchId,
+      },
+      data: {
+        isGuildMemberGenerationCompleted: true,
+      },
+    });
   }
 
   static async calculateNumOfMessagesPerDay(guildMemberId: number) {

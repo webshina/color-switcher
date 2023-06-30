@@ -38,19 +38,18 @@ model User {
 
 // Guild model
 model Guild {
-  id                  Int       @id @default(autoincrement())
-  discordId           String    @unique
+  id                  Int      @id @default(autoincrement())
+  discordId           String   @unique
   name                String
-  description         String?   @db.LongText
+  description         String?  @db.LongText
   coverImage          String?
   isPrivate           Boolean
   iconURL             String?
-  createdByUser       User?     @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdByUser       User?    @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
   createdByUserId     Int?
   availableChannelCnt Int?
-  lastSyncedAt        DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   // Members
   members GuildMember[]
@@ -201,13 +200,13 @@ model Message {
 model GuildBatch {
   id                                    Int      @id @default(autoincrement())
   guild                                 Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId                               Int      @unique
-  isChannelGenerateCompleted            Boolean  @default(false)
+  guildId                               Int
+  isChannelGenerationCompleted          Boolean  @default(false)
   totalChannelCnt                       Int?
   completedChannelCnt                   Int?
-  isChannelGenerationCompleted          Boolean  @default(false)
   isGuildDescriptionGenerationCompleted Boolean  @default(false)
   isGuildTagGenerationCompleted         Boolean  @default(false)
+  isGuildImageGenerationCompleted       Boolean  @default(false)
   isGuildMemberGenerationCompleted      Boolean  @default(false)
   createdAt                             DateTime @default(now())
   updatedAt                             DateTime @updatedAt

@@ -11,6 +11,7 @@ router.get('/api/user/me', userController.getMe);
 router.get('/api/user/admin-guilds', userController.fetchAdminGuilds);
 router.post('/api/guild/generate', guildController.generate);
 router.get('/api/guild/mine', guildController.getMine);
+router.get('/api/guild/progress/:batchId', guildController.getBatchProgress);
 router.get('/api/guild/:id', guildController.get);
 
 export { router };

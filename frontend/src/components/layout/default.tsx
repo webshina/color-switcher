@@ -12,6 +12,7 @@ import { MdDashboardCustomize } from 'react-icons/md';
 import { Menu, MenuItem, ProSidebar } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 import { animated, useSpring } from 'react-spring';
+import { DiscordConnectBtn } from '../common/DiscordConnectBtn';
 import { Logo } from '../common/Logo';
 
 type Props = {
@@ -51,9 +52,9 @@ const DefaultLayout: React.FC<Props> = (props) => {
               </div>
             )}
 
-            {/* <div className="absolute top-0 right-3">
+            <div className="absolute top-0 right-3">
               <DiscordConnectBtn />
-            </div> */}
+            </div>
           </div>
         </div>
 

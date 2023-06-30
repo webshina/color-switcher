@@ -1,6 +1,7 @@
 import {
   FetchGuildResponse,
   GenerateGuildResponse,
+  GetBatchProgressResponse,
 } from '#/common/types/apiResponses/GuildControllerResponse';
 import { GuildRepository } from '@/repositories/GuildRepository';
 import { UserRepository } from '@/repositories/UserRepository';
@@ -23,10 +24,14 @@ const generate = async (req: Request, res: Response) => {
   const user = await UserRepository.getLoginUser(req);
 
   try {
-    const guildId = await GuildRepository.fetchInfo(discordId, user!.id);
+    const { guildId, guildBatchId } = await GuildRepository.executeBatch(
+      discordId,
+      user!.id
+    );
 
     const responseData: GenerateGuildResponse = {
       guildId,
+      guildBatchId,
     };
 
     return res.json(responseData);
@@ -39,6 +44,7 @@ const generate = async (req: Request, res: Response) => {
 
 const getMine = async (req: Request, res: Response) => {
   const user = await UserRepository.getLoginUser(req);
+  if (!user) return res.status(401).json('Unauthorized');
 
   const responseData: FetchGuildResponse[] = await GuildRepository.getByUserId(
     user.id
@@ -47,4 +53,13 @@ const getMine = async (req: Request, res: Response) => {
   return res.json(responseData);
 };
 
-export default { generate, get, getMine };
+const getBatchProgress = async (req: Request, res: Response) => {
+  const { batchId } = req.params;
+
+  const response: GetBatchProgressResponse =
+    await GuildRepository.getBatchProgress(Number(batchId));
+
+  return res.json(response);
+};
+
+export default { generate, get, getMine, getBatchProgress };

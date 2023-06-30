@@ -29,6 +29,7 @@ const Home: NextPage = () => {
       <div className="flex flex-wrap">
         {guilds?.map((guild) => (
           <button
+            key={guild.id}
             className="flex flex-col items-center m-2"
             onClick={() => {
               router.push(`/guild/${guild.id}`);

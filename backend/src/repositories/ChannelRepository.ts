@@ -1,6 +1,6 @@
 import { ChannelItem, ChannelSummaryItem } from '#/common/types/Channel';
+import { createCompletion } from '@/lib/openAI';
 import { prisma } from '@/lib/prisma';
-import { addToDate } from '@/utils/dateHelper';
 import {
   copyRandomImage,
   deleteFile,
@@ -9,11 +9,7 @@ import {
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
 import { isDiscordError } from '@/utils/typeNarrower';
-import {
-  Channel,
-  ChannelCategory,
-  Message as MessageModel,
-} from '@prisma/client';
+import { Channel, ChannelCategory } from '@prisma/client';
 import axios from 'axios';
 import {
   Collection,
@@ -21,7 +17,6 @@ import {
   NonThreadGuildBasedChannel,
   TextChannel,
 } from 'discord.js';
-import { Configuration, OpenAIApi } from 'openai';
 import { v4 as uuid } from 'uuid';
 
 export class ChannelRepository {
@@ -127,6 +122,16 @@ export class ChannelRepository {
       },
     });
 
+    // Update batch progress
+    await prisma.guildBatch.update({
+      where: {
+        id: props.batchId,
+      },
+      data: {
+        totalChannelCnt: availableChannels.length,
+      },
+    });
+
     for (const channel of availableChannels) {
       // Save category data to database
       let categoryData: ChannelCategory | null = null;
@@ -188,7 +193,6 @@ export class ChannelRepository {
       }
 
       // Save messages to database
-      let messagesData: MessageModel;
       for (const fetchedMessage of fetchedMessages.values()) {
         if (
           fetchedMessage.content &&
@@ -203,7 +207,7 @@ export class ChannelRepository {
             batchId: props.batchId,
             createdAt: fetchedMessage.createdAt,
           };
-          messagesData = await prisma.message.upsert({
+          await prisma.message.upsert({
             where: {
               channelId_discordId: {
                 channelId: channelData.id,
@@ -229,10 +233,37 @@ export class ChannelRepository {
         // Create summary
         await this.generateSummaryOfChannel(channelData.id, fetchedMessages);
       }
+
+      // Update batch progress
+      const batch = await prisma.guildBatch.findUnique({
+        where: {
+          id: props.batchId,
+        },
+      });
+      await prisma.guildBatch.update({
+        where: {
+          id: props.batchId,
+        },
+        data: {
+          completedChannelCnt: batch?.completedChannelCnt
+            ? batch.completedChannelCnt + 1
+            : 1,
+        },
+      });
     }
 
     // Calculate activity level of channel from 0 to 5
     await this.calculateActivityLevel(props.guildId);
+
+    // Update batch progress
+    await prisma.guildBatch.update({
+      where: {
+        id: props.batchId,
+      },
+      data: {
+        isChannelGenerationCompleted: true,
+      },
+    });
   }
 
   static async generateImageOfChannel(channelId: number) {
@@ -292,15 +323,12 @@ export class ChannelRepository {
   ) {
     const now = new Date();
     let messagesPerDay = 0;
-    const oneWeekAgo = addToDate(now, { date: -7 });
     const firstMessageCreatedAt =
       fetchedMessages.last()?.createdAt ?? new Date();
-    const lastMessageCreatedAt =
-      fetchedMessages.first()?.createdAt ?? new Date();
     const daysElapsedSinceFirstMessageCreated =
       (now.getTime() - firstMessageCreatedAt.getTime()) / (1000 * 60 * 60 * 24);
 
-    if (fetchedMessages.size === 0 || lastMessageCreatedAt < oneWeekAgo) {
+    if (fetchedMessages.size === 0) {
       // No messages in the last week, set score to 0
       messagesPerDay = 0;
     } else {
@@ -334,11 +362,6 @@ export class ChannelRepository {
     channelId: number,
     fetchedMessages: Collection<string, Message<true>>
   ) {
-    const openAiApi = new OpenAIApi(
-      new Configuration({
-        apiKey: process.env.OPENAI_API_KEY,
-      })
-    );
     const messagesForSummary = fetchedMessages
       .filter((fetchedMessage) => {
         if (
@@ -365,13 +388,10 @@ ${JSON.stringify(messagesForSummary)}
 
 Summary:
 `;
-    const openAiResponse = await openAiApi.createCompletion({
-      model: 'text-davinci-003',
+    const summary = await createCompletion({
       prompt,
-      temperature: 0.8,
-      max_tokens: 516,
+      maxTokens: 516,
     });
-    const summary = openAiResponse.data.choices[0].text;
 
     // Save summary to database
     if (summary) {

@@ -1,6 +1,6 @@
 import { UserItem } from '#/common/types/User';
 import { useMe } from '@/hooks/repository/useMe';
-import { useCheckAuthPath } from '@/hooks/useCheckAuthPath';
+import { useCheckAuthPath } from '@/hooks/utils/useCheckAuthPath';
 import { post } from '@/utils/apiHelper';
 import { useRouter } from 'next/router';
 import { ReactNode, createContext } from 'react';

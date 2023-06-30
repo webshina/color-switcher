@@ -5,7 +5,6 @@ type Props = {
   discordMembers: GuildMemberItem[];
 };
 export const Members: React.FC<Props> = (props) => {
-  console.log(props.discordMembers);
   return (
     <div className="flex flex-wrap justify-center lg:justify-start">
       {props.discordMembers.map((discordMember) => (

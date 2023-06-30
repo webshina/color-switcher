@@ -7,9 +7,9 @@
     "start": "nodemon -q -r ./ts-node-require.ts src/app.ts",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
     "db:migrate:reset": "dotenv -e .env.development.local -- npx prisma migrate reset",
-    "db:seed": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts seeds/index.ts",
-    "db:sample": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts seeds/sampleData/index.ts",
-    "exec:poc": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts src/poc/test.ts"
+    "db:seed": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts prisma/seeds/index.ts",
+    "db:sample": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts prisma/seeds/sampleData/index.ts",
+    "exec:poc": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts src/poc/OpenAI.ts"
   },
   "author": "",
   "license": "ISC",

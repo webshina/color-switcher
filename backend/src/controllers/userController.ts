@@ -14,7 +14,11 @@ const fetchAdminGuilds = async (req: Request, res: Response) => {
   const { accessToken } = req.cookies;
 
   const user = await UserRepository.getByAccessToken(accessToken);
-  if (!user) throw new Error('User not found');
+  if (!user) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+    });
+  }
 
   const response = (await UserRepository.fetchAdminGuilds(
     user.id

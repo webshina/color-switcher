@@ -13,7 +13,6 @@ type Props = {
 export const GuildHomePage: React.FC<Props> = (props) => {
   const { data: guild } = useGuild({ guildId: props.guildId });
 
-  console.log(guild?.coverImageUrl);
   return (
     <>
       {guild && (
@@ -53,16 +52,24 @@ export const GuildHomePage: React.FC<Props> = (props) => {
           <div className="h-16" />
 
           {/* Channel list */}
-          <Title title={'Channels'} />
-          <div className="h-8" />
-          <Channels channels={guild.channels} />
-          <div className="h-16" />
+          {guild.channels && guild.channels.length > 0 && (
+            <>
+              <Title title={'Channels'} />
+              <div className="h-8" />
+              <Channels channels={guild.channels} />
+              <div className="h-16" />
+            </>
+          )}
 
           {/* Member list */}
-          <Title title={'Members'} />
-          <div className="h-8" />
-          <Members discordMembers={guild.members} />
-          <div className="h-8" />
+          {guild.members && guild.members.length > 0 && (
+            <>
+              <Title title={'Members'} />
+              <div className="h-8" />
+              <Members discordMembers={guild.members} />
+              <div className="h-8" />
+            </>
+          )}
 
           <div className="h-16" />
         </>
