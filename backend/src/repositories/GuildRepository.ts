@@ -16,6 +16,7 @@ import { Client } from 'discord.js';
 import { v4 as uuid } from 'uuid';
 import { ChannelRepository } from './ChannelRepository';
 import { GuildMemberRepository } from './GuildMemberRepository';
+import { UserRepository } from './UserRepository';
 
 export class GuildRepository {
   static async format(guildData: GuildData) {
@@ -87,7 +88,19 @@ export class GuildRepository {
         name: guildTag.name,
         guildId: guildTag.guildId,
       })),
-      members: guildMembers,
+      members: guildMembers.filter(
+        (guildMember) =>
+          !UserRepository.hasPermission(
+            Number(guildMember.permissions),
+            'MANAGE_GUILD'
+          )
+      ),
+      managementMembers: guildMembers.filter((guildMember) =>
+        UserRepository.hasPermission(
+          Number(guildMember.permissions),
+          'MANAGE_GUILD'
+        )
+      ),
     };
     return guildItem;
   }

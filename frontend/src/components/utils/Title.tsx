@@ -5,6 +5,7 @@ type Props = {
   subtitle?: string;
   fontSize?: number;
   color?: string;
+  icon?: React.ReactNode;
 };
 
 const Title: React.FC<Props> = ({
@@ -12,6 +13,7 @@ const Title: React.FC<Props> = ({
   subtitle,
   fontSize = 24,
   color = '#FFF',
+  icon,
 }) => {
   return (
     <>
@@ -22,7 +24,13 @@ const Title: React.FC<Props> = ({
         />
         <div className="w-5" />
         <div>
-          <div id="title" className="font-light" style={{ fontSize, color }}>
+          <div
+            id="title"
+            className="flex items-center font-light"
+            style={{ fontSize, color }}
+          >
+            {icon}
+            <div className="w-2" />
             {title}
           </div>
           <div className="my-[5px]" />

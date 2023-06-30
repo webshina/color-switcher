@@ -1,12 +1,13 @@
 import { BsDiscord } from 'react-icons/bs';
 
 type Props = {
-  inviteCode: string;
+  guildDiscordId: string;
+  channelDiscordId: string;
 };
 export const JumpChannelBtn: React.FC<Props> = (props) => {
   return (
     <a
-      href={`https://discord.gg/${props.inviteCode}`}
+      href={`https://discord.com/channels/${props.guildDiscordId}/${props.channelDiscordId}`}
       target="_blank"
       rel="noreferrer"
     >

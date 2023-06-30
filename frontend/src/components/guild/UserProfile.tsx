@@ -3,7 +3,7 @@ import CircleImage from '@/components/utils/CircleImage';
 import { ImageComponent } from '@/components/utils/ImageComponent';
 import { formatDate } from '@/utils/dateHelper';
 import React from 'react';
-import { ActivityLevel } from './common/ActiveLevel';
+import { ActivityLevel } from '../common/ActiveLevel';
 
 type Props = {
   discordMember: GuildMemberItem;

@@ -1,11 +1,14 @@
 import { useGuild } from '@/hooks/repository/useGuild';
 import Image from 'next/image';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Channels } from '../Channels';
-import { Members } from '../Members';
-import { TagCards } from '../TagCards';
+import { BsFillPeopleFill } from 'react-icons/bs';
+import { IoChatbubblesSharp } from 'react-icons/io5';
+import { MdManageAccounts } from 'react-icons/md';
 import CircleImage from '../utils/CircleImage';
 import Title from '../utils/Title';
+import { Channels } from './Channels';
+import { Members } from './Members';
+import { TagCards } from './TagCards';
 
 type Props = {
   guildId: number;
@@ -51,12 +54,24 @@ export const GuildHomePage: React.FC<Props> = (props) => {
           </div>
           <div className="h-16" />
 
+          {/* Management Team */}
+          <Title
+            title={'Management Team'}
+            icon={<MdManageAccounts color="white" />}
+          />
+          <div className="h-8" />
+          <Members discordMembers={guild.managementMembers} />
+          <div className="h-16" />
+
           {/* Channel list */}
           {guild.channels && guild.channels.length > 0 && (
             <>
-              <Title title={'Channels'} />
+              <Title
+                title={'Channels'}
+                icon={<IoChatbubblesSharp color="white" />}
+              />
               <div className="h-8" />
-              <Channels channels={guild.channels} />
+              <Channels guild={guild} />
               <div className="h-16" />
             </>
           )}
@@ -64,7 +79,10 @@ export const GuildHomePage: React.FC<Props> = (props) => {
           {/* Member list */}
           {guild.members && guild.members.length > 0 && (
             <>
-              <Title title={'Members'} />
+              <Title
+                title={'Members'}
+                icon={<BsFillPeopleFill color="white" />}
+              />
               <div className="h-8" />
               <Members discordMembers={guild.members} />
               <div className="h-8" />

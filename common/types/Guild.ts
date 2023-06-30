@@ -33,4 +33,5 @@ export type GuildItem = Omit<
   channels: ChannelItem[];
   tags: GuildTagItem[];
   members: GuildMemberItem[];
+  managementMembers: GuildMemberItem[];
 };

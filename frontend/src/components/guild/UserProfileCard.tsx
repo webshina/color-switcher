@@ -8,8 +8,8 @@ import {
 } from '@chakra-ui/react';
 import Image from 'next/image';
 import React from 'react';
+import { ActivityLevel } from '../common/ActiveLevel';
 import { UserProfile } from './UserProfile';
-import { ActivityLevel } from './common/ActiveLevel';
 
 type Props = {
   discordMember: GuildMemberItem;

@@ -1,4 +1,5 @@
 import { ChannelCategoryItem, ChannelItem } from '#/common/types/Channel';
+import { GuildItem } from '#/common/types/Guild';
 import {
   Accordion,
   AccordionButton,
@@ -7,17 +8,18 @@ import {
   AccordionPanel,
   Box,
 } from '@chakra-ui/react';
-import { ActivityLevel } from './common/ActiveLevel';
-import ImageCard from './utils/ImageCard';
+import { ActivityLevel } from '../common/ActiveLevel';
+import { JumpChannelBtn } from '../common/JumpChannelBtn';
+import ImageCard from '../utils/ImageCard';
 
 type Props = {
-  channels: ChannelItem[];
+  guild: GuildItem;
 };
 export const Channels: React.FC<Props> = (props) => {
   const categories: (ChannelCategoryItem & {
     channels: ChannelItem[];
   })[] = [];
-  props.channels.map((channel) => {
+  props.guild.channels.map((channel) => {
     if (!categories.some((category) => category.id === channel.categoryId)) {
       categories.push({
         ...channel.category!,
@@ -28,7 +30,7 @@ export const Channels: React.FC<Props> = (props) => {
   // Add channels to each category
   categories.map((category) => {
     category.channels = [];
-    props.channels.map((channel) => {
+    props.guild.channels.map((channel) => {
       if (channel.categoryId === category.id) {
         category.channels.push(channel);
       }
@@ -88,7 +90,10 @@ export const Channels: React.FC<Props> = (props) => {
                             <div className="h-5" />
                             {/* Go to channel */}
                             <div className="flex justify-end">
-                              {/* <JumpChannelBtn inviteCode={channel.inviteCode} /> */}
+                              <JumpChannelBtn
+                                guildDiscordId={props.guild.discordId}
+                                channelDiscordId={channel.discordId}
+                              />
                             </div>
                             <div className="h-3" />
                           </div>
