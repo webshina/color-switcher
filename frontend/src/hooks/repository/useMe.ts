@@ -4,8 +4,12 @@ import useSWR from 'swr';
 
 export const useMe = () => {
   const { ...swr } = useSWR('useMe', async () => {
-    const res = await get('/api/user/me');
-    return res.data as UserItem;
+    try {
+      const res = await get('/api/user/me');
+      return res.data as UserItem;
+    } catch (e) {
+      return null;
+    }
   });
 
   return {

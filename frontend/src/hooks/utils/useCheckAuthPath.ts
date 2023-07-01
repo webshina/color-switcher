@@ -3,7 +3,10 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import wildcardMatch from 'wildcard-match';
 
-export const useCheckAuthPath = (loadingUser: boolean, user?: UserItem) => {
+export const useCheckAuthPath = (
+  loadingUser: boolean,
+  user?: UserItem | null
+) => {
   const router = useRouter();
   const isIncludedOnlyLoginPaths = wildcardMatch([
     '/guild/create',
@@ -18,5 +21,5 @@ export const useCheckAuthPath = (loadingUser: boolean, user?: UserItem) => {
         }
       }
     }
-  }, [JSON.stringify(user)]);
+  }, [JSON.stringify(user), router.pathname, loadingUser]);
 };

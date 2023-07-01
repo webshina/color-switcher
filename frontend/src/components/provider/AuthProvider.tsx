@@ -7,7 +7,7 @@ import { ReactNode, createContext } from 'react';
 import { mutate } from 'swr';
 
 export type AuthContextProps = {
-  user?: UserItem;
+  user?: UserItem | null;
   loadingUser: boolean;
   login: (discordCode: string) => Promise<void>;
   logout: () => Promise<void>;

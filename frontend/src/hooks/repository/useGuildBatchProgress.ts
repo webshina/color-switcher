@@ -7,7 +7,6 @@ export const useGuildBatchProgress = (props: { guildId?: number }) => {
     props.guildId ? 'useGuildBatchProgress' : null,
     async () => {
       const res = await get('/api/guild/progress/' + props.guildId);
-      console.log(res.data);
       return res.data as GetBatchProgressResponse;
     },
     { refreshInterval: 500 }

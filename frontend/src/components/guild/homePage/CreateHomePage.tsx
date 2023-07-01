@@ -61,8 +61,6 @@ export const CreateHomePage: React.FC<Props> = (props) => {
     guildId: guildBatchId,
   });
   useEffect(() => {
-    console.log(guildBatchId);
-    console.log(progressData?.progressRate);
     if (progressData?.progressRate === 1) {
       router.push(`/guild/${guildId}`);
     }
