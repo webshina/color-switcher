@@ -1,4 +1,4 @@
-import { GuildHomePage } from '@/components/guild/GuildHomePage';
+import { GuildHomePage } from '@/components/guild/homePage/GuildHomePage';
 import DefaultLayout from '@/components/layout/default';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';

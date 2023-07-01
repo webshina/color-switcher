@@ -316,7 +316,7 @@ export class ChannelRepository {
     });
 
     if (existingChannelData.image) {
-      deleteFile('guildImages', existingChannelData.image);
+      deleteFile('guildCoverImages', existingChannelData.image);
     }
   }
 

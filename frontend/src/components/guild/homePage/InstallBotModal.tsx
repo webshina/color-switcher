@@ -1,3 +1,4 @@
+import { ImageComponent } from '@/components/utils/ImageComponent';
 import {
   Button,
   Modal,
@@ -9,7 +10,6 @@ import {
 } from '@chakra-ui/react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { HiCursorClick } from 'react-icons/hi';
-import { ImageComponent } from '../utils/ImageComponent';
 
 type Props = {
   isOpen: boolean;

@@ -1,4 +1,5 @@
 import { messages } from '#/common/constants/messages';
+import { ImageComponent } from '@/components/utils/ImageComponent';
 import { useGuildBatchProgress } from '@/hooks/repository/useGuildBatchProgress';
 import { useMyAdminGuilds } from '@/hooks/repository/useMyAdminGuilds';
 import useInputField from '@/hooks/utils/useInputField';
@@ -9,7 +10,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdPrecisionManufacturing } from 'react-icons/md';
-import { ImageComponent } from '../utils/ImageComponent';
 import { GuildBatchProgress } from './GuildBatchProgress';
 import { InstallBotModal } from './InstallBotModal';
 
@@ -43,7 +43,7 @@ export const CreateHomePage: React.FC<Props> = (props) => {
     try {
       setLoading(true);
       const res = await post('/api/guild/generate', {
-        discordId: selectedGuildDiscordId,
+        guildDiscordId: selectedGuildDiscordId,
       });
       setGuildId(res.data.guildId);
       setGuildBatchId(res.data.guildBatchId);

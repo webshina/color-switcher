@@ -2,7 +2,7 @@ import CircleImage from '@/components/utils/CircleImage';
 import { ImageComponent } from '@/components/utils/ImageComponent';
 import React from 'react';
 import { ActivityLevel } from './ActiveLevel';
-import { GuildMemberItem } from './types/GuildMember';
+import { GuildMemberItem } from './types/DiscordMember';
 
 type Props = {
   discordMember: GuildMemberItem;

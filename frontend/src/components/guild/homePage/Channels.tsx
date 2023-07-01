@@ -8,9 +8,9 @@ import {
   AccordionPanel,
   Box,
 } from '@chakra-ui/react';
-import { ActivityLevel } from '../common/ActiveLevel';
-import { JumpChannelBtn } from '../common/JumpChannelBtn';
-import ImageCard from '../utils/ImageCard';
+import { ActivityLevel } from '../../common/ActiveLevel';
+import { JumpChannelBtn } from '../../common/JumpChannelBtn';
+import ImageCard from '../../utils/ImageCard';
 
 type Props = {
   guild: GuildItem;

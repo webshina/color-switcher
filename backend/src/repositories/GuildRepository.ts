@@ -6,13 +6,16 @@ import { prisma } from '@/lib/prisma';
 import {
   copyRandomImage,
   deleteFile,
+  getFileInfoFromFormidable,
   getImageUrl,
   saveFileFromUrl,
+  uploadFile,
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
 import { Guild as GuildData } from '@prisma/client';
 import axios, { isAxiosError } from 'axios';
 import { Client } from 'discord.js';
+import formidable from 'formidable';
 import { v4 as uuid } from 'uuid';
 import { ChannelRepository } from './ChannelRepository';
 import { GuildMemberRepository } from './GuildMemberRepository';
@@ -76,7 +79,7 @@ export class GuildRepository {
       description: guildData.description,
       coverImageUrl:
         guildData.coverImage &&
-        getImageUrl('guildImages', guildData.coverImage),
+        getImageUrl('guildCoverImages', guildData.coverImage),
       isPrivate: guildData.isPrivate,
       iconURL: guildData.iconURL,
       createdByUserId: guildData.createdByUserId,
@@ -109,6 +112,24 @@ export class GuildRepository {
     const guildData = await prisma.guild.findUnique({
       where: {
         id: guildId,
+      },
+      include: {
+        channels: {
+          include: {
+            channelSummaries: true,
+          },
+        },
+      },
+    });
+    if (!guildData) throw new Error('Guild not found');
+
+    return await this.format(guildData);
+  }
+
+  static async getByDiscordId(guildDiscordId: string) {
+    const guildData = await prisma.guild.findUnique({
+      where: {
+        discordId: guildDiscordId,
       },
       include: {
         channels: {
@@ -199,34 +220,34 @@ export class GuildRepository {
 
     // Generate channels data
     const fetchedChannels = await fetchedGuild.channels.fetch();
-    ChannelRepository.generateChannelsData({
+    // ChannelRepository.generateChannelsData({
+    //   guildId: guildData.id,
+    //   channels: fetchedChannels.values(),
+    //   batchId: guildBatch.id,
+    // }).then(() => {
+    //   // Generate Description data
+    //   this.generateDescription({
+    //     guildId: guildData.id,
+    //     batchId: guildBatch.id,
+    //   });
+    //   // Generate Tags data
+    //   this.generateTags({
+    //     guildId: guildData.id,
+    //     batchId: guildBatch.id,
+    //   }).then(() => {
+    //     // Generate GuildImage data
+    //     this.generateGuildImage({
+    //       guildId: guildData.id,
+    //       batchId: guildBatch.id,
+    //     });
+    //   });
+    // Generate Member data
+    GuildMemberRepository.generateMember({
+      fetchedGuild: fetchedGuild,
       guildId: guildData.id,
-      channels: fetchedChannels.values(),
       batchId: guildBatch.id,
-    }).then(() => {
-      // Generate Description data
-      this.generateDescription({
-        guildId: guildData.id,
-        batchId: guildBatch.id,
-      });
-      // Generate Tags data
-      this.generateTags({
-        guildId: guildData.id,
-        batchId: guildBatch.id,
-      }).then(() => {
-        // Generate GuildImage data
-        this.generateGuildImage({
-          guildId: guildData.id,
-          batchId: guildBatch.id,
-        });
-      });
-      // Generate Member data
-      GuildMemberRepository.generateMember({
-        fetchedGuild: fetchedGuild,
-        guildId: guildData.id,
-        batchId: guildBatch.id,
-      });
     });
+    // });
 
     return {
       guildId: guildData.id,
@@ -396,7 +417,7 @@ Keywords:
           if (imageUrl) {
             const { fileName: savedImageName } = await saveFileFromUrl({
               url: imageUrl,
-              dir: 'guildImages',
+              dir: 'guildCoverImages',
               fileName: uuid(),
             });
             imageName = savedImageName;
@@ -411,7 +432,7 @@ Keywords:
 
       if (!imageName) {
         imageName = `${existingGuildData.id}`;
-        await copyRandomImage('guildImages', `${uuid()}.jpg`);
+        await copyRandomImage('guildCoverImages', `${uuid()}.jpg`);
       }
 
       await prisma.guild.update({
@@ -424,7 +445,7 @@ Keywords:
       });
 
       if (existingGuildData.coverImage) {
-        deleteFile('guildImages', existingGuildData.coverImage);
+        deleteFile('guildCoverImages', existingGuildData.coverImage);
       }
     }
 
@@ -474,5 +495,46 @@ Keywords:
     result.progressRate = Number((completedWorkCnt / allWorkCnt).toFixed(2));
 
     return result;
+  }
+
+  static async update(
+    guildId: number,
+    params: {
+      coverImage?: formidable.File;
+    }
+  ) {
+    const oldGuildData = await prisma.guild.findUnique({
+      where: {
+        id: guildId,
+      },
+    });
+    if (!oldGuildData) {
+      throw new Error('Guild not found');
+    }
+
+    if (params.coverImage) {
+      const newFileName = uuid();
+      const { buffer, ext, mimetype } = await getFileInfoFromFormidable(
+        params.coverImage
+      );
+      const { fileName } = await uploadFile({
+        dir: 'guildCoverImages',
+        file: buffer,
+        fileName: newFileName,
+        extension: ext,
+        mimetype,
+      });
+      await prisma.guild.update({
+        where: {
+          id: guildId,
+        },
+        data: {
+          coverImage: fileName,
+        },
+      });
+      if (oldGuildData.coverImage) {
+        deleteFile('guildCoverImages', oldGuildData.coverImage);
+      }
+    }
   }
 }

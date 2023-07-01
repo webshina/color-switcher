@@ -1,11 +1,14 @@
+import CircleImage from '@/components/utils/CircleImage';
+import Title from '@/components/utils/Title';
 import { useGuild } from '@/hooks/repository/useGuild';
+import { useMe } from '@/hooks/repository/useMe';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import 'react-datepicker/dist/react-datepicker.css';
+import { AiFillSetting } from 'react-icons/ai';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { IoChatbubblesSharp } from 'react-icons/io5';
 import { MdManageAccounts } from 'react-icons/md';
-import CircleImage from '../utils/CircleImage';
-import Title from '../utils/Title';
 import { Channels } from './Channels';
 import { Members } from './Members';
 import { TagCards } from './TagCards';
@@ -14,14 +17,19 @@ type Props = {
   guildId: number;
 };
 export const GuildHomePage: React.FC<Props> = (props) => {
+  const router = useRouter();
   const { data: guild } = useGuild({ guildId: props.guildId });
+  const { data: user } = useMe();
+  const isOwner = guild?.managementMembers.some(
+    (member) => member.discordId === user?.discordId
+  );
 
   return (
     <>
       {guild && (
         <>
           {/* Cover Image */}
-          <div className="relative h-60 w-full bg-gray-200">
+          <div className="relative h-60 w-full">
             <Image
               src={guild.coverImageUrl ?? '/images/no_image.jpeg'}
               alt="cover"
@@ -35,6 +43,22 @@ export const GuildHomePage: React.FC<Props> = (props) => {
                 height="100px"
               />
             </div>
+
+            {/* Management button */}
+            {isOwner && (
+              <div className="absolute top-0 right-0 m-2">
+                <button
+                  className="flex items-center px-4 py-2 text-lg bg-slate-800 rounded-xl border-2 border-slate-700"
+                  onClick={() => {
+                    router.push(`/guild/${guild.id}/management`);
+                  }}
+                >
+                  <AiFillSetting />
+                  <div className="w-1" />
+                  Management
+                </button>
+              </div>
+            )}
           </div>
           <div className="h-20" />
 

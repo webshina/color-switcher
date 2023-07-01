@@ -7,6 +7,7 @@ import { GuildRepository } from '@/repositories/GuildRepository';
 import { UserRepository } from '@/repositories/UserRepository';
 import { isError } from '@/utils/typeNarrower';
 import { Request, Response } from 'express';
+import Formidable from 'formidable';
 
 const get = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -19,13 +20,13 @@ const get = async (req: Request, res: Response) => {
 };
 
 const generate = async (req: Request, res: Response) => {
-  const { discordId } = req.body;
+  const { guildDiscordId } = req.body;
 
   const user = await UserRepository.getLoginUser(req);
 
   try {
     const { guildId, guildBatchId } = await GuildRepository.executeBatch(
-      discordId,
+      guildDiscordId,
       user!.id
     );
 
@@ -62,4 +63,18 @@ const getBatchProgress = async (req: Request, res: Response) => {
   return res.json(response);
 };
 
-export default { generate, get, getMine, getBatchProgress };
+const update = async (req: Request, res: Response) => {
+  const { guildId } = req.params;
+
+  const form = new Formidable.IncomingForm();
+  form.parse(req, async (err, fields, files) => {
+    const { coverImage } = files;
+    await GuildRepository.update(Number(guildId), {
+      coverImage: coverImage as Formidable.File,
+    });
+
+    return res.json('success');
+  });
+};
+
+export default { generate, get, getMine, getBatchProgress, update };

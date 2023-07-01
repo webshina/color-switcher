@@ -1,4 +1,5 @@
 import { GuildMemberItem } from '#/common/types/Guild';
+import { ActivityLevel } from '@/components/common/ActiveLevel';
 import {
   Modal,
   ModalBody,
@@ -8,7 +9,6 @@ import {
 } from '@chakra-ui/react';
 import Image from 'next/image';
 import React from 'react';
-import { ActivityLevel } from '../common/ActiveLevel';
 import { UserProfile } from './UserProfile';
 
 type Props = {
