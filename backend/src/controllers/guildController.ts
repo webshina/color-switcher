@@ -68,13 +68,32 @@ const update = async (req: Request, res: Response) => {
 
   const form = new Formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
+    const { description } = fields;
     const { coverImage } = files;
     await GuildRepository.update(Number(guildId), {
       coverImage: coverImage as Formidable.File,
+      description: description as string,
     });
 
     return res.json('success');
   });
 };
 
-export default { generate, get, getMine, getBatchProgress, update };
+const toggleAutoGeneration = async (req: Request, res: Response) => {
+  const { guildId } = req.params;
+  const { target, value } = req.body;
+  await GuildRepository.toggleAutoGeneration(Number(guildId), {
+    target: target as string,
+    value: value as boolean,
+  });
+  return res.json('success');
+};
+
+export default {
+  generate,
+  get,
+  getMine,
+  getBatchProgress,
+  update,
+  toggleAutoGeneration,
+};

@@ -6,6 +6,7 @@ import { BsFillPeopleFill } from 'react-icons/bs';
 import { IoChatbubblesSharp } from 'react-icons/io5';
 import { MdManageAccounts } from 'react-icons/md';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
+import { GuildDescriptionForm } from './GuildDescriptionForm';
 
 type Props = {
   guildId: number;
@@ -29,6 +30,7 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
           <div className="h-20" />
 
           {/* Channel name */}
+          <GuildDescriptionForm guild={guild} />
           <div className="h-8" />
 
           {/* Tags */}

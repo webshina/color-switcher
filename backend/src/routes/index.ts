@@ -28,6 +28,12 @@ router.post(
   isGuildManager,
   guildController.update
 );
+router.post(
+  '/api/guild/toggle-auto-generation/:guildId',
+  withAuth,
+  isGuildManager,
+  guildController.toggleAutoGeneration
+);
 router.get('/api/guild/mine', withAuth, guildController.getMine);
 router.get(
   '/api/guild/progress/:batchId',
