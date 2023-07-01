@@ -89,6 +89,17 @@ const toggleAutoGeneration = async (req: Request, res: Response) => {
   return res.json('success');
 };
 
+const updateTag = async (req: Request, res: Response) => {
+  const { guildId } = req.params;
+  const { method, tagName, tagId } = req.body;
+  await GuildRepository.updateTag(Number(guildId), {
+    method,
+    name: tagName as string,
+    tagId: Number(tagId),
+  });
+  return res.json('success');
+};
+
 export default {
   generate,
   get,
@@ -96,4 +107,5 @@ export default {
   getBatchProgress,
   update,
   toggleAutoGeneration,
+  updateTag,
 };

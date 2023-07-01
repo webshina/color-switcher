@@ -34,6 +34,12 @@ router.post(
   isGuildManager,
   guildController.toggleAutoGeneration
 );
+router.post(
+  '/api/guild/tag/:guildId',
+  withAuth,
+  isGuildManager,
+  guildController.updateTag
+);
 router.get('/api/guild/mine', withAuth, guildController.getMine);
 router.get(
   '/api/guild/progress/:batchId',

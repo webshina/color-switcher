@@ -4,7 +4,7 @@ import { BsRobot } from 'react-icons/bs';
 
 type Props = {
   guildId: number;
-  target: 'description';
+  target: 'description' | 'tags';
   isChecked: boolean;
   onChange: (value: boolean) => void;
 };

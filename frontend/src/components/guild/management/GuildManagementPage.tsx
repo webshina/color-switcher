@@ -7,6 +7,7 @@ import { IoChatbubblesSharp } from 'react-icons/io5';
 import { MdManageAccounts } from 'react-icons/md';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
 import { GuildDescriptionForm } from './GuildDescriptionForm';
+import { GuildTagForm } from './GuildTagForm';
 
 type Props = {
   guildId: number;
@@ -29,15 +30,13 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
           <GuildCoverImageForm guild={guild} />
           <div className="h-20" />
 
-          {/* Channel name */}
+          {/* Description */}
           <GuildDescriptionForm guild={guild} />
           <div className="h-8" />
 
           {/* Tags */}
+          <GuildTagForm guild={guild} />
           <div className="h-8" />
-
-          {/* Description */}
-          <div className="h-16" />
 
           {/* Management Team */}
           <Title
