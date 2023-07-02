@@ -46,6 +46,12 @@ router.post(
   isGuildManager,
   guildController.updateCategory
 );
+router.post(
+  '/api/guild/:guildId/channels',
+  withAuth,
+  isGuildManager,
+  guildController.updateChannel
+);
 router.get('/api/guild/mine', withAuth, guildController.getMine);
 router.get(
   '/api/guild/progress/:batchId',

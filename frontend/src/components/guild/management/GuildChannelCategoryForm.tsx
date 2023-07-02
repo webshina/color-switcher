@@ -12,11 +12,11 @@ import {
 } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DropResult } from 'react-beautiful-dnd';
 import 'react-datepicker/dist/react-datepicker.css';
-import { MdDragHandle } from 'react-icons/md';
+import { MdDragIndicator } from 'react-icons/md';
 import { mutate } from 'swr';
-import { GuildChannelForm } from './GuildChannelForm';
+import { GuildChannelsForm } from './GuildChannelsForm';
 const DynamicDroppable = dynamic(
   () => import('react-beautiful-dnd').then((mod) => mod.Droppable),
   { ssr: false }
@@ -56,7 +56,6 @@ export const GuildChannelCategoryForm: React.FC<Props> = (props) => {
       await post(`/api/guild/${props.guild.id}/channel/category`, {
         categoryOrders,
       });
-      console.log('useGuild');
       await mutate('useGuild');
       toast({
         status: 'success',
@@ -75,7 +74,7 @@ export const GuildChannelCategoryForm: React.FC<Props> = (props) => {
     <>
       <Title title="Channels" />
       <div className="h-8" />
-      <DragDropContext
+      <DynamicDragDropContext
         onDragEnd={(result) => {
           save(result);
         }}
@@ -108,7 +107,7 @@ export const GuildChannelCategoryForm: React.FC<Props> = (props) => {
                                     id="drag-handle"
                                     {...provided.dragHandleProps}
                                   >
-                                    <MdDragHandle size={20} />
+                                    <MdDragIndicator size={20} />
                                   </div>
                                   <div className="w-2" />
                                   <div className="text-2xl font-bold">
@@ -122,12 +121,7 @@ export const GuildChannelCategoryForm: React.FC<Props> = (props) => {
                           <AccordionPanel p={0} pb={4}>
                             <div className="h-1" />
                             <div className="flex flex-wrap">
-                              {category.channels.map((channel) => (
-                                <GuildChannelForm
-                                  key={channel.id}
-                                  channel={channel}
-                                />
-                              ))}
+                              <GuildChannelsForm channels={category.channels} />
                             </div>
                           </AccordionPanel>
                           <div className="h-8" />
@@ -141,7 +135,7 @@ export const GuildChannelCategoryForm: React.FC<Props> = (props) => {
             </div>
           )}
         </DynamicDroppable>
-      </DragDropContext>
+      </DynamicDragDropContext>
     </>
   );
 };

@@ -62,6 +62,7 @@ export class ChannelRepository {
         return channelSummaryItem;
       }),
       autoGenerate: channel.autoGenerate,
+      order: channel.order,
     };
 
     return channelItem;
@@ -505,6 +506,32 @@ Summary:
           activityScore,
         },
       });
+    }
+  }
+
+  static async update(props: {
+    guildId?: number;
+    channelId?: number;
+    params: {
+      orders: {
+        id: number;
+        order: number;
+      }[];
+    };
+  }) {
+    if (props.params.orders && props.params.orders.length > 0) {
+      await Promise.all(
+        props.params.orders.map(async (order) => {
+          await prisma.channel.update({
+            where: {
+              id: order.id,
+            },
+            data: {
+              order: order.order,
+            },
+          });
+        })
+      );
     }
   }
 }

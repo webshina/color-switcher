@@ -3,6 +3,7 @@ import {
   GenerateGuildResponse,
   GetBatchProgressResponse,
 } from '#/common/types/apiResponses/GuildControllerResponse';
+import { ChannelRepository } from '@/repositories/ChannelRepository';
 import { GuildRepository } from '@/repositories/GuildRepository';
 import { UserRepository } from '@/repositories/UserRepository';
 import { isError } from '@/utils/typeNarrower';
@@ -109,6 +110,21 @@ const updateCategory = async (req: Request, res: Response) => {
   return res.json('success');
 };
 
+const updateChannel = async (req: Request, res: Response) => {
+  const { guildId, channelId } = req.params;
+  const { orders } = req.body;
+
+  await ChannelRepository.update({
+    guildId: Number(guildId),
+    channelId: Number(channelId),
+    params: {
+      orders,
+    },
+  });
+
+  return res.json('success');
+};
+
 export default {
   generate,
   get,
@@ -118,4 +134,5 @@ export default {
   toggleAutoGeneration,
   updateTag,
   updateCategory,
+  updateChannel,
 };
