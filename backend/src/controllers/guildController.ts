@@ -100,6 +100,15 @@ const updateTag = async (req: Request, res: Response) => {
   return res.json('success');
 };
 
+const updateCategory = async (req: Request, res: Response) => {
+  const { guildId } = req.params;
+  const { categoryOrders } = req.body;
+
+  await GuildRepository.updateCategory(Number(guildId), { categoryOrders });
+
+  return res.json('success');
+};
+
 export default {
   generate,
   get,
@@ -108,4 +117,5 @@ export default {
   update,
   toggleAutoGeneration,
   updateTag,
+  updateCategory,
 };

@@ -4,7 +4,7 @@ import {
   GuildRole,
   GuildTag,
 } from '../../backend/node_modules/.prisma/client';
-import { ChannelItem } from './Channel';
+import { ChannelCategoryItem } from './Channel';
 
 export type GuildTagItem = Omit<GuildTag, 'createdAt' | 'updatedAt'>;
 
@@ -30,7 +30,7 @@ export type GuildItem = Omit<
   coverImageUrl?: string | null;
   availableChannelCnt: number;
   createdChannelCnt: number;
-  channels: ChannelItem[];
+  categories: ChannelCategoryItem[];
   tags: GuildTagItem[];
   members: GuildMemberItem[];
   managementMembers: GuildMemberItem[];

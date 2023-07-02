@@ -1,4 +1,5 @@
 import { messages } from '#/common/constants/messages';
+import { ChannelCategoryItem, ChannelItem } from '#/common/types/Channel';
 import { GuildItem, GuildMemberItem } from '#/common/types/Guild';
 import { GetBatchProgressResponse } from '#/common/types/apiResponses/GuildControllerResponse';
 import { createCompletion } from '@/lib/openAI';
@@ -12,7 +13,6 @@ import {
   uploadFile,
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
-import { Guild as GuildData } from '@prisma/client';
 import axios, { isAxiosError } from 'axios';
 import { Client } from 'discord.js';
 import formidable from 'formidable';
@@ -22,8 +22,52 @@ import { GuildMemberRepository } from './GuildMemberRepository';
 import { UserRepository } from './UserRepository';
 
 export class GuildRepository {
-  static async format(guildData: GuildData) {
-    const channelItems = await ChannelRepository.getByGuildId(guildData.id);
+  static async format(guildId: number) {
+    const guildData = await prisma.guild.findUnique({
+      where: {
+        id: guildId,
+      },
+      include: {
+        channelCategories: {
+          include: {
+            channels: {
+              include: {
+                channelSummaries: true,
+              },
+            },
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
+        channels: {
+          include: {
+            channelSummaries: true,
+          },
+        },
+      },
+    });
+    if (!guildData) {
+      throw new Error('Guild not found');
+    }
+
+    const channelCategoryItems: ChannelCategoryItem[] = [];
+    for (const channelCategory of guildData.channelCategories) {
+      const channelItems: ChannelItem[] =
+        await ChannelRepository.getByGuildIdCategoryId(
+          guildData.id,
+          channelCategory.id
+        );
+      const channelCategoryItem: ChannelCategoryItem = {
+        id: channelCategory.id,
+        discordId: channelCategory.discordId,
+        guildId: channelCategory.guildId,
+        name: channelCategory.name,
+        channels: channelItems,
+        order: channelCategory.order,
+      };
+      channelCategoryItems.push(channelCategoryItem);
+    }
 
     // Fetch tags
     const guildTags = await prisma.guildTag.findMany({
@@ -86,8 +130,8 @@ export class GuildRepository {
       iconURL: guildData.iconURL,
       createdByUserId: guildData.createdByUserId,
       availableChannelCnt: guildData.availableChannelCnt ?? 0,
-      createdChannelCnt: channelItems.length,
-      channels: channelItems,
+      createdChannelCnt: guildData.channels.length,
+      categories: channelCategoryItems,
       tags: guildTags.map((guildTag) => ({
         id: guildTag.id,
         name: guildTag.name,
@@ -125,7 +169,7 @@ export class GuildRepository {
     });
     if (!guildData) throw new Error('Guild not found');
 
-    return await this.format(guildData);
+    return await this.format(guildData.id);
   }
 
   static async getByDiscordId(guildDiscordId: string) {
@@ -143,7 +187,7 @@ export class GuildRepository {
     });
     if (!guildData) throw new Error('Guild not found');
 
-    return await this.format(guildData);
+    return await this.format(guildData.id);
   }
 
   static async getByUserId(userId: number) {
@@ -165,7 +209,7 @@ export class GuildRepository {
 
     const guildItems = await Promise.all(
       guildDataList.map(async (guildData) => {
-        return await this.format(guildData);
+        return await this.format(guildData.id);
       })
     );
     return guildItems;
@@ -597,5 +641,28 @@ Keywords:
         },
       });
     }
+  }
+
+  static async updateCategory(
+    guildId: number,
+    params: {
+      categoryOrders: {
+        id: number;
+        order: number;
+      }[];
+    }
+  ) {
+    await Promise.all(
+      params.categoryOrders.map((categoryOrder) =>
+        prisma.channelCategory.update({
+          where: {
+            id: categoryOrder.id,
+          },
+          data: {
+            order: categoryOrder.order,
+          },
+        })
+      )
+    );
   }
 }

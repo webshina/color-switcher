@@ -1,4 +1,3 @@
-import { ChannelCategoryItem, ChannelItem } from '#/common/types/Channel';
 import { GuildItem } from '#/common/types/Guild';
 import {
   Accordion,
@@ -15,32 +14,15 @@ type Props = {
   guild: GuildItem;
 };
 export const Channels: React.FC<Props> = (props) => {
-  const categories: (ChannelCategoryItem & {
-    channels: ChannelItem[];
-  })[] = [];
-  props.guild.channels.map((channel) => {
-    if (!categories.some((category) => category.id === channel.categoryId)) {
-      categories.push({
-        ...channel.category!,
-        channels: [],
-      });
-    }
-  });
-  // Add channels to each category
-  categories.map((category) => {
-    category.channels = [];
-    props.guild.channels.map((channel) => {
-      if (channel.categoryId === category.id) {
-        category.channels.push(channel);
-      }
-    });
-  });
   return (
     <Accordion
-      defaultIndex={Array.from({ length: categories.length }, (v, k) => k)} // Open all accordions
+      defaultIndex={Array.from(
+        { length: props.guild.categories.length },
+        (v, k) => k
+      )} // Open all accordions
       allowMultiple
     >
-      {categories.map((category) => (
+      {props.guild.categories.map((category) => (
         <AccordionItem key={category.id}>
           <h2>
             <AccordionButton className="bg-slate-800">

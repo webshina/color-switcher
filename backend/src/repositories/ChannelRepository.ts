@@ -50,9 +50,7 @@ export class ChannelRepository {
       category: categoryData
         ? {
             id: categoryData.id,
-            discordId: categoryData.discordId,
             name: categoryData.name,
-            guildId: categoryData.guildId,
           }
         : null,
       summaries: channelSummaries.map((summary) => {
@@ -63,6 +61,7 @@ export class ChannelRepository {
         };
         return channelSummaryItem;
       }),
+      autoGenerate: channel.autoGenerate,
     };
 
     return channelItem;
@@ -82,6 +81,26 @@ export class ChannelRepository {
     const channels = await prisma.channel.findMany({
       where: {
         guildId: guildId,
+      },
+      orderBy: {
+        messagesPerDay: 'desc',
+      },
+    });
+    if (!channels) throw new Error('Channel not found');
+
+    const formattedChannels = await Promise.all(
+      channels.map(async (channel) => {
+        return await this.format(channel);
+      })
+    );
+    return formattedChannels;
+  }
+
+  static async getByGuildIdCategoryId(guildId: number, categoryId: number) {
+    const channels = await prisma.channel.findMany({
+      where: {
+        guildId: guildId,
+        categoryId: categoryId,
       },
       orderBy: {
         messagesPerDay: 'desc',

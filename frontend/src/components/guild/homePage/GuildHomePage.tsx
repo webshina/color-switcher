@@ -88,7 +88,7 @@ export const GuildHomePage: React.FC<Props> = (props) => {
           <div className="h-16" />
 
           {/* Channel list */}
-          {guild.channels && guild.channels.length > 0 && (
+          {guild.categories && guild.categories.length > 0 && (
             <>
               <Title
                 title={'Channels'}
