@@ -1,5 +1,4 @@
 import { ChannelItem } from '#/common/types/Channel';
-import { SaveBtn } from '@/components/common/SaveBtn';
 import { useImagesUploader } from '@/hooks/utils/useImagesUpload';
 import useValidate from '@/hooks/utils/useValidation';
 import { post } from '@/utils/apiHelper';
@@ -111,10 +110,6 @@ export const GuildChannelForm: React.FC<Props> = (props) => {
         {showConversationSummary && (
           <ConversationSummaries summaries={props.channel.summaries} />
         )}
-
-        <div className="flex justify-end m-2">
-          <SaveBtn onClick={() => {}} disabled={false} />
-        </div>
       </div>
     </div>
   );
