@@ -1,4 +1,5 @@
 import authController from '@/controllers/authController';
+import channelController from '@/controllers/channelController';
 import guildController from '@/controllers/guildController';
 import userController from '@/controllers/userController';
 import { withAuth } from '@/middleware/auth';
@@ -50,7 +51,13 @@ router.post(
   '/api/guild/:guildId/channels',
   withAuth,
   isGuildManager,
-  guildController.updateChannel
+  channelController.updateChannels
+);
+router.post(
+  '/api/guild/:guildId/channel/:channelId',
+  withAuth,
+  isGuildManager,
+  channelController.updateChannel
 );
 router.get('/api/guild/mine', withAuth, guildController.getMine);
 router.get(

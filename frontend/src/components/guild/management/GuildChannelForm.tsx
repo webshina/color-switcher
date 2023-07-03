@@ -39,7 +39,10 @@ export const GuildChannelForm: React.FC<Props> = (props) => {
     try {
       const formData = new FormData();
       formData.append('image', image);
-      await post(`/api/guild/channel/update/${props.channel.id}`, formData);
+      await post(
+        `/api/guild/${props.channel.guildId}/channel/${props.channel.id}`,
+        formData
+      );
       toast({
         status: 'success',
         description: 'Saved',

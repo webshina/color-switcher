@@ -4,8 +4,10 @@ import { prisma } from '@/lib/prisma';
 import {
   copyRandomImage,
   deleteFile,
+  getFileInfoFromFormidable,
   getImageUrl,
   saveFileFromUrl,
+  uploadFile,
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
 import { isDiscordError } from '@/utils/typeNarrower';
@@ -17,6 +19,7 @@ import {
   NonThreadGuildBasedChannel,
   TextChannel,
 } from 'discord.js';
+import formidable from 'formidable';
 import { v4 as uuid } from 'uuid';
 
 export class ChannelRepository {
@@ -509,9 +512,8 @@ Summary:
     }
   }
 
-  static async update(props: {
-    guildId?: number;
-    channelId?: number;
+  static async updateOrder(props: {
+    guildId: number;
     params: {
       orders: {
         id: number;
@@ -532,6 +534,48 @@ Summary:
           });
         })
       );
+    }
+  }
+
+  static async update(
+    channelId: number,
+    params: {
+      image: formidable.File;
+    }
+  ) {
+    const oldChannelData = await prisma.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+    });
+    if (!oldChannelData) {
+      throw new Error('Channel not found');
+    }
+
+    // Update cover image
+    if (params.image) {
+      const newFileName = uuid();
+      const { buffer, ext, mimetype } = await getFileInfoFromFormidable(
+        params.image
+      );
+      const { fileName } = await uploadFile({
+        dir: 'channelImages',
+        file: buffer,
+        fileName: newFileName,
+        extension: ext,
+        mimetype,
+      });
+      await prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          image: fileName,
+        },
+      });
+      if (oldChannelData.image) {
+        deleteFile('channelImages', oldChannelData.image);
+      }
     }
   }
 }
