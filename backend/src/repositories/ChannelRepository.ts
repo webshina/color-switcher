@@ -64,7 +64,7 @@ export class ChannelRepository {
         };
         return channelSummaryItem;
       }),
-      autoGenerate: channel.autoGenerate,
+      showConversationSummary: channel.showConversationSummary,
       order: channel.order,
     };
 
@@ -540,7 +540,8 @@ Summary:
   static async update(
     channelId: number,
     params: {
-      image: formidable.File;
+      image?: formidable.File;
+      showConversationSummary?: boolean;
     }
   ) {
     const oldChannelData = await prisma.channel.findUnique({
@@ -576,6 +577,18 @@ Summary:
       if (oldChannelData.image) {
         deleteFile('channelImages', oldChannelData.image);
       }
+    }
+
+    // Update autoGenerateSummary
+    if (params.showConversationSummary !== undefined) {
+      await prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          showConversationSummary: params.showConversationSummary,
+        },
+      });
     }
   }
 }

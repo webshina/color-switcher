@@ -1,3 +1,4 @@
+import { AutoGenerateTarget } from '#/common/types/AutoGenerateTarget';
 import {
   FetchGuildResponse,
   GenerateGuildResponse,
@@ -82,10 +83,12 @@ const update = async (req: Request, res: Response) => {
 const toggleAutoGeneration = async (req: Request, res: Response) => {
   const { guildId } = req.params;
   const { target, value } = req.body;
+
   await GuildRepository.toggleAutoGeneration(Number(guildId), {
-    target: target as string,
+    target: target as AutoGenerateTarget,
     value: value as boolean,
   });
+
   return res.json('success');
 };
 

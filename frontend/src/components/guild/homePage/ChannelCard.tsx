@@ -3,6 +3,7 @@ import { GuildItem } from '#/common/types/Guild';
 import { ActivityLevel } from '@/components/common/ActiveLevel';
 import { JumpChannelBtn } from '@/components/common/JumpChannelBtn';
 import ImageCard from '@/components/utils/ImageCard';
+import { ConversationSummaries } from './ConversationSummaries';
 
 type Props = {
   guild: GuildItem;
@@ -25,18 +26,7 @@ export const ChannelCard: React.FC<Props> = (props) => {
             {/* Conversation Summary */}
             <div className="text-sm font-semibold">AI Summary</div>
             <div className="h-3" />
-            <div className="p-4 h-48 overflow-auto rounded-md bg-slate-800">
-              {props.channel.summaries.map((summary) => {
-                return (
-                  <div
-                    key={summary.id}
-                    className="my-1 p-3 rounded-md bg-white/10 text-sm"
-                  >
-                    {summary.content}
-                  </div>
-                );
-              })}
-            </div>
+            <ConversationSummaries summaries={props.channel.summaries} />
             <div className="h-5" />
             {/* Go to channel */}
             <div className="flex justify-end">

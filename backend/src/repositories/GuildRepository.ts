@@ -1,4 +1,5 @@
 import { messages } from '#/common/constants/messages';
+import { AutoGenerateTarget } from '#/common/types/AutoGenerateTarget';
 import { ChannelCategoryItem, ChannelItem } from '#/common/types/Channel';
 import { GuildItem, GuildMemberItem } from '#/common/types/Guild';
 import { GetBatchProgressResponse } from '#/common/types/apiResponses/GuildControllerResponse';
@@ -602,7 +603,7 @@ Keywords:
   static async toggleAutoGeneration(
     guildId: number,
     params: {
-      target: string;
+      target: AutoGenerateTarget;
       value: boolean;
     }
   ) {

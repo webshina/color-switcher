@@ -134,21 +134,21 @@ model GuildTag {
 
 // Channel model
 model Channel {
-  id             Int              @id @default(autoincrement())
-  discordId      String
-  name           String
-  topic          String?
-  image          String?
-  guild          Guild            @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId        Int
-  category       ChannelCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  categoryId     Int?
-  messagesPerDay Float?
-  activityScore  Int?
-  autoGenerate   Boolean          @default(true)
-  order          Int              @default(0)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id                      Int              @id @default(autoincrement())
+  discordId               String
+  name                    String
+  topic                   String?
+  image                   String?
+  guild                   Guild            @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId                 Int
+  category                ChannelCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId              Int?
+  messagesPerDay          Float?
+  activityScore           Int?
+  showConversationSummary Boolean          @default(true)
+  order                   Int              @default(0)
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
 
   // Channel Summaries
   channelSummaries ChannelSummary[]

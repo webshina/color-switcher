@@ -21,10 +21,11 @@ const updateChannel = async (req: Request, res: Response) => {
 
   const form = new Formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
-    const {} = fields;
+    const { showConversationSummary } = fields;
     const { image } = files;
     await ChannelRepository.update(Number(channelId), {
       image: image as Formidable.File,
+      showConversationSummary: showConversationSummary === 'true',
     });
 
     return res.json('success');

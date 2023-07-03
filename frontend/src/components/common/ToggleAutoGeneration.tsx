@@ -1,10 +1,13 @@
+import { AutoGenerateTarget } from '#/common/types/AutoGenerateTarget';
 import { post } from '@/utils/apiHelper';
 import { Switch, useToast } from '@chakra-ui/react';
 import { BsRobot } from 'react-icons/bs';
+import { mutate } from 'swr';
 
 type Props = {
   guildId: number;
-  target: 'description' | 'tags';
+  channelId?: number;
+  target: AutoGenerateTarget;
   isChecked: boolean;
   onChange: (value: boolean) => void;
 };
@@ -16,7 +19,10 @@ export const ToggleAutoGeneration: React.FC<Props> = (props) => {
       await post(`/api/guild/toggle-auto-generation/${props.guildId}`, {
         target: props.target,
         value: value,
+        channelId: props.channelId,
       });
+      await mutate('useGuild');
+
       toast({
         status: 'success',
         description: 'Saved',
@@ -46,7 +52,6 @@ export const ToggleAutoGeneration: React.FC<Props> = (props) => {
           props.onChange(e.target.checked);
         }}
       />
-      <div className="w-5" />
     </div>
   );
 };
