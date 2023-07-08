@@ -61,6 +61,11 @@ router.post(
   channelController.updateChannel
 );
 router.post(
+  '/api/guild/:guildId/members',
+  withAuth,
+  guildMemberController.updateMembers
+);
+router.post(
   '/api/guild/:guildId/member/:memberId/posts',
   withAuth,
   guildMemberController.updatePosts

@@ -26,11 +26,10 @@ type Props = {
 };
 export const GuildChannelsForm: React.FC<Props> = (props) => {
   const toast = useToast();
-  // const [generateAuto, setGenerateAuto] = useState(props.guild.autoGenerate);
   const [channels, setChannels] = useState(props.channels);
   const screenSize = useScreenSize();
 
-  const save = async (result: DropResult) => {
+  const saveOrder = async (result: DropResult) => {
     // Sort on screen
     const newChannels = Array.from(channels);
     const [recordedItem] = newChannels.splice(result.source.index, 1);
@@ -39,7 +38,6 @@ export const GuildChannelsForm: React.FC<Props> = (props) => {
     const orders = newChannels.map((category, index) => {
       return {
         id: category.id,
-        name: category.name,
         order: index,
       };
     });
@@ -66,7 +64,7 @@ export const GuildChannelsForm: React.FC<Props> = (props) => {
     <>
       <DynamicDragDropContext
         onDragEnd={(result) => {
-          save(result);
+          saveOrder(result);
         }}
       >
         <DynamicDroppable

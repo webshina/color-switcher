@@ -49,6 +49,7 @@ export class GuildMemberRepository {
       messagesPerDay: guildMemberData.messagesPerDay,
       activityScore: guildMemberData.activityScore,
       autoGenerate: guildMemberData.autoGenerate,
+      order: guildMemberData.order,
       roles: guildMemberData.roleRelations.map((roleRelation) => ({
         id: roleRelation.guildRole.id,
         discordId: roleRelation.guildRole.discordId,
@@ -71,6 +72,9 @@ export class GuildMemberRepository {
     const membersData = await prisma.guildMember.findMany({
       where: {
         guildId,
+      },
+      orderBy: {
+        order: 'asc',
       },
     });
     const members: GuildMemberItem[] = [];
@@ -418,5 +422,30 @@ export class GuildMemberRepository {
         autoGenerate: value,
       },
     });
+  }
+
+  static async updateOrder(props: {
+    guildId: number;
+    params: {
+      orders: {
+        id: number;
+        order: number;
+      }[];
+    };
+  }) {
+    if (props.params.orders && props.params.orders.length > 0) {
+      await Promise.all(
+        props.params.orders.map(async (order) => {
+          await prisma.guildMember.update({
+            where: {
+              id: order.id,
+            },
+            data: {
+              order: order.order,
+            },
+          });
+        })
+      );
+    }
   }
 }

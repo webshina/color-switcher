@@ -47,7 +47,6 @@ export const GuildChannelCategoryForm: React.FC<Props> = (props) => {
     const categoryOrders = newCategories.map((category, index) => {
       return {
         id: category.id,
-        name: category.name,
         order: index,
       };
     });
