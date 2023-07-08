@@ -82,7 +82,7 @@ export class GuildMemberRepository {
     return members;
   }
 
-  static async generateMember(props: {
+  static async generate(props: {
     fetchedGuild: Guild;
     guildId: number;
     batchId: number;
@@ -407,5 +407,16 @@ export class GuildMemberRepository {
     });
 
     return fetchedManagementMembers;
+  }
+
+  static async toggleAutoGeneration(memberId: number, value: boolean) {
+    await prisma.guildMember.update({
+      where: {
+        id: memberId,
+      },
+      data: {
+        autoGenerate: value,
+      },
+    });
   }
 }

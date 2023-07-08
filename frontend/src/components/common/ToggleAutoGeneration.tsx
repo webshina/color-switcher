@@ -7,6 +7,7 @@ import { mutate } from 'swr';
 type Props = {
   guildId: number;
   channelId?: number;
+  memberId?: number;
   target: AutoGenerateTarget;
   isChecked: boolean;
   onChange: (value: boolean) => void;
@@ -16,10 +17,11 @@ export const ToggleAutoGeneration: React.FC<Props> = (props) => {
 
   const toggleAutoGeneration = async (value: boolean) => {
     try {
-      await post(`/api/guild/toggle-auto-generation/${props.guildId}`, {
+      await post(`/api/guild/${props.guildId}/toggle-auto-generation`, {
         target: props.target,
         value: value,
         channelId: props.channelId,
+        memberId: props.memberId,
       });
       await mutate('useGuild');
 
@@ -37,10 +39,10 @@ export const ToggleAutoGeneration: React.FC<Props> = (props) => {
   };
 
   return (
-    <div className="flex justify-end items-center">
+    <div className="flex items-center">
       <BsRobot />
       <div className="w-2" />
-      <div className="text-sm">Auto-AI Generation</div>
+      <div className="text-sm">AI Generate</div>
       <div className="w-2" />
       <Switch
         id="toggle-auto-generation"

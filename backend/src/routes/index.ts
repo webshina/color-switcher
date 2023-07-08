@@ -31,7 +31,7 @@ router.post(
   guildController.update
 );
 router.post(
-  '/api/guild/toggle-auto-generation/:guildId',
+  '/api/guild/:guildId/toggle-auto-generation',
   withAuth,
   isGuildManager,
   guildController.toggleAutoGeneration

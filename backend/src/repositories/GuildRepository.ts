@@ -258,7 +258,7 @@ export class GuildRepository {
         });
       });
       // Generate Member data
-      GuildMemberRepository.generateMember({
+      GuildMemberRepository.generate({
         fetchedGuild: fetchedGuild,
         guildId: guildData.id,
         batchId: guildBatch.id,

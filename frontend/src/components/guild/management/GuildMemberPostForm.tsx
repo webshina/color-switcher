@@ -9,6 +9,7 @@ import { mutate } from 'swr';
 type Props = {
   post: GuildPostItem;
   member: GuildMemberItem;
+  disabled?: boolean;
 };
 export const GuildMemberPostForm: React.FC<Props> = (props) => {
   const toast = useToast();
@@ -55,6 +56,7 @@ export const GuildMemberPostForm: React.FC<Props> = (props) => {
       onChange={(e) => {
         toggleHasPost(props.post.id, e.target.checked);
       }}
+      disabled={props.disabled}
     >
       {postDisplayName[props.post.name]}
     </Checkbox>

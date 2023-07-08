@@ -73,7 +73,7 @@ export const GuildTagForm: React.FC<Props> = (props) => {
     <>
       <Title title="Tags" />
       <div className="h-5" />
-      <div className="text-end">
+      <div className="flex justify-end">
         <ToggleAutoGeneration
           guildId={props.guild.id}
           target="tags"

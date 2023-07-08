@@ -66,7 +66,7 @@ export const GuildDescriptionForm: React.FC<Props> = (props) => {
     <>
       <Title title="Description" />
       <div className="h-5" />
-      <div className="text-end">
+      <div className="flex justify-end">
         <ToggleAutoGeneration
           guildId={props.guild.id}
           target="description"

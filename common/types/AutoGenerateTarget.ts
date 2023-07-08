@@ -1,1 +1,1 @@
-export type AutoGenerateTarget = 'description' | 'tags';
+export type AutoGenerateTarget = 'description' | 'tags' | 'member';

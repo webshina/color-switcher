@@ -23,7 +23,7 @@ export const isGuildManager = async (
   let guildData: GuildItem | null = null;
   let managementMembers: { discordId: string }[] = [];
   if (paramGuildId) {
-    guildData = await GuildRepository.getByDiscordId(paramGuildId);
+    guildData = await GuildRepository.getById(Number(paramGuildId));
     managementMembers = guildData!.managementMembers.map(
       (managementMember) => ({
         discordId: managementMember.discordId,

@@ -4,6 +4,7 @@ import {
   GenerateGuildResponse,
   GetBatchProgressResponse,
 } from '#/common/types/apiResponses/GuildControllerResponse';
+import { GuildMemberRepository } from '@/repositories/GuildMemberRepository';
 import { GuildRepository } from '@/repositories/GuildRepository';
 import { UserRepository } from '@/repositories/UserRepository';
 import { isError } from '@/utils/typeNarrower';
@@ -82,12 +83,20 @@ const update = async (req: Request, res: Response) => {
 
 const toggleAutoGeneration = async (req: Request, res: Response) => {
   const { guildId } = req.params;
-  const { target, value } = req.body;
+  const { value, memberId } = req.body;
+  const target = req.body.target as AutoGenerateTarget;
 
-  await GuildRepository.toggleAutoGeneration(Number(guildId), {
-    target: target as AutoGenerateTarget,
-    value: value as boolean,
-  });
+  if (target === 'tags' || target === 'description') {
+    await GuildRepository.toggleAutoGeneration(Number(guildId), {
+      target,
+      value: value as boolean,
+    });
+  } else if (target === 'member') {
+    await GuildMemberRepository.toggleAutoGeneration(
+      Number(memberId),
+      value as boolean
+    );
+  }
 
   return res.json('success');
 };
