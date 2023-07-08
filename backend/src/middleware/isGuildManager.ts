@@ -1,7 +1,9 @@
+import { messages } from '#/common/constants/messages';
 import { GuildItem } from '#/common/types/Guild';
 import { GuildMemberRepository } from '@/repositories/GuildMemberRepository';
 import { GuildRepository } from '@/repositories/GuildRepository';
 import { UserRepository } from '@/repositories/UserRepository';
+import { isError } from '@/utils/typeNarrower';
 import { NextFunction, Request, Response } from 'express';
 
 export const isGuildManager = async (
@@ -39,13 +41,21 @@ export const isGuildManager = async (
       );
     } catch (error) {
       // If guild is not registered, fetch management members from bot
-      const fetchedManagementMembers =
-        await GuildMemberRepository.fetchManagementMembersFromBot(
-          paramGuildDiscordId
-        );
-      managementMembers = fetchedManagementMembers.map((member) => ({
-        discordId: member.id,
-      }));
+      try {
+        const fetchedManagementMembers =
+          await GuildMemberRepository.fetchManagementMembersFromBot(
+            paramGuildDiscordId
+          );
+        managementMembers = fetchedManagementMembers.map((member) => ({
+          discordId: member.id,
+        }));
+      } catch (error) {
+        if (isError(error)) {
+          if (error.message === messages.botNotInstalled) {
+            return res.status(400).json(messages.botNotInstalled);
+          }
+        }
+      }
     }
   }
 

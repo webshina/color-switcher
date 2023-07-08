@@ -1,3 +1,4 @@
+import { messages } from '#/common/constants/messages';
 import { GuildMemberItem } from '#/common/types/Guild';
 import { getBot } from '@/lib/discort';
 import { prisma } from '@/lib/prisma';
@@ -398,7 +399,7 @@ export class GuildMemberRepository {
     const bot = await getBot();
     const fetchedGuilds = await bot.guilds.fetch();
     const fetchedGuild = await fetchedGuilds.get(guildDiscordId)?.fetch();
-    if (!fetchedGuild) throw new Error('Guild not found');
+    if (!fetchedGuild) throw new Error(messages.botNotInstalled);
 
     const members = fetchedGuild.members.cache;
     const fetchedManagementMembers = members.filter((member) => {
