@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { User } from '@prisma/client';
 import axios from 'axios';
 import { Request } from 'express';
+import { GuildMemberRepository } from './GuildMemberRepository';
 
 export class UserRepository {
   static async format(user: User) {
@@ -24,11 +25,15 @@ export class UserRepository {
         name: guildMember.guild.name,
         isPrivate: guildMember.guild.isPrivate,
         iconURL: guildMember.guild.iconURL,
-        isOwner: guildMember.isOwner,
         permissions: Number(guildMember.permissions),
-        manageable:
-          guildMember.isOwner ||
-          this.hasPermission(Number(guildMember.permissions), 'MANAGE_GUILD'),
+        isOwner: GuildMemberRepository.hasPermission(
+          Number(guildMember.permissions),
+          'ADMINISTRATOR'
+        ),
+        isManager: GuildMemberRepository.hasPermission(
+          Number(guildMember.permissions),
+          'MANAGE_GUILD'
+        ),
       })),
     };
 
@@ -88,7 +93,12 @@ export class UserRepository {
       name: string;
     }[] = [];
     for (const fetchedGuild of fetchedGuilds) {
-      if (this.hasPermission(fetchedGuild.permissions, 'MANAGE_GUILD')) {
+      if (
+        GuildMemberRepository.hasPermission(
+          fetchedGuild.permissions,
+          'MANAGE_GUILD'
+        )
+      ) {
         adminGuilds.push({
           id: fetchedGuild.id,
           discordId: fetchedGuild.id,
@@ -98,16 +108,5 @@ export class UserRepository {
     }
 
     return adminGuilds;
-  }
-
-  static hasPermission(permissions: number, permissionType: 'MANAGE_GUILD') {
-    const permissionTypes = {
-      MANAGE_GUILD: 0x20,
-    };
-    const permissionHex = permissionTypes[permissionType];
-    return (
-      // Check if the user has the MANAGE_GUILD permission by doing a bitwise AND
-      (permissions & permissionHex) === permissionHex
-    );
   }
 }

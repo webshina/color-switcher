@@ -9,8 +9,8 @@ export type UserItem = Omit<
     discordId: String;
     name: String;
     iconURL: String | null;
-    isOwner: boolean;
     permissions: number;
-    manageable: boolean;
+    isOwner: boolean;
+    isManager: boolean;
   }[];
 };

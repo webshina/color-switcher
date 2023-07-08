@@ -42,7 +42,7 @@ export const CreateHomePage: React.FC<Props> = (props) => {
     if (!selectedGuildDiscordId) return;
     try {
       setLoading(true);
-      const res = await post('/api/guild/generate', {
+      const res = await post(`/api/guild/${selectedGuildDiscordId}/generate`, {
         guildDiscordId: selectedGuildDiscordId,
       });
       setGuildId(res.data.guildId);
@@ -79,7 +79,10 @@ export const CreateHomePage: React.FC<Props> = (props) => {
       <InstallBotModal
         isOpen={isOpenInstallBotModal}
         onOpen={onOpenInstallBotModal}
-        onClose={onCloseInstallBotModal}
+        onClose={() => {
+          onCloseInstallBotModal();
+          setLoading(false);
+        }}
       />
 
       <div className="flex flex-col items-center w-full p-24 bg-slate-900 rounded-xl">

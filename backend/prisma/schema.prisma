@@ -67,6 +67,9 @@ model Guild {
   channelCategories ChannelCategory[]
 
   guildBatches GuildBatch[]
+
+  // Posts
+  posts GuildPost[]
 }
 
 // GuildMember model
@@ -78,18 +81,51 @@ model GuildMember {
   User           User?     @relation(fields: [userId], references: [id])
   userId         Int?
   name           String
-  isOwner        Boolean
   permissions    BigInt
   displayName    String?
   avatarURL      String?
   messagesPerDay Float?
   activityScore  Int?
   joinedAt       DateTime?
+  autoGenerate   Boolean   @default(true)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   // Roles
   roleRelations GuildMemberRoleRelation[]
+
+  // Posts
+  postRelations GuildMemberPostRelation[]
+}
+
+enum PostName {
+  MANAGER
+}
+
+model GuildPost {
+  id        Int      @id @default(autoincrement())
+  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  guildId   Int
+  name      PostName
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Post Relations
+  postRelations GuildMemberPostRelation[]
+
+  @@unique([guildId, name])
+}
+
+model GuildMemberPostRelation {
+  id            Int         @id @default(autoincrement())
+  guildMember   GuildMember @relation(fields: [guildMemberId], references: [id], onDelete: Cascade)
+  guildMemberId Int
+  guildPost     GuildPost   @relation(fields: [guildPostId], references: [id], onDelete: Cascade)
+  guildPostId   Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([guildMemberId, guildPostId])
 }
 
 // Guild Role model

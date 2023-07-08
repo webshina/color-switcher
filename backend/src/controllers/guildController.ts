@@ -26,7 +26,7 @@ const generate = async (req: Request, res: Response) => {
   const user = await UserRepository.getLoginUser(req);
 
   try {
-    const { guildId, guildBatchId } = await GuildRepository.executeBatch(
+    const { guildId, guildBatchId } = await GuildRepository.generate(
       guildDiscordId,
       user!.id
     );

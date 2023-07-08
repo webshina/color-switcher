@@ -1,8 +1,87 @@
+import { GuildMemberItem } from '#/common/types/Guild';
+import { getBot } from '@/lib/discort';
 import { prisma } from '@/lib/prisma';
 import { addToDate } from '@/utils/dateHelper';
+import { GuildMember } from '@prisma/client';
 import { Guild } from 'discord.js';
 
 export class GuildMemberRepository {
+  static async format(memberId: number) {
+    const guildMemberData = await prisma.guildMember.findUnique({
+      where: {
+        id: memberId,
+      },
+      include: {
+        roleRelations: {
+          include: {
+            guildMember: true,
+            guildRole: true,
+          },
+        },
+        postRelations: {
+          include: {
+            guildPost: true,
+          },
+        },
+      },
+    });
+    if (!guildMemberData) {
+      throw new Error('Guild member not found');
+    }
+    const guildMember: GuildMemberItem = {
+      id: guildMemberData.id,
+      userId: guildMemberData.userId,
+      discordId: guildMemberData.discordId,
+      guildId: guildMemberData.guildId,
+      name: guildMemberData.name,
+      isOwner: this.hasPermission(
+        Number(guildMemberData.permissions),
+        'ADMINISTRATOR'
+      ),
+      isManager: this.hasPermission(
+        Number(guildMemberData.permissions),
+        'MANAGE_GUILD'
+      ),
+      permissions: guildMemberData.permissions.toString(),
+      displayName: guildMemberData.displayName,
+      avatarURL: guildMemberData.avatarURL,
+      joinedAt: guildMemberData.joinedAt,
+      messagesPerDay: guildMemberData.messagesPerDay,
+      activityScore: guildMemberData.activityScore,
+      autoGenerate: guildMemberData.autoGenerate,
+      roles: guildMemberData.roleRelations.map((roleRelation) => ({
+        id: roleRelation.guildRole.id,
+        discordId: roleRelation.guildRole.discordId,
+        guildId: roleRelation.guildRole.guildId,
+        name: roleRelation.guildRole.name,
+        hexColor: roleRelation.guildRole.hexColor,
+        position: roleRelation.guildRole.position,
+        permissions: roleRelation.guildRole.permissions.toString(),
+      })),
+      posts: guildMemberData.postRelations.map((postRelation) => ({
+        id: postRelation.guildPost.id,
+        guildId: postRelation.guildPost.guildId,
+        name: postRelation.guildPost.name,
+      })),
+    };
+    return guildMember;
+  }
+
+  static async getByGuildId(guildId: number) {
+    const membersData = await prisma.guildMember.findMany({
+      where: {
+        guildId,
+      },
+    });
+    const members: GuildMemberItem[] = [];
+    for (const memberData of membersData) {
+      const member = await this.format(memberData.id);
+      members.push(member);
+    }
+
+    return members;
+  }
+
   static async generateMember(props: {
     fetchedGuild: Guild;
     guildId: number;
@@ -27,23 +106,60 @@ export class GuildMemberRepository {
           return;
         }
 
+        const existingGuildMember = await prisma.guildMember.findUnique({
+          where: {
+            discordId: fetchedMember.id,
+          },
+        });
+
         const data = {
           discordId: fetchedMember.id,
           guildId: props.guildId,
           name: fetchedMember.user.username,
-          isOwner: fetchedMember.id === props.fetchedGuild.ownerId,
           permissions: Number(fetchedMember.permissions),
           displayName: fetchedMember.displayName,
           avatarURL: fetchedMember.user.avatarURL(),
           joinedAt: fetchedMember.joinedAt,
         };
-        const guildMemberData = await prisma.guildMember.upsert({
-          where: {
-            discordId: fetchedMember.id,
-          },
-          update: data,
-          create: data,
-        });
+        let newGuildMemberData: GuildMember;
+        if (existingGuildMember) {
+          if (existingGuildMember.autoGenerate) {
+            newGuildMemberData = await prisma.guildMember.update({
+              where: {
+                discordId: fetchedMember.id,
+              },
+              data: {
+                ...data,
+              },
+            });
+          }
+          newGuildMemberData = existingGuildMember;
+        } else {
+          newGuildMemberData = await prisma.guildMember.create({
+            data,
+          });
+        }
+
+        // Upsert posts
+        if (newGuildMemberData.autoGenerate) {
+          const postIds = [];
+          if (
+            this.hasPermission(
+              Number(newGuildMemberData.permissions),
+              'MANAGE_GUILD'
+            )
+          ) {
+            const postData = await prisma.guildPost.findFirst({
+              where: {
+                name: 'MANAGER',
+              },
+            });
+            if (postData) {
+              postIds.push(postData.id);
+            }
+          }
+          await this.updatePosts(newGuildMemberData.id, postIds);
+        }
 
         // Fetch roles
         for (const role of fetchedMember.roles.cache.values()) {
@@ -64,13 +180,13 @@ export class GuildMemberRepository {
           });
 
           const data2 = {
-            guildMemberId: guildMemberData.id,
+            guildMemberId: newGuildMemberData.id,
             guildRoleId: guildRoleData.id,
           };
           await prisma.guildMemberRoleRelation.upsert({
             where: {
               guildMemberId_guildRoleId: {
-                guildMemberId: guildMemberData.id,
+                guildMemberId: newGuildMemberData.id,
                 guildRoleId: guildRoleData.id,
               },
             },
@@ -232,5 +348,64 @@ export class GuildMemberRepository {
         },
       });
     }
+  }
+
+  static hasPermission(
+    permissions: number,
+    permissionType: 'ADMINISTRATOR' | 'MANAGE_GUILD'
+  ) {
+    const permissionTypes = {
+      ADMINISTRATOR: 0x8,
+      MANAGE_GUILD: 0x20,
+    };
+    const permissionHex = permissionTypes[permissionType];
+    return (
+      // Check if the user has the MANAGE_GUILD permission by doing a bitwise AND
+      (permissions & permissionHex) === permissionHex
+    );
+  }
+
+  static async updatePosts(memberId: number, postIds: number[]) {
+    // Delete all posts
+    await prisma.guildMemberPostRelation.deleteMany({
+      where: {
+        guildMemberId: memberId,
+      },
+    });
+    // Create new posts
+    await Promise.all(
+      postIds.map(async (postId) => {
+        const post = await prisma.guildPost.findUnique({
+          where: {
+            id: postId,
+          },
+        });
+        await prisma.guildMemberPostRelation.create({
+          data: {
+            guildMemberId: memberId,
+            guildPostId: post!.id,
+          },
+        });
+      })
+    );
+  }
+
+  static async fetchManagementMembersFromBot(guildDiscordId: string) {
+    const bot = await getBot();
+    const fetchedGuilds = await bot.guilds.fetch();
+    const fetchedGuild = await fetchedGuilds.get(guildDiscordId)?.fetch();
+    if (!fetchedGuild) throw new Error('Guild not found');
+
+    const members = fetchedGuild.members.cache;
+    const fetchedManagementMembers = members.filter((member) => {
+      const fetchedMember = members.get(member.id);
+      if (!fetchedMember) return false;
+      return GuildMemberRepository.hasPermission(
+        Number(fetchedMember.permissions),
+        'MANAGE_GUILD'
+      );
+    });
+
+    return fetchedManagementMembers;
   }
 }

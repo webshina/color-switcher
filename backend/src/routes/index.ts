@@ -1,6 +1,7 @@
 import authController from '@/controllers/authController';
 import channelController from '@/controllers/channelController';
 import guildController from '@/controllers/guildController';
+import guildMemberController from '@/controllers/guildMemberController';
 import userController from '@/controllers/userController';
 import { withAuth } from '@/middleware/auth';
 import { isGuildManager } from '@/middleware/isGuildManager';
@@ -18,7 +19,7 @@ router.get('/api/user/admin-guilds', withAuth, userController.fetchAdminGuilds);
 
 // Guild
 router.post(
-  '/api/guild/generate',
+  '/api/guild/:guildDiscordId/generate',
   withAuth,
   isGuildManager,
   guildController.generate
@@ -58,6 +59,11 @@ router.post(
   withAuth,
   isGuildManager,
   channelController.updateChannel
+);
+router.post(
+  '/api/guild/:guildId/member/:memberId/posts',
+  withAuth,
+  guildMemberController.updatePosts
 );
 router.get('/api/guild/mine', withAuth, guildController.getMine);
 router.get(

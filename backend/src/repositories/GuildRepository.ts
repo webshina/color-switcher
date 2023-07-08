@@ -1,8 +1,9 @@
 import { messages } from '#/common/constants/messages';
 import { AutoGenerateTarget } from '#/common/types/AutoGenerateTarget';
 import { ChannelCategoryItem, ChannelItem } from '#/common/types/Channel';
-import { GuildItem, GuildMemberItem } from '#/common/types/Guild';
+import { GuildItem, GuildPostItem } from '#/common/types/Guild';
 import { GetBatchProgressResponse } from '#/common/types/apiResponses/GuildControllerResponse';
+import { getBot } from '@/lib/discort';
 import { createCompletion } from '@/lib/openAI';
 import { prisma } from '@/lib/prisma';
 import {
@@ -14,13 +15,12 @@ import {
   uploadFile,
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
+import { PostName } from '@prisma/client';
 import axios, { isAxiosError } from 'axios';
-import { Client } from 'discord.js';
 import formidable from 'formidable';
 import { v4 as uuid } from 'uuid';
 import { ChannelRepository } from './ChannelRepository';
 import { GuildMemberRepository } from './GuildMemberRepository';
-import { UserRepository } from './UserRepository';
 
 export class GuildRepository {
   static async format(guildId: number) {
@@ -46,6 +46,7 @@ export class GuildRepository {
             channelSummaries: true,
           },
         },
+        posts: true,
       },
     });
     if (!guildData) {
@@ -78,44 +79,13 @@ export class GuildRepository {
     });
 
     // Fetch members
-    const guildMembersData = await prisma.guildMember.findMany({
-      where: {
-        guildId: guildData.id,
-      },
-      include: {
-        roleRelations: {
-          include: {
-            guildMember: true,
-            guildRole: true,
-          },
-        },
-      },
-    });
-    const guildMembers: GuildMemberItem[] = guildMembersData.map(
-      (guildMember) => ({
-        id: guildMember.id,
-        userId: guildMember.userId,
-        discordId: guildMember.discordId,
-        guildId: guildMember.guildId,
-        name: guildMember.name,
-        isOwner: guildMember.isOwner,
-        permissions: guildMember.permissions.toString(),
-        displayName: guildMember.displayName,
-        avatarURL: guildMember.avatarURL,
-        joinedAt: guildMember.joinedAt,
-        messagesPerDay: guildMember.messagesPerDay,
-        activityScore: guildMember.activityScore,
-        roles: guildMember.roleRelations.map((roleRelation) => ({
-          id: roleRelation.guildRole.id,
-          discordId: roleRelation.guildRole.discordId,
-          guildId: roleRelation.guildRole.guildId,
-          name: roleRelation.guildRole.name,
-          hexColor: roleRelation.guildRole.hexColor,
-          position: roleRelation.guildRole.position,
-          permissions: roleRelation.guildRole.permissions.toString(),
-        })),
-      })
-    );
+    const guildMembers = await GuildMemberRepository.getByGuildId(guildData.id);
+
+    const posts: GuildPostItem[] = guildData.posts.map((post) => ({
+      id: post.id,
+      guildId: post.guildId,
+      name: post.name,
+    }));
 
     const guildItem: GuildItem = {
       id: guildData.id,
@@ -138,19 +108,11 @@ export class GuildRepository {
         name: guildTag.name,
         guildId: guildTag.guildId,
       })),
-      members: guildMembers.filter(
-        (guildMember) =>
-          !UserRepository.hasPermission(
-            Number(guildMember.permissions),
-            'MANAGE_GUILD'
-          )
+      members: guildMembers.filter((guildMember) => !guildMember.isManager),
+      managementMembers: guildMembers.filter(
+        (guildMember) => guildMember.isManager
       ),
-      managementMembers: guildMembers.filter((guildMember) =>
-        UserRepository.hasPermission(
-          Number(guildMember.permissions),
-          'MANAGE_GUILD'
-        )
-      ),
+      posts,
     };
     return guildItem;
   }
@@ -216,17 +178,8 @@ export class GuildRepository {
     return guildItems;
   }
 
-  static async executeBatch(discordId: string, createdByUserId: number) {
-    const bot = new Client({
-      intents: [
-        'Guilds',
-        'GuildMessages',
-        'GuildMessageReactions',
-        'MessageContent',
-        'GuildPresences',
-      ],
-    });
-    await bot.login(process.env.DISCORD_BOT_TOKEN);
+  static async generate(discordId: string, createdByUserId: number) {
+    const bot = await getBot();
 
     // Fetch Guild Info
     const cachedGuilds = bot.guilds.cache;
@@ -257,6 +210,22 @@ export class GuildRepository {
         name: fetchedGuild.name,
         iconURL: fetchedGuild.iconURL(),
       },
+    });
+
+    // Create guild posts
+    const guildPostData: {
+      guildId: number;
+      name: PostName;
+    } = {
+      guildId: guildData.id,
+      name: 'MANAGER',
+    };
+    await prisma.guildPost.upsert({
+      where: {
+        guildId_name: guildPostData,
+      },
+      update: guildPostData,
+      create: guildPostData,
     });
 
     const guildBatch = await prisma.guildBatch.create({
@@ -401,7 +370,7 @@ Description:
       );
       const languageName = await detectLanguage(materialsForTags);
       const prompt = `-Create keywords of this Discord server using following channel data.
--Comma-separated output.
+-Separated by ",".
 -Only in ${languageName}.
 -List at most 5.
 -In order of relevance.
