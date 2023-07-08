@@ -19,6 +19,7 @@ type Props = {
   children: ReactNode;
   bgClassName?: string;
   showLogo?: boolean;
+  noPadding?: boolean;
 };
 const DefaultLayout: React.FC<Props> = (props) => {
   const [isShowSideNav, setIsShowSideNav] = useState(false);
@@ -96,7 +97,18 @@ const DefaultLayout: React.FC<Props> = (props) => {
           <animated.div style={stylesSideNav} />
 
           {/* Contents */}
-          <div className="w-full p-3 lg:p-8 pb-48 md:pl-14 lg:pl-16">
+          <div
+            className="w-full"
+            style={
+              props.noPadding
+                ? { padding: '0px' }
+                : {
+                    padding: screenSize === 'lg' ? '2rem' : '0.75rem',
+                    paddingBottom: '12rem',
+                    paddingLeft: screenSize === 'lg' ? '4rem' : '0.875rem',
+                  }
+            }
+          >
             {props.children}
           </div>
         </div>
