@@ -75,7 +75,7 @@ export const GuildChannelsForm: React.FC<Props> = (props) => {
             <div
               {...provided.droppableProps}
               ref={provided.innerRef}
-              className="flex flex-col lg:flex-row"
+              className="flex flex-col lg:flex-row overflow-auto"
             >
               {channels.map((channel, index) => (
                 <DynamicDraggable

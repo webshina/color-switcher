@@ -18,7 +18,7 @@ export const GuildMemberForm: React.FC<Props> = (props) => {
   const [generateAuto, setGenerateAuto] = useState(props.member.autoGenerate);
 
   return (
-    <div key={props.member.id} className="flex flex-col w-[200px]">
+    <div key={props.member.id} className="flex flex-col w-[250px]">
       <div
         className="flex justify-center items-center p-2 bg-slate-600 rounded-t-xl"
         {...props.dragHandleProps}
@@ -39,27 +39,31 @@ export const GuildMemberForm: React.FC<Props> = (props) => {
             />
           </div>
         </div>
-        <div className="h-8" />
-
-        <ToggleAutoGeneration
-          guildId={props.member.guildId}
-          memberId={props.member.id}
-          target="member"
-          isChecked={generateAuto}
-          onChange={(value) => {
-            setGenerateAuto(value);
-          }}
-        />
         <div className="h-4" />
 
-        {guild?.posts.map((post) => (
-          <GuildMemberPostForm
-            key={post.id}
-            post={post}
-            member={props.member}
-            disabled={generateAuto}
+        <div className="flex justify-between">
+          <div className="text-sm">Post</div>
+          <ToggleAutoGeneration
+            guildId={props.member.guildId}
+            memberId={props.member.id}
+            target="member"
+            isChecked={generateAuto}
+            onChange={(value) => {
+              setGenerateAuto(value);
+            }}
           />
-        ))}
+        </div>
+        <div className="h-1" />
+        <div className="p-2 border-[1px] border-gray-500 rounded">
+          {guild?.posts.map((post) => (
+            <GuildMemberPostForm
+              key={post.id}
+              post={post}
+              member={props.member}
+              disabled={generateAuto}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
