@@ -1,4 +1,4 @@
-import { getBot } from '@/lib/discort';
+import { getBot } from '@/lib/discord';
 import { isDiscordError } from '@/utils/typeNarrower';
 import { TextChannel } from 'discord.js';
 

@@ -1,6 +1,6 @@
 import { messages } from '#/common/constants/messages';
 import { GuildMemberItem } from '#/common/types/Guild';
-import { getBot } from '@/lib/discort';
+import { getBot } from '@/lib/discord';
 import { prisma } from '@/lib/prisma';
 import { addToDate } from '@/utils/dateHelper';
 import { GuildMember } from '@prisma/client';
@@ -114,7 +114,10 @@ export class GuildMemberRepository {
 
         const existingGuildMember = await prisma.guildMember.findUnique({
           where: {
-            discordId: fetchedMember.id,
+            guildId_discordId: {
+              guildId: props.guildId,
+              discordId: fetchedMember.id,
+            },
           },
         });
 
@@ -132,7 +135,10 @@ export class GuildMemberRepository {
           if (existingGuildMember.autoGenerate) {
             newGuildMemberData = await prisma.guildMember.update({
               where: {
-                discordId: fetchedMember.id,
+                guildId_discordId: {
+                  guildId: props.guildId,
+                  discordId: fetchedMember.id,
+                },
               },
               data: {
                 ...data,

@@ -3,7 +3,7 @@ import { AutoGenerateTarget } from '#/common/types/AutoGenerateTarget';
 import { ChannelCategoryItem, ChannelItem } from '#/common/types/Channel';
 import { GuildItem, GuildPostItem } from '#/common/types/Guild';
 import { GetBatchProgressResponse } from '#/common/types/apiResponses/GuildControllerResponse';
-import { getBot } from '@/lib/discort';
+import { getBot } from '@/lib/discord';
 import { createCompletion } from '@/lib/openAI';
 import { prisma } from '@/lib/prisma';
 import {

@@ -78,7 +78,7 @@ model Guild {
 // GuildMember model
 model GuildMember {
   id             Int       @id @default(autoincrement())
-  discordId      String    @unique
+  discordId      String
   guild          Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId        Int
   User           User?     @relation(fields: [userId], references: [id])
@@ -100,6 +100,8 @@ model GuildMember {
 
   // Posts
   postRelations GuildMemberPostRelation[]
+
+  @@unique([guildId, discordId])
 }
 
 enum PostName {
