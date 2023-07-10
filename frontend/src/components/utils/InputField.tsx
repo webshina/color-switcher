@@ -145,7 +145,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
         {props.type === 'select' && (
           <Select
             id={props.id}
-            value={props.value ?? ''}
+            value={props.value}
             disabled={props.disabled}
             placeholder="Select ..."
             onChange={(e) => {
@@ -153,11 +153,15 @@ const InputField: React.FC<InputFieldProps> = (props) => {
               props.onChange && props.onChange(e);
             }}
           >
-            {props.options.map((option) => (
-              <option key={option.label} value={option.value}>
-                {option.label}
-              </option>
-            ))}
+            <>
+              {props.options.map((option) => {
+                return (
+                  <option key={option.label} value={option.value}>
+                    {option.label}
+                  </option>
+                );
+              })}
+            </>
           </Select>
         )}
 

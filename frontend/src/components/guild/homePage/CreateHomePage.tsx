@@ -13,7 +13,9 @@ import { MdPrecisionManufacturing } from 'react-icons/md';
 import { GuildBatchProgress } from './GuildBatchProgress';
 import { InstallBotModal } from './InstallBotModal';
 
-type Props = {};
+type Props = {
+  guildDiscordId?: string;
+};
 export const CreateHomePage: React.FC<Props> = (props) => {
   const router = useRouter();
   const { data: adminGuilds } = useMyAdminGuilds();
@@ -21,6 +23,7 @@ export const CreateHomePage: React.FC<Props> = (props) => {
   const [guildId, setGuildId] = useState<number>();
   const [guildBatchId, setGuildBatchId] = useState<number>();
 
+  // Selected guild input field
   const {
     inputField: selectedGuildDiscordIdInputField,
     valueState: selectedGuildDiscordId,
@@ -32,9 +35,7 @@ export const CreateHomePage: React.FC<Props> = (props) => {
         label: guild.name as string,
         value: guild.discordId,
       })) ?? [],
-    value:
-      adminGuilds?.[0]?.discordId ??
-      'There is no server for which you have administrative privileges',
+    value: props.guildDiscordId ?? adminGuilds?.[0]?.discordId,
   });
 
   // Generate
@@ -86,7 +87,7 @@ export const CreateHomePage: React.FC<Props> = (props) => {
       />
 
       <div className="flex flex-col items-center w-full p-24 bg-slate-900 rounded-xl">
-        <div className="text-2xl">Create your discord HOME !</div>
+        <div className="text-2xl">Generate your discord HOME !</div>
         <ImageComponent
           imgSrc={`/images/undraw_artificial_intelligence_re_enpp.svg`}
           width={300}
@@ -107,7 +108,7 @@ export const CreateHomePage: React.FC<Props> = (props) => {
             >
               <MdPrecisionManufacturing size={30} />
               <div className="w-2" />
-              Create
+              Generate
             </button>
           )}
         </div>

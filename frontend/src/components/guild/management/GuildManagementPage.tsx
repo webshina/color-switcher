@@ -3,6 +3,7 @@ import { useMe } from '@/hooks/repository/useMe';
 import { useRouter } from 'next/router';
 import 'react-datepicker/dist/react-datepicker.css';
 import { BiArrowBack } from 'react-icons/bi';
+import { MdPrecisionManufacturing } from 'react-icons/md';
 import { GuildChannelCategoryForm } from './GuildChannelCategoryForm';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
 import { GuildDescriptionForm } from './GuildDescriptionForm';
@@ -42,6 +43,21 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
             </button>
           </div>
           <div className="h-20" />
+
+          {/* Update by AI */}
+          <div className="flex justify-center">
+            <button
+              className="flex justify-center items-center px-8 py-4 gradient-bg-purple-to-pink rounded-xl border border-gray-600 font-bold text-lg"
+              onClick={() => {
+                router.push(`/guild/create?guildDiscordId=${guild.discordId}`);
+              }}
+            >
+              <MdPrecisionManufacturing size={30} />
+              <div className="w-2" />
+              Update by AI
+            </button>
+          </div>
+          <div className="h-16" />
 
           {/* Cover Image */}
           <GuildCoverImageForm guild={guild} />

@@ -99,15 +99,20 @@ const DefaultLayout: React.FC<Props> = (props) => {
           {/* Contents */}
           <div
             className="w-full"
-            style={
-              props.noPadding
-                ? { padding: '0px' }
-                : {
-                    padding: screenSize === 'lg' ? '2rem' : '0.75rem',
-                    paddingBottom: '12rem',
-                    paddingLeft: screenSize === 'lg' ? '4rem' : '0.875rem',
-                  }
-            }
+            style={{
+              paddingTop: props.noPadding
+                ? '0px'
+                : screenSize === 'lg'
+                ? '2rem'
+                : '0.75rem',
+              paddingBottom: props.noPadding ? '0px' : '12rem',
+              paddingLeft: props.noPadding
+                ? '0px'
+                : screenSize === 'lg'
+                ? '4rem'
+                : '0.875rem',
+              paddingRight: props.noPadding ? '0px' : '2rem',
+            }}
           >
             {props.children}
           </div>
