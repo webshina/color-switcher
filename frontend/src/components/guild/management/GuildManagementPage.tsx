@@ -7,6 +7,7 @@ import { GuildChannelCategoryForm } from './GuildChannelCategoryForm';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
 import { GuildDescriptionForm } from './GuildDescriptionForm';
 import { GuildMembersForm } from './GuildMembersForm';
+import { GuildShareMessageForm } from './GuildShareMessageForm';
 import { GuildTagForm } from './GuildTagForm';
 
 type Props = {
@@ -48,6 +49,10 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
 
           {/* Description */}
           <GuildDescriptionForm guild={guild} />
+          <div className="h-16" />
+
+          {/* Share Message */}
+          <GuildShareMessageForm guild={guild} />
           <div className="h-16" />
 
           {/* Tags */}

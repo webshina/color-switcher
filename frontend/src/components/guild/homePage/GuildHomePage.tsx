@@ -1,4 +1,6 @@
+import { DiscordConnectBtn } from '@/components/common/DiscordConnectBtn';
 import CircleImage from '@/components/utils/CircleImage';
+import { ImageComponent } from '@/components/utils/ImageComponent';
 import Title from '@/components/utils/Title';
 import { useGuild } from '@/hooks/repository/useGuild';
 import { useMe } from '@/hooks/repository/useMe';
@@ -11,6 +13,7 @@ import { IoChatbubblesSharp } from 'react-icons/io5';
 import { MdManageAccounts } from 'react-icons/md';
 import { Channels } from './Channels';
 import { Members } from './Members';
+import { ShareButton } from './ShareButton';
 import { TagCards } from './TagCards';
 
 type Props = {
@@ -60,7 +63,11 @@ export const GuildHomePage: React.FC<Props> = (props) => {
               </div>
             )}
           </div>
-          <div className="h-20" />
+
+          {/* Share button */}
+          <div className="flex justify-end my-5 mr-3">
+            <ShareButton message={guild.shareMessage ?? ''} />
+          </div>
 
           {/* Channel name */}
           <div className="text-2xl lg:text-5xl font-bold">{guild.name}</div>
@@ -101,17 +108,31 @@ export const GuildHomePage: React.FC<Props> = (props) => {
           )}
 
           {/* Member list */}
-          {guild.members && guild.members.length > 0 && (
-            <>
-              <Title
-                title={'Members'}
-                icon={<BsFillPeopleFill color="white" />}
-              />
-              <div className="h-8" />
+          <Title title={'Members'} icon={<BsFillPeopleFill color="white" />} />
+          <div className="h-8" />
+          {guild.isMember ? (
+            guild.members && guild.members.length > 0 ? (
               <Members discordMembers={guild.members} />
+            ) : (
+              <div>No members ...</div>
+            )
+          ) : (
+            <div className="flex flex-col items-center p-16 bg-dark-light rounded-lg">
+              <div className="text-xl">Only visible to community members</div>
               <div className="h-8" />
-            </>
+              <ImageComponent
+                imgSrc="/images/login.svg"
+                height={130}
+                width={130}
+              />
+              <div className="h-12"></div>
+              {!user && <DiscordConnectBtn />}
+              {user && !guild.isMember && (
+                <div className="text-xl">Join this community !</div>
+              )}
+            </div>
           )}
+          <div className="h-8" />
 
           <div className="h-16" />
         </>

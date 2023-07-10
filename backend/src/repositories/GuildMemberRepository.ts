@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { addToDate } from '@/utils/dateHelper';
 import { GuildMember } from '@prisma/client';
 import { Guild } from 'discord.js';
+import { UserRepository } from './UserRepository';
 
 export class GuildMemberRepository {
   static async format(memberId: number) {
@@ -448,5 +449,18 @@ export class GuildMemberRepository {
         })
       );
     }
+  }
+
+  static async isMember(guildId: number, userId: number) {
+    const userItem = await UserRepository.getById(userId);
+    const guildMember = await prisma.guildMember.findMany({
+      where: {
+        guildId,
+      },
+    });
+    const isMember = guildMember.some(
+      (member) => member.discordId === userItem.discordId
+    );
+    return isMember;
   }
 }

@@ -40,7 +40,11 @@ export const isGuildManager = async (
         })
       );
     } catch (error) {
-      // If guild is not registered, fetch management members from bot
+      // pass
+    }
+
+    // If guild is not registered, fetch management members from bot
+    if (managementMembers.length === 0) {
       try {
         const fetchedManagementMembers =
           await GuildMemberRepository.fetchManagementMembersFromBot(
@@ -66,7 +70,7 @@ export const isGuildManager = async (
     ? true
     : false;
   if (!isGuildManager) {
-    return res.status(403).json('You are not the owner of this guild.');
+    return res.status(401).json('You are not the manager of this guild.');
   }
 
   next();

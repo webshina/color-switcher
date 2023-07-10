@@ -16,7 +16,17 @@ const get = async (req: Request, res: Response) => {
 
   const result = await GuildRepository.getById(Number(id));
 
-  const responseData: FetchGuildResponse = result;
+  // Return members if login user is a member of the guild
+  const user = await UserRepository.getLoginUser(req);
+  const isMember = user
+    ? await GuildMemberRepository.isMember(Number(id), user.id)
+    : false;
+
+  const responseData: FetchGuildResponse = {
+    ...result,
+    members: isMember ? result.members : [],
+    isMember,
+  };
 
   return res.json(responseData);
 };
@@ -86,7 +96,11 @@ const toggleAutoGeneration = async (req: Request, res: Response) => {
   const { value, memberId } = req.body;
   const target = req.body.target as AutoGenerateTarget;
 
-  if (target === 'tags' || target === 'description') {
+  if (
+    target === 'tags' ||
+    target === 'description' ||
+    target === 'shareMessage'
+  ) {
     await GuildRepository.toggleAutoGeneration(Number(guildId), {
       target,
       value: value as boolean,

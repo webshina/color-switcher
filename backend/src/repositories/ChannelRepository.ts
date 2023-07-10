@@ -223,7 +223,8 @@ export class ChannelRepository {
         if (
           fetchedMessage.content &&
           !fetchedMessage.author.bot &&
-          fetchedMessage.content !== ''
+          fetchedMessage.content !== '' &&
+          fetchedMessage.embeds[0]?.data.type !== 'gifv' // Ignore gif
         ) {
           const data = {
             discordId: fetchedMessage.id,
@@ -257,7 +258,7 @@ export class ChannelRepository {
         await this.generateImageOfChannel(channelData.id);
 
         // Create summary
-        await this.generateSummaryOfChannel(channelData.id, fetchedMessages);
+        await this.generateSummary(channelData.id, props.batchId);
       }
 
       // Update batch progress
@@ -387,21 +388,18 @@ export class ChannelRepository {
     return messagesPerDay;
   }
 
-  static async generateSummaryOfChannel(
-    channelId: number,
-    fetchedMessages: Collection<string, Message<true>>
-  ) {
-    const messagesForSummary = fetchedMessages
-      .filter((fetchedMessage) => {
-        if (
-          fetchedMessage.content &&
-          !fetchedMessage.author.bot &&
-          fetchedMessage.content !== ''
-        ) {
-          return true;
-        }
-      })
-      .map((fetchedMessage) => fetchedMessage.content)
+  static async generateSummary(channelId: number, batchId: number) {
+    const messages = await prisma.message.findMany({
+      where: {
+        channelId,
+        batchId,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+    const messagesForSummary = messages
+      .map((message) => message.content)
       .slice(0, 12)
       .reverse();
     if (messagesForSummary.length === 0) return;
