@@ -111,7 +111,11 @@ const DefaultLayout: React.FC<Props> = (props) => {
                 : screenSize === 'lg'
                 ? '4rem'
                 : '0.875rem',
-              paddingRight: props.noPadding ? '0px' : '2rem',
+              paddingRight: props.noPadding
+                ? '0px'
+                : screenSize === 'lg'
+                ? '2rem'
+                : '0.875rem',
             }}
           >
             {props.children}
