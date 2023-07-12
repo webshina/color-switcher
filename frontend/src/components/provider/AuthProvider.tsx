@@ -1,13 +1,13 @@
 import { UserItem } from '#/common/types/User';
 import { useMe } from '@/hooks/repository/useMe';
-import { useCheckAuthPath } from '@/hooks/useCheckAuthPath';
+import { useCheckAuthPath } from '@/hooks/utils/useCheckAuthPath';
 import { post } from '@/utils/apiHelper';
 import { useRouter } from 'next/router';
 import { ReactNode, createContext } from 'react';
 import { mutate } from 'swr';
 
 export type AuthContextProps = {
-  user?: UserItem;
+  user?: UserItem | null;
   loadingUser: boolean;
   login: (discordCode: string) => Promise<void>;
   logout: () => Promise<void>;

@@ -18,9 +18,6 @@ startDiscordBot();
 const app = express();
 const port = 3005;
 
-// Static files
-app.use(express.static(localStoragePath));
-
 // Middleware
 app.use(express.json());
 app.use(
@@ -30,6 +27,9 @@ app.use(
   })
 );
 app.use(cookieParser());
+
+// Static files
+app.use(express.static(localStoragePath));
 
 app.use('/', router);
 

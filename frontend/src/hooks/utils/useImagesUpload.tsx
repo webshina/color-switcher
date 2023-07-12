@@ -81,16 +81,16 @@ export const useImagesUploader = (
         <div
           className="flex flex-col justify-center items-center p-8 rounded"
           style={{
-            backgroundColor: isDragging ? '#AAA' : '#DDD',
+            backgroundColor: isDragging ? '#AAA' : '#333',
             border: 'dotted 2px #AAA',
           }}
           {...dragProps}
         >
           <button
             onClick={onImageUpload}
-            className="px-3 py-1 bg-purple-500 rounded text-xs text-white"
+            className="px-3 py-1 bg-discord-purple rounded text-xs text-white"
           >
-            アップロード
+            Upload
           </button>
           <div className="h-5"></div>
 

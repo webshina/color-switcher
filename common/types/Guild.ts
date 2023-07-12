@@ -1,7 +1,33 @@
-import { Guild, GuildTag } from '../../backend/node_modules/.prisma/client';
-import { ChannelItem } from './Channel';
+import {
+  Guild,
+  GuildMember,
+  GuildPost,
+  GuildRole,
+  GuildTag,
+} from '../../backend/node_modules/.prisma/client';
+import { ChannelCategoryItem } from './Channel';
 
 export type GuildTagItem = Omit<GuildTag, 'createdAt' | 'updatedAt'>;
+
+export type GuildRoleItem = Omit<
+  GuildRole,
+  'permissions' | 'createdAt' | 'updatedAt'
+> & {
+  permissions: string;
+};
+
+export type GuildPostItem = Omit<GuildPost, 'createdAt' | 'updatedAt'>;
+
+export type GuildMemberItem = Omit<
+  GuildMember,
+  'permissions' | 'createdAt' | 'updatedAt'
+> & {
+  permissions: string;
+  isOwner: boolean;
+  isManager: boolean;
+  roles: GuildRoleItem[];
+  posts: GuildPostItem[];
+};
 
 export type GuildItem = Omit<
   Guild,
@@ -10,6 +36,9 @@ export type GuildItem = Omit<
   coverImageUrl?: string | null;
   availableChannelCnt: number;
   createdChannelCnt: number;
-  channels: ChannelItem[];
+  categories: ChannelCategoryItem[];
   tags: GuildTagItem[];
+  members: GuildMemberItem[];
+  managementMembers: GuildMemberItem[];
+  posts: GuildPostItem[];
 };

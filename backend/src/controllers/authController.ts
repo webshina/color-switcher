@@ -32,15 +32,6 @@ const discordConnect = async (req: Request, res: Response) => {
     }
   );
 
-  const { data: guildsData } = await axios.get(
-    'https://discord.com/api/users/@me/guilds',
-    {
-      headers: {
-        authorization: `Bearer ${tokenData.access_token}`,
-      },
-    }
-  );
-
   // Save the user data
   const savingUserData = {
     discordId: authData.id,
@@ -55,36 +46,6 @@ const discordConnect = async (req: Request, res: Response) => {
     update: savingUserData,
     create: savingUserData,
   });
-
-  // Save the guild member data
-  await prisma.guildMember.deleteMany({
-    where: {
-      userId: user.id,
-    },
-  });
-  for (const guildData of guildsData) {
-    const guild = await prisma.guild.upsert({
-      where: {
-        discordId: guildData.id,
-      },
-      update: {},
-      create: {
-        discordId: guildData.id,
-        name: guildData.name,
-        isPrivate: true,
-        inProgress: false,
-      },
-    });
-    await prisma.guildMember.create({
-      data: {
-        userId: user.id,
-        guildId: guild.id,
-        guildDiscordId: guildData.id,
-        isOwner: guildData.owner,
-        permissions: guildData.permissions,
-      },
-    });
-  }
 
   // Set cookie
   res.cookie('accessToken', tokenData.access_token, {

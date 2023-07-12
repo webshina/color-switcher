@@ -1,5 +1,4 @@
 import { ActivityLevel } from '@/components/common/ActiveLevel';
-import { JumpChannelBtn } from '@/components/common/JumpChannelBtn';
 import {
   Accordion,
   AccordionButton,
@@ -9,6 +8,7 @@ import {
   Box,
 } from '@chakra-ui/react';
 import ImageCard from '../utils/ImageCard';
+import { JumpChannelBtn } from './JumpChannelBtn';
 import { ChannelItem } from './types/Channel';
 
 type Props = {
@@ -86,7 +86,7 @@ export const Channels: React.FC<Props> = (props) => {
 
                             {/* Go to channel */}
                             <div className="flex justify-end">
-                              <JumpChannelBtn inviteCode={channel.inviteCode} />
+                              <JumpChannelBtn />
                             </div>
 
                             <div className="h-3" />
@@ -110,7 +110,7 @@ export const Channels: React.FC<Props> = (props) => {
                         <ActivityLevel level={channel.activityLevel} />
                         <div className="h-3" />
                         <div className="absolute bottom-4 right-5">
-                          <JumpChannelBtn inviteCode={channel.inviteCode} />
+                          <JumpChannelBtn />
                         </div>
                       </div>
                     </>

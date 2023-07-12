@@ -1,22 +1,26 @@
 import { ChannelItem, ChannelSummaryItem } from '#/common/types/Channel';
+import { createCompletion } from '@/lib/openAI';
 import { prisma } from '@/lib/prisma';
-import { addToDate } from '@/utils/dateHelper';
 import {
   copyRandomImage,
+  deleteFile,
+  getFileInfoFromFormidable,
   getImageUrl,
   saveFileFromUrl,
+  uploadFile,
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
 import { isDiscordError } from '@/utils/typeNarrower';
 import { Channel, ChannelCategory } from '@prisma/client';
-import axios, { isAxiosError } from 'axios';
+import axios from 'axios';
 import {
   Collection,
   Message,
   NonThreadGuildBasedChannel,
   TextChannel,
 } from 'discord.js';
-import { Configuration, OpenAIApi } from 'openai';
+import formidable from 'formidable';
+import { v4 as uuid } from 'uuid';
 
 export class ChannelRepository {
   static async format(channel: Channel) {
@@ -49,9 +53,7 @@ export class ChannelRepository {
       category: categoryData
         ? {
             id: categoryData.id,
-            discordId: categoryData.discordId,
             name: categoryData.name,
-            guildId: categoryData.guildId,
           }
         : null,
       summaries: channelSummaries.map((summary) => {
@@ -62,6 +64,8 @@ export class ChannelRepository {
         };
         return channelSummaryItem;
       }),
+      showConversationSummary: channel.showConversationSummary,
+      order: channel.order,
     };
 
     return channelItem;
@@ -82,6 +86,29 @@ export class ChannelRepository {
       where: {
         guildId: guildId,
       },
+      orderBy: {
+        messagesPerDay: 'desc',
+      },
+    });
+    if (!channels) throw new Error('Channel not found');
+
+    const formattedChannels = await Promise.all(
+      channels.map(async (channel) => {
+        return await this.format(channel);
+      })
+    );
+    return formattedChannels;
+  }
+
+  static async getByGuildIdCategoryId(guildId: number, categoryId: number) {
+    const channels = await prisma.channel.findMany({
+      where: {
+        guildId: guildId,
+        categoryId: categoryId,
+      },
+      orderBy: {
+        messagesPerDay: 'desc',
+      },
     });
     if (!channels) throw new Error('Channel not found');
 
@@ -96,6 +123,7 @@ export class ChannelRepository {
   static async generateChannelsData(props: {
     guildId: number;
     channels: IterableIterator<NonThreadGuildBasedChannel | null>;
+    batchId: number;
   }) {
     const availableChannels: TextChannel[] = [];
     for (const channel of props.channels) {
@@ -117,6 +145,16 @@ export class ChannelRepository {
       },
       data: {
         availableChannelCnt: availableChannels.length,
+      },
+    });
+
+    // Update batch progress
+    await prisma.guildBatch.update({
+      where: {
+        id: props.batchId,
+      },
+      data: {
+        totalChannelCnt: availableChannels.length,
       },
     });
 
@@ -185,8 +223,17 @@ export class ChannelRepository {
         if (
           fetchedMessage.content &&
           !fetchedMessage.author.bot &&
-          fetchedMessage.content !== ''
+          fetchedMessage.content !== '' &&
+          fetchedMessage.embeds[0]?.data.type !== 'gifv' // Ignore gif
         ) {
+          const data = {
+            discordId: fetchedMessage.id,
+            content: fetchedMessage.content,
+            authorDiscordId: fetchedMessage.author.id,
+            channelId: channelData.id,
+            batchId: props.batchId,
+            createdAt: fetchedMessage.createdAt,
+          };
           await prisma.message.upsert({
             where: {
               channelId_discordId: {
@@ -194,14 +241,8 @@ export class ChannelRepository {
                 discordId: fetchedMessage.id,
               },
             },
-            create: {
-              discordId: fetchedMessage.id,
-              content: fetchedMessage.content,
-              authorDiscordId: fetchedMessage.author.id,
-              channelId: channelData.id,
-              createdAt: fetchedMessage.createdAt,
-            },
-            update: {},
+            create: data,
+            update: data,
           });
         }
       }
@@ -217,53 +258,78 @@ export class ChannelRepository {
         await this.generateImageOfChannel(channelData.id);
 
         // Create summary
-        await this.generateSummaryOfChannel(channelData.id, fetchedMessages);
+        await this.generateSummary(channelData.id, props.batchId);
       }
+
+      // Update batch progress
+      const batch = await prisma.guildBatch.findUnique({
+        where: {
+          id: props.batchId,
+        },
+      });
+      await prisma.guildBatch.update({
+        where: {
+          id: props.batchId,
+        },
+        data: {
+          completedChannelCnt: batch?.completedChannelCnt
+            ? batch.completedChannelCnt + 1
+            : 1,
+        },
+      });
     }
 
     // Calculate activity level of channel from 0 to 5
     await this.calculateActivityLevel(props.guildId);
+
+    // Update batch progress
+    await prisma.guildBatch.update({
+      where: {
+        id: props.batchId,
+      },
+      data: {
+        isChannelGenerationCompleted: true,
+      },
+    });
   }
 
   static async generateImageOfChannel(channelId: number) {
-    const channelData = await prisma.channel.findUnique({
+    const existingChannelData = await prisma.channel.findUnique({
       where: {
         id: channelId,
       },
     });
-    if (!channelData) {
+    if (!existingChannelData) {
       throw new Error('Channel not found');
     }
-    if (channelData.image) return;
+    if (existingChannelData.image) return;
 
     let imageName: string | null = null;
-    try {
-      const res = await axios(
-        `https://api.unsplash.com/search/photos?query=${channelData.name}&page=1&per_page=1`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept-Version': 'v1',
-            Authorization: `Client-ID ${process.env.UNSPLASH_API_ACCESS_KEY}`,
-          },
-        }
-      );
-      const imageUrl = res.data.results[0]?.urls.small;
+    const res = await axios(
+      `https://api.unsplash.com/search/photos?query=${existingChannelData.name}&page=1&per_page=1`,
+      {
+        method: 'GET',
+        headers: {
+          'Accept-Version': 'v1',
+          Authorization: `Client-ID ${process.env.UNSPLASH_API_ACCESS_KEY}`,
+        },
+      }
+    );
+
+    // delete existing image
+    const imageUrl = res.data.results[0]?.urls.small;
+    if (imageUrl) {
       const { fileName: savedImageName } = await saveFileFromUrl({
         url: imageUrl,
         dir: 'channelImages',
-        fileName: `${channelData.guildId}-${channelData.id}`,
+        fileName: uuid(),
       });
       imageName = savedImageName;
-    } catch (error) {
-      if (isAxiosError(error)) {
-        imageName = `${channelData.guildId}-${channelData.id}.jpg`;
-        await copyRandomImage(
-          'channelImages',
-          `${channelData.guildId}-${channelData.id}.jpg`
-        );
-      }
+    } else {
+      imageName = `${uuid()}.jpg`;
+      await copyRandomImage('channelImages', imageName);
     }
+
     await prisma.channel.update({
       where: {
         id: channelId,
@@ -272,6 +338,10 @@ export class ChannelRepository {
         image: imageName,
       },
     });
+
+    if (existingChannelData.image) {
+      deleteFile('guildCoverImages', existingChannelData.image);
+    }
   }
 
   static async calculateNumOfMessagesPerDay(
@@ -280,15 +350,15 @@ export class ChannelRepository {
   ) {
     const now = new Date();
     let messagesPerDay = 0;
-    const oneWeekAgo = addToDate(now, { date: -7 });
     const firstMessageCreatedAt =
       fetchedMessages.last()?.createdAt ?? new Date();
-    const lastMessageCreatedAt =
-      fetchedMessages.first()?.createdAt ?? new Date();
-    const daysElapsedSinceFirstMessageCreated =
-      (now.getTime() - firstMessageCreatedAt.getTime()) / (1000 * 60 * 60 * 24);
-
-    if (fetchedMessages.size === 0 || lastMessageCreatedAt < oneWeekAgo) {
+    const timesElapsedSinceFirstMessageCreated =
+      now.getTime() - firstMessageCreatedAt.getTime();
+    const daysElapsedSinceFirstMessageCreated = Math.max(
+      timesElapsedSinceFirstMessageCreated / (1000 * 60 * 60 * 24),
+      1
+    );
+    if (fetchedMessages.size === 0) {
       // No messages in the last week, set score to 0
       messagesPerDay = 0;
     } else {
@@ -318,26 +388,18 @@ export class ChannelRepository {
     return messagesPerDay;
   }
 
-  static async generateSummaryOfChannel(
-    channelId: number,
-    fetchedMessages: Collection<string, Message<true>>
-  ) {
-    const openAiApi = new OpenAIApi(
-      new Configuration({
-        apiKey: process.env.OPENAI_API_KEY,
-      })
-    );
-    const messagesForSummary = fetchedMessages
-      .filter((fetchedMessage) => {
-        if (
-          fetchedMessage.content &&
-          !fetchedMessage.author.bot &&
-          fetchedMessage.content !== ''
-        ) {
-          return true;
-        }
-      })
-      .map((fetchedMessage) => fetchedMessage.content)
+  static async generateSummary(channelId: number, batchId: number) {
+    const messages = await prisma.message.findMany({
+      where: {
+        channelId,
+        batchId,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+    const messagesForSummary = messages
+      .map((message) => message.content)
       .slice(0, 12)
       .reverse();
     if (messagesForSummary.length === 0) return;
@@ -353,13 +415,10 @@ ${JSON.stringify(messagesForSummary)}
 
 Summary:
 `;
-    const openAiResponse = await openAiApi.createCompletion({
-      model: 'text-davinci-003',
+    const summary = await createCompletion({
       prompt,
-      temperature: 0.8,
-      max_tokens: 516,
+      maxTokens: 516,
     });
-    const summary = openAiResponse.data.choices[0].text;
 
     // Save summary to database
     if (summary) {
@@ -391,21 +450,31 @@ Summary:
         guildId: guildId,
       },
     });
-    const messagesPerDays = channels
+    let channelMessageScores = channels
       // Filter out channels that don't have messagesPerDay
       .filter((channel) => {
         if (channel.messagesPerDay !== null) {
           return true;
         }
       })
-      .map((channel) => channel.messagesPerDay!);
-    const maxMessagesPerDay = Math.max(...messagesPerDays);
-    const minMessagesPerDay = Math.min(...messagesPerDays);
+      .map((channel) => ({
+        id: channel.id,
+        // Logarithmically scale messagesPerDay
+        score: Math.log10(channel.messagesPerDay!),
+      }));
+    const channelMessageScoresArray = channelMessageScores.map(
+      (channelMessageScore) => channelMessageScore.score
+    );
+    const maxScore = Math.max(...channelMessageScoresArray);
+    const minScore = Math.min(...channelMessageScoresArray);
     let activityScore = 0;
-    for (const channel of channels) {
+    for (const channelMessageScore of channelMessageScores) {
       if (channels.length <= 5) {
         // If number of channels is a little, evaluate activityScore on an absolute scale
-        const messagesPerDay = channels[0].messagesPerDay!;
+        const channel = channels.find(
+          (channel) => channel.id === channelMessageScore.id
+        );
+        const messagesPerDay = channel!.messagesPerDay!;
         if (messagesPerDay === 0) {
           activityScore = 0;
         } else if (messagesPerDay < 0.1) {
@@ -420,20 +489,102 @@ Summary:
           activityScore = 5;
         }
       } else {
+        // Standardize activityScore on a scale of 0 to 5
         activityScore =
-          maxMessagesPerDay === 0 && minMessagesPerDay === 0
+          maxScore === 0 && minScore === 0
             ? 0
             : Math.round(
-                (channel.messagesPerDay! - minMessagesPerDay) /
-                  (maxMessagesPerDay - minMessagesPerDay)
-              ) * 5;
+                ((channelMessageScore.score! - minScore) /
+                  (maxScore - minScore)) *
+                  5
+              );
       }
       await prisma.channel.update({
         where: {
-          id: channel.id,
+          id: channelMessageScore.id,
         },
         data: {
           activityScore,
+        },
+      });
+    }
+  }
+
+  static async updateOrder(props: {
+    guildId: number;
+    params: {
+      orders: {
+        id: number;
+        order: number;
+      }[];
+    };
+  }) {
+    if (props.params.orders && props.params.orders.length > 0) {
+      await Promise.all(
+        props.params.orders.map(async (order) => {
+          await prisma.channel.update({
+            where: {
+              id: order.id,
+            },
+            data: {
+              order: order.order,
+            },
+          });
+        })
+      );
+    }
+  }
+
+  static async update(
+    channelId: number,
+    params: {
+      image?: formidable.File;
+      showConversationSummary?: boolean;
+    }
+  ) {
+    const oldChannelData = await prisma.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+    });
+    if (!oldChannelData) {
+      throw new Error('Channel not found');
+    }
+
+    // Update cover image
+    if (params.image) {
+      const newFileName = uuid();
+      const { buffer, ext, mimetype } = await getFileInfoFromFormidable(
+        params.image
+      );
+      const { fileName } = await uploadFile({
+        dir: 'channelImages',
+        file: buffer,
+        fileName: newFileName,
+        extension: ext,
+        mimetype,
+      });
+      await prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          image: fileName,
+        },
+      });
+      if (oldChannelData.image) {
+        deleteFile('channelImages', oldChannelData.image);
+      }
+    }
+
+    // Update autoGenerateSummary
+    if (params.showConversationSummary !== undefined) {
+      await prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          showConversationSummary: params.showConversationSummary,
         },
       });
     }

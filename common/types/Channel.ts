@@ -7,7 +7,9 @@ import {
 export type ChannelCategoryItem = Omit<
   ChannelCategory,
   'createdAt' | 'updatedAt'
->;
+> & {
+  channels: ChannelItem[];
+};
 
 export type ChannelSummaryItem = Omit<
   ChannelSummary,
@@ -16,6 +18,6 @@ export type ChannelSummaryItem = Omit<
 
 export type ChannelItem = Omit<Channel, 'image' | 'createdAt' | 'updatedAt'> & {
   imageURL: string | null;
-  category: ChannelCategoryItem | null;
+  category: { id: number; name: string } | null;
   summaries: ChannelSummaryItem[];
 };

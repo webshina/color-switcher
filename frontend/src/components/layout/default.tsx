@@ -6,16 +6,20 @@ import {
   AiFillInfoCircle,
   AiOutlineFundProjectionScreen,
 } from 'react-icons/ai';
+import { BiLogOut } from 'react-icons/bi';
 import { FiMenu } from 'react-icons/fi';
+import { MdDashboardCustomize } from 'react-icons/md';
 import { Menu, MenuItem, ProSidebar } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 import { animated, useSpring } from 'react-spring';
+import { DiscordConnectBtn } from '../common/DiscordConnectBtn';
 import { Logo } from '../common/Logo';
 
 type Props = {
   children: ReactNode;
   bgClassName?: string;
   showLogo?: boolean;
+  noPadding?: boolean;
 };
 const DefaultLayout: React.FC<Props> = (props) => {
   const [isShowSideNav, setIsShowSideNav] = useState(false);
@@ -49,9 +53,9 @@ const DefaultLayout: React.FC<Props> = (props) => {
               </div>
             )}
 
-            {/* <div className="absolute top-0 right-3">
+            <div className="absolute top-0 right-3">
               <DiscordConnectBtn />
-            </div> */}
+            </div>
           </div>
         </div>
 
@@ -64,12 +68,12 @@ const DefaultLayout: React.FC<Props> = (props) => {
               className="!fixed top-[78px]"
             >
               <Menu>
-                {/* <MenuItem
+                <MenuItem
                   icon={<MdDashboardCustomize />}
                   onClick={() => router.push('/owner/dashboard')}
                 >
                   Dashboard
-                </MenuItem> */}
+                </MenuItem>
                 <MenuItem
                   icon={<AiFillInfoCircle />}
                   onClick={() => router.push('/landing')}
@@ -82,18 +86,38 @@ const DefaultLayout: React.FC<Props> = (props) => {
                 >
                   Sample
                 </MenuItem>
-                {/* {user && (
+                {user && (
                   <MenuItem icon={<BiLogOut />} onClick={logout}>
                     Logout
                   </MenuItem>
-                )} */}
+                )}
               </Menu>
             </ProSidebar>
           </div>
           <animated.div style={stylesSideNav} />
 
           {/* Contents */}
-          <div className="w-full p-3 lg:p-8 pb-48 md:pl-14 lg:pl-16">
+          <div
+            className="w-full"
+            style={{
+              paddingTop: props.noPadding
+                ? '0px'
+                : screenSize === 'lg'
+                ? '2rem'
+                : '0.75rem',
+              paddingBottom: props.noPadding ? '0px' : '12rem',
+              paddingLeft: props.noPadding
+                ? '0px'
+                : screenSize === 'lg'
+                ? '4rem'
+                : '0.875rem',
+              paddingRight: props.noPadding
+                ? '0px'
+                : screenSize === 'lg'
+                ? '2rem'
+                : '0.875rem',
+            }}
+          >
             {props.children}
           </div>
         </div>

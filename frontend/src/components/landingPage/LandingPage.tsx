@@ -68,26 +68,26 @@ export const LandingPage: React.FC<Props> = () => {
       <div className="h-56" />
 
       {/* How to use */}
-      <div className={classHeading}>
-        All you need to do is{' '}
-        <span className="gradient-text-purple-to-pink">ONLY</span> install Bot
-        to Discord
+      <div className="w-screen py-[100px] bg-gradient-to-b from-dark via-[#160144] to-dark">
+        <div className="h-16" />
+        <div className={classHeading}>
+          All you need to do is{' '}
+          <span className="gradient-text-purple-to-pink">ONLY</span> install Bot
+          to Discord
+        </div>
+        <div className="h-24" />
+        <div className="flex justify-center">
+          <ImageComponent
+            imgSrc={`/images/landingPage/installBotToDiscord.svg`}
+            width={screenSize === 'lg' ? 800 : 300}
+            height={screenSize === 'lg' ? 180 : 60}
+            objectFit="contain"
+          />
+        </div>
+        <div className="h-16" />
       </div>
-      <div className="h-24" />
-      <div className="flex justify-center">
-        <ImageComponent
-          imgSrc={`/images/landingPage/installBotToDiscord.svg`}
-          width={screenSize === 'lg' ? 800 : 300}
-          height={screenSize === 'lg' ? 180 : 60}
-          objectFit="contain"
-        />
-      </div>
-      <div className="h-56" />
 
-      <div className={classHeading}>
-        {/* Whatever it is, let's make it first! */}
-        Coming soon...
-      </div>
+      <div className={classHeading}>Coming soon...</div>
       <div className="h-16" />
       <div className="flex justify-center">
         <div className="flex flex-col items-center">
@@ -102,6 +102,33 @@ export const LandingPage: React.FC<Props> = () => {
         </div>
       </div>
       <div className="h-36" />
+
+      {/* Contact */}
+      <div className="flex justify-center">
+        <button
+          onClick={() => {
+            window.open('https://twitter.com/TAZ_tt_tt', '_blank');
+          }}
+        >
+          <div className="flex flex-col items-center w-[300px] lg:w-[800px] py-10 px-16 border-4 border-white/50 bg-slate-900 rounded-3xl">
+            <div className="font-bold text-xl lg:text-3xl text-white">
+              Contact us on Twitter
+            </div>
+            <div className="h-8" />
+            <div className="flex justify-center">
+              <div className="flex flex-col items-center">
+                <ImageComponent
+                  height={screenSize === 'lg' ? 150 : 100}
+                  width={screenSize === 'lg' ? 150 : 100}
+                  imgSrc={'/images/snsIcons/Twitter_gradient__to_pink.png'}
+                  objectFit="contain"
+                />
+              </div>
+            </div>
+          </div>
+        </button>
+      </div>
+      <div className="h-16" />
 
       {/* Member */}
       <div className="my-20 mx-8 flex flex-col items-center">

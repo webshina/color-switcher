@@ -24,31 +24,43 @@ const localUploadPath = '../../storage/uploads';
 
 export const getFileTypeAndExtension = (
   buffer: Buffer
-): { mime: string; ext: string } | null => {
+): { mime: string; ext: string } => {
+  const signatureToFileInfo: { [key: string]: { mime: string; ext: string } } =
+    {
+      ffd8ffe0: { mime: 'image/jpeg', ext: 'jpg' },
+      ffd8ffe1: { mime: 'image/jpeg', ext: 'jpg' },
+      ffd8ffe2: { mime: 'image/jpeg', ext: 'jpg' },
+      ffd8ffe3: { mime: 'image/jpeg', ext: 'jpg' },
+      ffd8ffe8: { mime: 'image/jpeg', ext: 'jpg' },
+      '89504e47': { mime: 'image/png', ext: 'png' },
+      '47494638': { mime: 'image/gif', ext: 'gif' },
+      '25504446': { mime: 'application/pdf', ext: 'pdf' },
+      '504b0304': { mime: 'application/zip', ext: 'zip' },
+      '504b0506': { mime: 'application/zip', ext: 'zip' },
+      '504b0708': { mime: 'application/zip', ext: 'zip' },
+      '52617221': { mime: 'application/x-rar-compressed', ext: 'rar' },
+      d0cf11e0: { mime: 'application/vnd.ms-office', ext: 'doc' }, // Older Microsoft Office Formats (doc, xls, ppt)
+      '504d0a': { mime: 'text/x-pascal', ext: 'p' },
+      // add more cases as needed...
+    };
+
   // check the first few bytes of the buffer for the file signature
   const signature = buffer.toString('hex', 0, 4);
+  let fileInfo = signatureToFileInfo[signature];
 
-  switch (signature) {
-    case 'ffd8ffe0':
-    case 'ffd8ffe1':
-    case 'ffd8ffe2':
-    case 'ffd8ffe3':
-    case 'ffd8ffe8':
-      return { mime: 'image/jpeg', ext: 'jpg' };
-    case '89504e47':
-      return { mime: 'image/png', ext: 'png' };
-    // add more cases as needed...
-    default:
-      return null;
+  if (!fileInfo) {
+    throw new Error('File type is invalid');
   }
+
+  return fileInfo;
 };
 
 export const getFileInfoFromBuffer = async (buffer: Buffer) => {
   const type = getFileTypeAndExtension(buffer);
   return {
     buffer: buffer,
-    ext: type?.ext,
-    mimetype: type?.mime,
+    ext: type.ext,
+    mimetype: type.mime,
   };
 };
 
@@ -75,26 +87,32 @@ export const saveFileFromUrl = async (props: {
   if (!type.ext || !type.mimetype) {
     throw 'File type is invalid';
   }
-  await uploadFile(props.dir, buffer, props.fileName, type.ext, type.mimetype);
+  await uploadFile({
+    dir: props.dir,
+    file: buffer,
+    fileName: props.fileName,
+    extension: type.ext,
+    mimetype: type.mimetype,
+  });
 
   return {
     fileName: `${props.fileName}.${type.ext}`,
   };
 };
 
-export const uploadFile = async (
-  dir: UploadDirs,
-  file: Buffer,
-  fileName: string,
-  extension: string,
-  mimetype: string
-) => {
-  const path = `${dir}/${fileName}.${extension}`;
+export const uploadFile = async (props: {
+  dir: UploadDirs;
+  file: Buffer;
+  fileName: string;
+  extension: string;
+  mimetype: string;
+}) => {
+  const path = `${props.dir}/${props.fileName}.${props.extension}`;
 
-  await _uploadToStorage(file, path, mimetype);
+  await _uploadToStorage(props.file, path, props.mimetype);
 
   return {
-    fileName: `${fileName}.${extension}`,
+    fileName: `${props.fileName}.${props.extension}`,
     fullPath: `${process.env.NEXT_PUBLIC_IMG_BASE_URL}/${path}`,
   };
 };
@@ -146,7 +164,7 @@ export const deleteFile = (dir: UploadDirs, fileName: string) => {
       (err, data) => {}
     );
   } else {
-    fs.unlinkSync(localUploadPath + '/' + path);
+    fs.unlinkSync(Path.join(__dirname, localUploadPath, path));
   }
 };
 

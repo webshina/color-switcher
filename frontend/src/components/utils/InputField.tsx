@@ -131,7 +131,12 @@ const InputField: React.FC<InputFieldProps> = (props) => {
               props.onChange && props.onChange(e);
             }}
             rows={props.rows}
-            className="px-3 py-1 w-full border-[1px] border-gray-300 rounded"
+            className="px-3 py-1 w-full border-[1px] rounded"
+            style={{
+              backgroundColor: props.disabled ? '#111' : '#222',
+              color: props.disabled ? '#777' : '#fff',
+              borderColor: props.disabled ? '#333' : '#ddd',
+            }}
             disabled={props.disabled}
           />
         )}
@@ -140,7 +145,7 @@ const InputField: React.FC<InputFieldProps> = (props) => {
         {props.type === 'select' && (
           <Select
             id={props.id}
-            value={props.value ?? ''}
+            value={props.value}
             disabled={props.disabled}
             placeholder="Select ..."
             onChange={(e) => {
@@ -148,11 +153,15 @@ const InputField: React.FC<InputFieldProps> = (props) => {
               props.onChange && props.onChange(e);
             }}
           >
-            {props.options.map((option) => (
-              <option key={option.label} value={option.value}>
-                {option.label}
-              </option>
-            ))}
+            <>
+              {props.options.map((option) => {
+                return (
+                  <option key={option.label} value={option.value}>
+                    {option.label}
+                  </option>
+                );
+              })}
+            </>
           </Select>
         )}
 
