@@ -1,5 +1,5 @@
-import { GuildMemberItem } from './types/GuildMember';
 import { UserProfileCard } from './UserProfileCard';
+import { GuildMemberItem } from './types/DiscordMember';
 
 type Props = {
   discordMembers: GuildMemberItem[];

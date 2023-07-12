@@ -20,7 +20,7 @@ const Home: NextPage = () => {
     }
   }, [router.query.code]);
 
-  return <></>;
+  return <div></div>;
 };
 
 export default Home;

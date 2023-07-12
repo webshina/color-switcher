@@ -9,7 +9,7 @@ import Image from 'next/image';
 import React from 'react';
 import { ActivityLevel } from '../common/ActiveLevel';
 import { UserProfile } from './UserProfile';
-import { GuildMemberItem } from './types/GuildMember';
+import { GuildMemberItem } from './types/DiscordMember';
 
 type Props = {
   discordMember: GuildMemberItem;
