@@ -2,6 +2,7 @@ import authController from '@/controllers/authController';
 import channelController from '@/controllers/channelController';
 import guildController from '@/controllers/guildController';
 import guildMemberController from '@/controllers/guildMemberController';
+import testController from '@/controllers/testController';
 import userController from '@/controllers/userController';
 import { withAuth } from '@/middleware/auth';
 import { isGuildManager } from '@/middleware/isGuildManager';
@@ -77,5 +78,7 @@ router.get(
   guildController.getBatchProgress
 );
 router.get('/api/guild/:id', guildController.get);
+
+router.get('/api/test', testController.test);
 
 export { router };
