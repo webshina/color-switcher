@@ -38,9 +38,24 @@ app.use(Sentry.Handlers.tracingHandler());
 
 // Middleware
 app.use(express.json());
+const allowedOrigins = [
+  'http://localhost:3004',
+  'https://www.favo-community.com',
+];
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        return callback(
+          new Error(
+            'The CORS policy for this site does not allow access from the specified Origin.'
+          ),
+          false
+        );
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );
