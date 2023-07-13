@@ -9,8 +9,12 @@ import { startDiscordBot } from './eventListeners/discord';
 import { router } from './routes';
 
 // env
-dotenv.config({ path: path.join(__dirname, '../.env.development') });
-dotenv.config({ path: path.join(__dirname, '../.env.development.local') });
+dotenv.config({
+  path: path.join(__dirname, `../.env.${process.env.NODE_ENV}`),
+});
+dotenv.config({
+  path: path.join(__dirname, `../.env.${process.env.NODE_ENV}.local`),
+});
 
 // Discord Bot
 startDiscordBot();
