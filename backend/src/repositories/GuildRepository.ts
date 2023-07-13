@@ -248,7 +248,7 @@ export class GuildRepository {
         batchId: guildBatch.id,
       }).then(() => {
         // Generate GuildImage data
-        this.generateGuildImage({
+        this.generateCoverImage({
           guildId: guildData.id,
           batchId: guildBatch.id,
         });
@@ -514,7 +514,7 @@ Keywords:
     });
   }
 
-  static async generateGuildImage(props: { guildId: number; batchId: number }) {
+  static async generateCoverImage(props: { guildId: number; batchId: number }) {
     const existingGuildData = await prisma.guild.findUnique({
       where: {
         id: props.guildId,
