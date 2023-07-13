@@ -13,5 +13,6 @@ services:
     ports:
       - '3310:3306'
     command: --innodb-use-native-aio=0
+    restart: always
 volumes:
   mysql:

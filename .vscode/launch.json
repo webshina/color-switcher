@@ -16,14 +16,6 @@
       }
     },
     {
-      // server side debug
-      "type": "node",
-      "request": "attach",
-      "name": "Nextjs: Server",
-      "skipFiles": ["<node_internals>/**"],
-      "port": 9229
-    },
-    {
       // client side debug
       "type": "pwa-chrome",
       "request": "launch",
@@ -42,6 +34,7 @@
       "internalConsoleOptions": "neverOpen",
       "runtimeArgs": ["-r", "./backend/ts-node-require"],
       "env": {
+        "NODE_ENV": "development",
         "TS_NODE_PROJECT": "./backend/tsconfig.json"
       },
       "skipFiles": ["<node_internals>/**"]
