@@ -9,9 +9,12 @@ import { Readable, pipeline } from 'stream';
 import util from 'util';
 
 // Define destination of saving file
-const destination = process.env.AWS_S3_BUCKET ? 's3' : 'local';
-const s3 =
-  destination === 's3'
+const getDestination = () => {
+  return process.env.AWS_S3_BUCKET ? 's3' : 'local';
+};
+
+const getS3 = () => {
+  return getDestination() === 's3'
     ? new S3({
         region: 'ap-northeast-1',
         credentials: {
@@ -20,6 +23,7 @@ const s3 =
         },
       })
     : undefined;
+};
 const localUploadPath = '../../storage/uploads';
 
 export const getFileTypeAndExtension = (
@@ -139,14 +143,14 @@ const _uploadToStorage = async (
   path: string,
   mimetype: string
 ) => {
-  if (destination === 's3') {
+  if (getDestination() === 's3') {
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET!,
-      Key: path,
+      Key: `uploads/${path}`,
       Body: file,
       ContentType: mimetype,
     });
-    await s3!.send(command);
+    await getS3()!.send(command);
   } else {
     await util.promisify(pipeline)(
       Readable.from(file),
@@ -155,11 +159,11 @@ const _uploadToStorage = async (
   }
 };
 
-export const deleteFile = (dir: UploadDirs, fileName: string) => {
-  const path = `${dir}/${fileName}`;
+export const deleteFile = async (dir: UploadDirs, fileName: string) => {
+  const path = `uploads/${dir}/${fileName}`;
 
-  if (destination === 's3') {
-    s3!.deleteObject(
+  if (getDestination() === 's3') {
+    getS3()!.deleteObject(
       { Bucket: process.env.AWS_S3_BUCKET!, Key: path },
       (err, data) => {}
     );
