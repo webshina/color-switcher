@@ -45,8 +45,6 @@
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.2.1",
     "express": "^4.18.2",
-    "firebase": "^9.17.2",
-    "firebase-admin": "^11.0.1",
     "formidable": "^2.1.1",
     "framer-motion": "^6.5.1",
     "gltfjsx": "^6.1.11",
