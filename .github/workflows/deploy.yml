@@ -24,8 +24,8 @@ jobs:
             git pull origin main &&
             cd /var/app/discord-home/backend &&
             npm install &&
-            npm run db:migrate &&
-            npm run db:seed &&
+            npx dotenv -e .env.production.local -- npx prisma migrate deploy &&
+            npx dotenv -e .env.production -- dotenv -e .env.production.local -- ts-node --require ./ts-node-require.ts prisma/seeds/index.ts &&
             cd /var/app/discord-home/frontend &&
             npm install && npm run build &&
             pm2 restart discord-home
