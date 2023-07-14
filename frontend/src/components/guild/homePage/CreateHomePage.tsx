@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdPrecisionManufacturing } from 'react-icons/md';
+import { mutate } from 'swr';
 import { GuildBatchProgress } from './GuildBatchProgress';
 import { InstallBotModal } from './InstallBotModal';
 
@@ -57,15 +58,22 @@ export const CreateHomePage: React.FC<Props> = (props) => {
     }
   };
 
-  // Fetch batch progress
+  // Fetch batch progress every 1 second
   const { data: progressData } = useGuildBatchProgress({
-    guildId: guildBatchId,
+    guildBatchId,
   });
+  // reset progress
+  useEffect(() => {
+    mutate('useGuildBatchProgress', {
+      ...progressData,
+      progressRate: 0,
+    });
+  }, []);
   useEffect(() => {
     if (progressData?.progressRate === 1) {
       router.push(`/guild/${guildId}`);
     }
-  }, [progressData?.progressRate]);
+  }, [progressData]);
 
   // Install bot modal
   const {

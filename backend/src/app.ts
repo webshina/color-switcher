@@ -21,7 +21,6 @@ startDiscordBot();
 
 // Express
 const app = express();
-const port = 3005;
 
 // Sentry
 Sentry.init({
@@ -69,7 +68,16 @@ app.use('/', router);
 // Sentry error handler should be after all controllers
 app.use(Sentry.Handlers.errorHandler());
 
+// Handle uncaught exceptions
+process.on('uncaughtException', function (err) {
+  console.error('Caught exception:', err);
+  // Sentry
+  Sentry.captureException(err);
+  process.exit(1);
+});
+
 // Start the server
+const port = 3005;
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });

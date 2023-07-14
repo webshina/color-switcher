@@ -1,6 +1,6 @@
 import { UploadDirs } from '#/common/types/UploadDirs';
 import { localStoragePath } from '@/config/config';
-import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { CopyObjectCommand, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import axios from 'axios';
 import formidable from 'formidable';
 import fs from 'fs';
@@ -176,19 +176,37 @@ export const getImageUrl = (path: UploadDirs, imageName: string) => {
   return `${process.env.IMG_BASE_URL}/uploads/${path}/${imageName}`;
 };
 
-export const copyFile = async (
+export const copy = async (
   fromFilePath: string,
   toDir: string,
   toFileName: string
 ) => {
-  const copyFile = util.promisify(fs.copyFile);
+  if (getDestination() === 's3') {
+    const copySource = `${fromFilePath}`;
+    const copyDestination = `uploads/${toDir}/${toFileName}`;
 
-  // Define the source and destination directories
-  const srcFile = Path.resolve(__dirname, localStoragePath, fromFilePath);
-  const destFile = Path.resolve(__dirname, localStoragePath, toDir, toFileName);
+    const command = new CopyObjectCommand({
+      Bucket: process.env.AWS_S3_BUCKET!,
+      CopySource: encodeURI(`${process.env.AWS_S3_BUCKET}/${copySource}`),
+      Key: copyDestination,
+    });
 
-  // Copy the file
-  await copyFile(srcFile, destFile);
+    await getS3()!.send(command);
+  } else {
+    const copyFile = util.promisify(fs.copyFile);
+
+    // Define the source and destination directories
+    const srcFile = Path.resolve(__dirname, localStoragePath, fromFilePath);
+    const destFile = Path.resolve(
+      __dirname,
+      localUploadPath,
+      toDir,
+      toFileName
+    );
+
+    // Copy the file
+    await copyFile(srcFile, destFile);
+  }
 };
 
 export const copyRandomImage = async (
@@ -199,5 +217,5 @@ export const copyRandomImage = async (
   // Generate random number of 1-10
   const randomNum = Math.floor(Math.random() * 10) + 1;
   const fromFileName = `${randomNum}.jpeg`;
-  await copyFile(`${fromDir}/${fromFileName}`, `uploads/${toDir}`, toFileName);
+  await copy(`${fromDir}/${fromFileName}`, `${toDir}`, toFileName);
 };
