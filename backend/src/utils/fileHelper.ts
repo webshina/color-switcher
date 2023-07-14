@@ -199,7 +199,7 @@ export const copy = async (
     const srcFile = Path.resolve(__dirname, localStoragePath, fromFilePath);
     const destFile = Path.resolve(
       __dirname,
-      localStoragePath,
+      localUploadPath,
       toDir,
       toFileName
     );
