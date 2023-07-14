@@ -2,14 +2,18 @@ import { GetBatchProgressResponse } from '#/common/types/apiResponses/GuildContr
 import { get } from '@/utils/apiHelper';
 import useSWR from 'swr';
 
-export const useGuildBatchProgress = (props: { guildId?: number }) => {
+export const useGuildBatchProgress = (props: { guildBatchId?: number }) => {
   const { ...swr } = useSWR(
-    props.guildId ? 'useGuildBatchProgress' : null,
+    props.guildBatchId ? 'useGuildBatchProgress' : null,
     async () => {
-      const res = await get('/api/guild/progress/' + props.guildId);
+      const res = await get('/api/guild/progress/' + props.guildBatchId);
       return res.data as GetBatchProgressResponse;
     },
-    { refreshInterval: 500 }
+    {
+      refreshInterval: 1000,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
   );
 
   return {

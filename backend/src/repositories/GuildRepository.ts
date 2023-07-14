@@ -607,7 +607,7 @@ Keywords:
     };
 
     // Calculate progress rate
-    let allWorkCnt = (guildBatch.totalChannelCnt ?? 0) + 5;
+    let allWorkCnt = (guildBatch.totalChannelCnt ?? 0) + 6;
     // List of works
     // // isChannelGenerationCompleted
     // // isGuildDescriptionGenerationCompleted
