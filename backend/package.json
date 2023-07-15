@@ -10,6 +10,7 @@
     "db:migrate:reset": "dotenv -e .env.development.local -- npx prisma migrate reset",
     "db:seed": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts prisma/seeds/index.ts",
     "db:sample": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts prisma/seeds/sampleData/index.ts",
+    "exec:batch": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts batch/generateGuilds.ts",
     "exec:poc": "dotenv -e .env.development -- dotenv -e .env.development.local -- ts-node --require ./ts-node-require.ts src/poc/OpenAI.ts"
   },
   "author": "",
