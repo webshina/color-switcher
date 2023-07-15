@@ -3,8 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
-import winston from 'winston';
 import { localStoragePath } from './config/config';
+import { logger } from './lib/winston';
 import { router } from './routes';
 
 // env
@@ -13,22 +13,6 @@ dotenv.config({
 });
 dotenv.config({
   path: path.join(__dirname, `../.env.${process.env.NODE_ENV}.local`),
-});
-
-// Set up Winston logger
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  defaultMeta: { service: 'discord-home' },
-  transports: [
-    new winston.transports.File({
-      filename: path.join(__dirname, '../logs/error.log'),
-      level: 'error',
-    }),
-    new winston.transports.File({
-      filename: path.join(__dirname, '../logs/combined.log'),
-    }),
-  ],
 });
 
 // Express
