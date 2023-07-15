@@ -234,19 +234,20 @@ export class GuildRepository {
         guildId: guildData.id,
         batchId: guildBatch.id,
       });
-      // Generate InviteLink data
-      this.generateInviteLink(guildData.id, fetchedChannels).then(() => {
-        // Generate ShareMessage data
-        this.generateShareMessage({
-          guildId: guildData.id,
-          batchId: guildBatch.id,
-        });
-      });
       // Generate Tags data
       this.generateTags({
         guildId: guildData.id,
         batchId: guildBatch.id,
       }).then(() => {
+        // Generate InviteLink data
+        this.generateInviteLink(guildData.id, fetchedChannels).then(() => {
+          // Generate ShareMessage data
+          this.generateShareMessage({
+            guildId: guildData.id,
+            batchId: guildBatch.id,
+          });
+        });
+
         // Generate GuildImage data
         this.generateCoverImage({
           guildId: guildData.id,
