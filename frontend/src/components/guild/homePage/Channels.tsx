@@ -37,7 +37,7 @@ export const Channels: React.FC<Props> = (props) => {
             <div className="flex flex-wrap">
               {category.channels.map((channel) => (
                 <div key={channel.id}>
-                  {channel.activityScore! >= 0 ? (
+                  {channel.activityScore! > 0 ? (
                     // High activity level
                     <ChannelCard guild={props.guild} channel={channel} />
                   ) : (

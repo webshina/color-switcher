@@ -38,6 +38,7 @@ const app = express();
 app.use(express.json());
 const allowedOrigins = [
   'http://localhost:3004',
+  'https://favo-community.com',
   'https://www.favo-community.com',
 ];
 
