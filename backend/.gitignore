@@ -15,3 +15,5 @@ package-lock.json
 *.local
 
 /storage/uploads/**
+
+/logs/**

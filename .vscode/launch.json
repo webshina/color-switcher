@@ -48,7 +48,7 @@
       "restart": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "runtimeArgs": ["-r", "./backend/ts-node-require"],
+      "runtimeArgs": ["-q", "-r", "./backend/ts-node-require"],
       "env": {
         "NODE_ENV": "development",
         "TS_NODE_PROJECT": "./backend/tsconfig.json"
