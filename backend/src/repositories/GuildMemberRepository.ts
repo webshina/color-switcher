@@ -2,6 +2,7 @@ import { messages } from '#/common/constants/messages';
 import { GuildMemberItem } from '#/common/types/Guild';
 import { getBot } from '@/lib/discord';
 import { prisma } from '@/lib/prisma';
+import { standardize } from '@/utils/calcutationHelper';
 import { addToDate } from '@/utils/dateHelper';
 import { GuildMember } from '@prisma/client';
 import { Guild } from 'discord.js';
@@ -300,32 +301,33 @@ export class GuildMemberRepository {
       })
     );
 
-    let memberMessageScores = guildMembers
-      // Filter out channels that don't have messagesPerDay
-      .filter((guildMember) => {
-        if (guildMember.messagesPerDay !== null) {
-          return true;
-        }
-      })
-      .map((guildMember) => ({
-        id: guildMember.id,
-        // Logarithmically scale messagesPerDay
-        score:
-          guildMember.messagesPerDay && guildMember.messagesPerDay > 0
-            ? Math.log10(guildMember.messagesPerDay)
-            : 0,
-      }));
-    const memberMessageScoresArray = memberMessageScores.map(
-      (memberMessageScore) => memberMessageScore.score
-    );
-    const maxScore = Math.max(...memberMessageScoresArray);
-    const minScore = Math.min(...memberMessageScoresArray);
+    // Filter out channels that don't have messagesPerDay
+    const filteredMembers = guildMembers.filter((guildMember) => {
+      if (guildMember.messagesPerDay !== null) {
+        return true;
+      }
+    });
+    // Standardize scores
+    const standardizedScores = filteredMembers.map((member) => ({
+      id: member.id,
+      score: standardize(
+        member.messagesPerDay!,
+        filteredMembers.map((member) => member.messagesPerDay!),
+        10,
+        1
+      ),
+    }));
+    // Log for correction
+    let correctedScores = standardizedScores.map((data) => ({
+      id: data.id,
+      score: Math.log10(data.score!),
+    }));
     let activityScore = 0;
-    for (const memberMessageScore of memberMessageScores) {
+    for (const scoreData of correctedScores) {
       if (guildMembers.length < 2) {
         // If number of channels is a little, evaluate activityScore on an absolute scale
         const member = guildMembers.find(
-          (member) => member.id === memberMessageScore.id
+          (member) => member.id === scoreData.id
         );
         const messagesPerDay = member!.messagesPerDay!;
         if (messagesPerDay === 0) {
@@ -342,18 +344,17 @@ export class GuildMemberRepository {
           activityScore = 5;
         }
       } else {
-        activityScore =
-          maxScore === 0 && minScore === 0
-            ? 0
-            : Math.round(
-                ((memberMessageScore.score! - minScore) /
-                  (maxScore - minScore)) *
-                  5
-              );
+        activityScore = Math.round(
+          standardize(
+            scoreData.score,
+            correctedScores.map((data) => data.score),
+            5
+          )
+        );
       }
       await prisma.guildMember.update({
         where: {
-          id: memberMessageScore.id,
+          id: scoreData.id,
         },
         data: {
           activityScore,

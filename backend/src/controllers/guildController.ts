@@ -142,7 +142,6 @@ const updateCategory = async (req: Request, res: Response) => {
 const updateAnnouncementToManager = async (req: Request, res: Response) => {
   const { announcementId } = req.params;
   const { isShow } = req.body;
-
   await prisma.announcementToGuildManager.update({
     where: {
       id: Number(announcementId),

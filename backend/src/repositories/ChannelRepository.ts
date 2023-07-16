@@ -1,6 +1,7 @@
 import { ChannelItem, ChannelSummaryItem } from '#/common/types/Channel';
 import { createCompletion } from '@/lib/openAI';
 import { prisma } from '@/lib/prisma';
+import { standardize } from '@/utils/calcutationHelper';
 import {
   copyRandomImage,
   deleteFile,
@@ -450,30 +451,32 @@ Summary:
         guildId: guildId,
       },
     });
-    let channelMessageScores = channels
-      // Filter out channels that don't have messagesPerDay
-      .filter((channel) => {
-        if (channel.messagesPerDay !== null) {
-          return true;
-        }
-      })
-      .map((channel) => ({
-        id: channel.id,
-        // Logarithmically scale messagesPerDay
-        score: Math.log10(channel.messagesPerDay!),
-      }));
-    const channelMessageScoresArray = channelMessageScores.map(
-      (channelMessageScore) => channelMessageScore.score
-    );
-    const maxScore = Math.max(...channelMessageScoresArray);
-    const minScore = Math.min(...channelMessageScoresArray);
+    // Filter out channels with no messages
+    const filteredChannels = channels.filter((channel) => {
+      if (channel.messagesPerDay !== null) {
+        return true;
+      }
+    });
+    // Standardize messagesPerDay
+    const standardizedScores = filteredChannels.map((channel) => ({
+      id: channel.id,
+      score: standardize(
+        channel.messagesPerDay!,
+        filteredChannels.map((channel) => channel.messagesPerDay!),
+        10,
+        1
+      ),
+    }));
+    // Log for correction
+    let correctedScores = standardizedScores.map((channel) => ({
+      id: channel.id,
+      score: Math.log10(channel.score!),
+    }));
     let activityScore = 0;
-    for (const channelMessageScore of channelMessageScores) {
+    for (const scoreData of correctedScores) {
       if (channels.length <= 5) {
         // If number of channels is a little, evaluate activityScore on an absolute scale
-        const channel = channels.find(
-          (channel) => channel.id === channelMessageScore.id
-        );
+        const channel = channels.find((channel) => channel.id === scoreData.id);
         const messagesPerDay = channel!.messagesPerDay!;
         if (messagesPerDay === 0) {
           activityScore = 0;
@@ -490,18 +493,17 @@ Summary:
         }
       } else {
         // Standardize activityScore on a scale of 0 to 5
-        activityScore =
-          maxScore === 0 && minScore === 0
-            ? 0
-            : Math.round(
-                ((channelMessageScore.score! - minScore) /
-                  (maxScore - minScore)) *
-                  5
-              );
+        activityScore = Math.round(
+          standardize(
+            scoreData.score,
+            correctedScores.map((channel) => channel.score),
+            5
+          )
+        );
       }
       await prisma.channel.update({
         where: {
-          id: channelMessageScore.id,
+          id: scoreData.id,
         },
         data: {
           activityScore,
