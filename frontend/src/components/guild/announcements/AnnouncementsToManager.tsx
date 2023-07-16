@@ -17,8 +17,7 @@ export const AnnouncementsToManager: React.FC<Props> = (props) => {
   return (
     <>
       {isShow && (
-        <div className="mx-24 my-12 p-3 bg-slate-500 rounded">
-          <div className="text-xl">Notice</div>
+        <div className="mx-24 my-12 p-3 bg-slate-900 rounded">
           <div className="flex justify-start items-center overflow-x-auto">
             {props.guild.announcementsToGuildManager.map((announcement) => (
               <>
