@@ -4,6 +4,7 @@ import {
   GenerateGuildResponse,
   GetBatchProgressResponse,
 } from '#/common/types/apiResponses/GuildControllerResponse';
+import { prisma } from '@/lib/prisma';
 import { GuildMemberRepository } from '@/repositories/GuildMemberRepository';
 import { GuildRepository } from '@/repositories/GuildRepository';
 import { UserRepository } from '@/repositories/UserRepository';
@@ -26,6 +27,9 @@ const get = async (req: Request, res: Response) => {
     ...result,
     members: isMember ? result.members : [],
     isMember,
+    announcementsToGuildManager: isMember
+      ? result.announcementsToGuildManager
+      : [],
   };
 
   return res.json(responseData);
@@ -135,6 +139,22 @@ const updateCategory = async (req: Request, res: Response) => {
   return res.json('success');
 };
 
+const updateAnnouncementToManager = async (req: Request, res: Response) => {
+  const { announcementId } = req.params;
+  const { isShow } = req.body;
+
+  await prisma.announcementToGuildManager.update({
+    where: {
+      id: Number(announcementId),
+    },
+    data: {
+      isShow: isShow as boolean,
+    },
+  });
+
+  return res.json('success');
+};
+
 export default {
   generate,
   get,
@@ -144,4 +164,5 @@ export default {
   toggleAutoGeneration,
   updateTag,
   updateCategory,
+  updateAnnouncementToManager,
 };

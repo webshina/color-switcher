@@ -20,7 +20,7 @@ type Props = {
 };
 export const GuildHomePage: React.FC<Props> = (props) => {
   return (
-    <>
+    <div className="lg:mx-24">
       {/* Cover Image */}
       <div className="relative h-60 w-full">
         <Image
@@ -105,6 +105,6 @@ export const GuildHomePage: React.FC<Props> = (props) => {
       <div className="h-8" />
 
       <div className="h-16" />
-    </>
+    </div>
   );
 };

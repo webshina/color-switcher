@@ -8,42 +8,52 @@ type Props = {
   guildId: number;
 };
 export const GuildHomePageSwitch: React.FC<Props> = (props) => {
+  return (
+    <div className="flex justify-around w-full">
+      <SwitchBtn
+        page="home"
+        text="HOME"
+        icon={<AiFillHome size={20} />}
+        currentPage={props.currentPage}
+        guildId={props.guildId}
+      />
+      <SwitchBtn
+        page="management"
+        text="SETTING"
+        icon={<AiFillSetting size={20} />}
+        currentPage={props.currentPage}
+        guildId={props.guildId}
+      />
+    </div>
+  );
+};
+
+type SwitchBtnProps = {
+  page: Page;
+  text: string;
+  icon: React.ReactNode;
+  currentPage: Page;
+  guildId: number;
+};
+const SwitchBtn: React.FC<SwitchBtnProps> = (props) => {
   const router = useRouter();
 
   return (
-    <div className="flex w-[600px] m-2 justify-center border-2 border-white/50 rounded-xl">
-      <button
-        className="flex justify-center items-center p-2 w-1/2 text-sm lg:text-lg"
-        style={{
-          backgroundColor:
-            props.currentPage === 'home'
-              ? 'rgba(255, 255, 255, 0.1)'
-              : 'transparent',
-        }}
-        onClick={() => {
-          router.push(`/guild/${props.guildId}`);
-        }}
-      >
-        <AiFillHome size={20} />
-        <div className="w-2" />
-        HOME
-      </button>
-      <button
-        className="flex justify-center items-center p-2 w-1/2 text-sm lg:text-lg"
-        style={{
-          backgroundColor:
-            props.currentPage === 'management'
-              ? 'rgba(255, 255, 255, 0.1)'
-              : 'transparent',
-        }}
-        onClick={() => {
-          router.push(`/guild/${props.guildId}?page=management`);
-        }}
-      >
-        <AiFillSetting size={20} />
-        <div className="w-2" />
-        MANAGEMENT
-      </button>
-    </div>
+    <button
+      className="flex flex-col justify-center items-center pt-2 w-1/2 text-sm lg:text-lg"
+      style={{
+        backgroundColor:
+          props.currentPage === props.page
+            ? 'rgba(255, 255, 255, 0.1)'
+            : 'transparent',
+      }}
+      onClick={() => {
+        router.push(`/guild/${props.guildId}?page=${props.page}`);
+      }}
+    >
+      {props.icon}
+      <div className="h-[0.5px]" />
+      <div className="text-[8px]">{props.text}</div>
+    </button>
   );
 };

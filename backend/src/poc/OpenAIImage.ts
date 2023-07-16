@@ -20,7 +20,8 @@ async function execute(prompt: string) {
   return response.data.data;
 }
 
-const prompt = '千葉';
+const prompt =
+  'Illustration of person sharing message on social media. Background color is dark.';
 execute(prompt)
   .then((result) => {
     console.log('Summary:');

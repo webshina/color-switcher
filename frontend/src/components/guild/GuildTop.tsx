@@ -3,6 +3,7 @@ import { useMe } from '@/hooks/repository/useMe';
 import { useRouter } from 'next/router';
 import 'react-datepicker/dist/react-datepicker.css';
 import { GuildHomePageSwitch, Page } from './GuildHomePageSwitch';
+import { AnnouncementsToManager } from './announcements/AnnouncementsToManager';
 import { GuildHomePage } from './homePage/GuildHomePage';
 import { GuildManagementPage } from './management/GuildManagementPage';
 
@@ -22,18 +23,8 @@ export const GuildTop: React.FC<Props> = (props) => {
     <>
       {guild && (
         <>
-          {/* Page Switch */}
-          {isOwner && (
-            <>
-              <div className="flex justify-center">
-                <GuildHomePageSwitch
-                  currentPage={props.page}
-                  guildId={props.guildId}
-                />
-              </div>
-              <div className="h-16" />
-            </>
-          )}
+          {/* Announcements */}
+          <AnnouncementsToManager guild={guild} user={user} />
 
           {/* Home Page */}
           {props.page === 'home' && <GuildHomePage guild={guild} user={user} />}
@@ -41,6 +32,17 @@ export const GuildTop: React.FC<Props> = (props) => {
           {/* Management Page */}
           {props.page === 'management' && (
             <GuildManagementPage guild={guild} user={user} />
+          )}
+
+          {/* Page Switch */}
+          {isOwner && (
+            // Fix to bottom of screen
+            <div className="fixed bottom-0 left-0 right-0 flex justify-center bg-gray-800/50 z-10">
+              <GuildHomePageSwitch
+                currentPage={props.page}
+                guildId={props.guildId}
+              />
+            </div>
           )}
         </>
       )}
