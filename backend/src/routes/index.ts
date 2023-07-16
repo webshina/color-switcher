@@ -78,6 +78,12 @@ router.get(
   guildController.getBatchProgress
 );
 router.get('/api/guild/:id', guildController.get);
+router.post(
+  '/api/guild/:guildId/announcement-to-manager/:announcementId',
+  withAuth,
+  isGuildManager,
+  guildController.updateAnnouncementToManager
+);
 
 router.get('/api/test', testController.test);
 

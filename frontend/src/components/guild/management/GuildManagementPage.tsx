@@ -26,7 +26,7 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
   return (
     <>
       {props.guild && (
-        <>
+        <div className="lg:mx-24">
           {/* Update by AI */}
           <div className="flex justify-center">
             <button
@@ -70,7 +70,7 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
           />
 
           <div className="h-16" />
-        </>
+        </div>
       )}
     </>
   );

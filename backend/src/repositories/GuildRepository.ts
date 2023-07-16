@@ -15,7 +15,7 @@ import {
   uploadFile,
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
-import { PostName } from '@prisma/client';
+import { Language, PostName } from '@prisma/client';
 import axios, { isAxiosError } from 'axios';
 import {
   ChannelType,
@@ -53,6 +53,11 @@ export class GuildRepository {
           },
         },
         posts: true,
+        announcementsToGuildManager: {
+          where: {
+            isShow: true,
+          },
+        },
       },
     });
     if (!guildData) {
@@ -109,6 +114,7 @@ export class GuildRepository {
       iconURL: guildData.iconURL,
       inviteURL: guildData.inviteURL,
       createdByUserId: guildData.createdByUserId,
+      language: guildData.language,
       availableChannelCnt: guildData.availableChannelCnt ?? 0,
       createdChannelCnt: guildData.channels.length,
       categories: channelCategoryItems,
@@ -122,6 +128,7 @@ export class GuildRepository {
         (guildMember) => guildMember.isManager
       ),
       posts,
+      announcementsToGuildManager: guildData.announcementsToGuildManager,
     };
     return guildItem;
   }
@@ -216,6 +223,9 @@ export class GuildRepository {
       create: guildPostData,
     });
 
+    // Create announcements
+    await this.createAnnouncementToGuildManager(guildData.id);
+
     const guildBatch = await prisma.guildBatch.create({
       data: {
         guildId: guildData.id,
@@ -266,6 +276,38 @@ export class GuildRepository {
       guildId: guildData.id,
       guildBatchId: guildBatch.id,
     };
+  }
+
+  static async createAnnouncementToGuildManager(guildId: number) {
+    await prisma.announcementToGuildManager.upsert({
+      where: {
+        guildId_name: {
+          guildId,
+          name: 'INSTRUCTION_FOR_POST_TO_CHANNEL',
+        },
+      },
+      update: {},
+      create: {
+        guildId,
+        name: 'INSTRUCTION_FOR_POST_TO_CHANNEL',
+        isShow: true,
+      },
+    });
+
+    await prisma.announcementToGuildManager.upsert({
+      where: {
+        guildId_name: {
+          guildId,
+          name: 'INSTRUCTION_FOR_POST_TO_SOCIAL_MEDIA',
+        },
+      },
+      update: {},
+      create: {
+        guildId,
+        name: 'INSTRUCTION_FOR_POST_TO_SOCIAL_MEDIA',
+        isShow: true,
+      },
+    });
   }
 
   static async generateInviteLink(
@@ -323,7 +365,20 @@ export class GuildRepository {
           };
         })
       );
-      const languageName = await detectLanguage(materialsForDescription);
+
+      // Detect language
+      const languageName = (await detectLanguage(
+        materialsForDescription
+      )) as Language;
+      await prisma.guild.update({
+        where: {
+          id: props.guildId,
+        },
+        data: {
+          language: languageName,
+        },
+      });
+
       const prompt = `Create description of Discord server using following channel data. 
 -Describe only in ${languageName}.
 -Be sure to write within 300 characters or less.

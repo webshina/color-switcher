@@ -1,4 +1,5 @@
 import {
+  AnnouncementToGuildManager,
   Guild,
   GuildMember,
   GuildPost,
@@ -29,6 +30,11 @@ export type GuildMemberItem = Omit<
   posts: GuildPostItem[];
 };
 
+export type AnnouncementToGuildManagerItem = Omit<
+  AnnouncementToGuildManager,
+  'createdAt' | 'updatedAt'
+>;
+
 export type GuildItem = Omit<
   Guild,
   'coverImage' | 'createdAt' | 'updatedAt'
@@ -41,4 +47,5 @@ export type GuildItem = Omit<
   members: GuildMemberItem[];
   managementMembers: GuildMemberItem[];
   posts: GuildPostItem[];
+  announcementsToGuildManager: AnnouncementToGuildManagerItem[];
 };
