@@ -1,5 +1,16 @@
 import { GuildItem } from '#/common/types/Guild';
 import { UserItem } from '#/common/types/User';
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+} from '@chakra-ui/react';
+import React from 'react';
 import { AnnouncementCard } from './AnnouncementCard';
 
 type Props = {
@@ -7,18 +18,30 @@ type Props = {
   user?: UserItem | null;
 };
 export const AnnouncementsToManager: React.FC<Props> = (props) => {
-  const isShow =
+  const [isOpenModal, setIsOpenModal] = React.useState<boolean>(
     props.user &&
-    props.guild.managementMembers.some(
-      (member) => member.discordId === props.user?.discordId
-    ) &&
-    props.guild.announcementsToGuildManager?.length > 0;
+      props.guild.managementMembers.some(
+        (member) => member.discordId === props.user?.discordId
+      ) &&
+      props.guild.announcementsToGuildManager?.length > 0
+      ? true
+      : false
+  );
+  const onCloseModal = () => setIsOpenModal(false);
 
   return (
-    <>
-      {isShow && (
-        <div className="mx-24 my-12 p-3 bg-slate-900 rounded">
-          <div className="flex justify-start items-center overflow-x-auto">
+    <Modal
+      closeOnOverlayClick={true}
+      isOpen={isOpenModal}
+      onClose={onCloseModal}
+      isCentered
+    >
+      <ModalOverlay />
+      <ModalContent bgColor="#222">
+        <ModalCloseButton />
+        <ModalHeader>ToDo</ModalHeader>
+        <ModalBody>
+          <div className="flex justify-start overflow-x-auto overflow-y-hidden">
             {props.guild.announcementsToGuildManager.map((announcement) => (
               <>
                 <div key={announcement.id} className="m-2">
@@ -30,8 +53,13 @@ export const AnnouncementsToManager: React.FC<Props> = (props) => {
               </>
             ))}
           </div>
-        </div>
-      )}
-    </>
+        </ModalBody>
+        <ModalFooter>
+          <Button colorScheme="whiteAlpha" mr={3} onClick={onCloseModal}>
+            Do it later
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };

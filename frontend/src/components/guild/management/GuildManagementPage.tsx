@@ -3,6 +3,7 @@ import { FetchGuildResponse } from '#/common/types/apiResponses/GuildControllerR
 import { useRouter } from 'next/router';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdPrecisionManufacturing } from 'react-icons/md';
+import { AnnouncementsToManager } from '../announcements/AnnouncementsToManager';
 import { GuildChannelCategoryForm } from './GuildChannelCategoryForm';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
 import { GuildDescriptionForm } from './GuildDescriptionForm';
@@ -27,6 +28,9 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
     <>
       {props.guild && (
         <div className="lg:mx-24">
+          {/* Announcements */}
+          <AnnouncementsToManager guild={props.guild} user={props.user} />
+
           {/* Update by AI */}
           <div className="flex justify-center">
             <button

@@ -3,7 +3,6 @@ import { useMe } from '@/hooks/repository/useMe';
 import { useRouter } from 'next/router';
 import 'react-datepicker/dist/react-datepicker.css';
 import { GuildHomePageSwitch, Page } from './GuildHomePageSwitch';
-import { AnnouncementsToManager } from './announcements/AnnouncementsToManager';
 import { GuildHomePage } from './homePage/GuildHomePage';
 import { GuildManagementPage } from './management/GuildManagementPage';
 
@@ -23,9 +22,6 @@ export const GuildTop: React.FC<Props> = (props) => {
     <>
       {guild && (
         <>
-          {/* Announcements */}
-          <AnnouncementsToManager guild={guild} user={user} />
-
           {/* Home Page */}
           {props.page === 'home' && <GuildHomePage guild={guild} user={user} />}
 

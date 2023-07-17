@@ -145,14 +145,14 @@ URL : ${process.env.NEXT_PUBLIC_APP_URL}/guild/${props.guild.id}`;
   };
 
   return (
-    <div>
-      <div className="px-3 py-3 font-bold bg-slate-700 rounded-t-xl">
+    <div className="w-[300px] overflow-y-hidden hover:overflow-y-auto">
+      <div className="px-3 py-3 font-bold text-sm bg-slate-700 rounded-t-xl">
         {title()}
       </div>
-      <div className="p-3 w-[400px] h-[500px] bg-slate-600 rounded-b-xl overflow-y-hidden hover:overflow-y-auto">
-        <div className="h-5" />
+      <div className="p-3 bg-slate-600 rounded-b-xl">
+        <div className="h-1" />
         {image()}
-        <div className="h-5" />
+        <div className="h-1" />
 
         <div className="flex justify-end">
           <Button colorScheme="pink" opacity={0.9} onClick={copyToClipboard}>
