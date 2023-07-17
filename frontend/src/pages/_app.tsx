@@ -1,3 +1,4 @@
+import { Meta } from '@/components/common/Meta';
 import { AuthProvider } from '@/components/provider/AuthProvider';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { AppProps } from 'next/app';
@@ -19,6 +20,12 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <ChakraProvider theme={theme}>
         <AuthProvider>
+          <Meta
+            title="Discord Home AI1"
+            description="Generate your Discord home page in ONE click !"
+            image="https://www.favo-community.com/images/thumbnail.png"
+            url="https://www.favo-community.com"
+          />
           <Component {...pageProps} />
         </AuthProvider>
       </ChakraProvider>
