@@ -21,7 +21,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <ChakraProvider theme={theme}>
         <AuthProvider>
           <Meta
-            title="Discord Home AI1"
+            title="Discord Home AI"
             description="Generate your Discord home page in ONE click !"
             image="https://www.favo-community.com/images/thumbnail.png"
             url="https://www.favo-community.com"
