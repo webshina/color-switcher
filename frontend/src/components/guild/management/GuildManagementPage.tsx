@@ -52,14 +52,23 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
                 <div className="my-2 text-sm">
                   Last Synced At :{' '}
                   <span className="font-bold">
-                    {formatDate(props.guild.lastSyncedAt, 'yyyy/M/d H:m')}
+                    {formatDate(
+                      new Date(props.guild.lastSyncedAt.toLocaleString()),
+                      'M/d H:m'
+                    )}
                   </span>
                 </div>
                 <div className="h-2" />
               </>
             )}
             <div className="text-sm">
-              ※ Automatically updated at 18:00 (UTC)
+              ※ Automatically updated at{' '}
+              {formatDate(
+                new Date(
+                  new Date(Date.UTC(2023, 6, 18, 18, 0, 0)).toLocaleString()
+                ),
+                'H:m'
+              )}
             </div>
           </div>
           <div className="h-16" />

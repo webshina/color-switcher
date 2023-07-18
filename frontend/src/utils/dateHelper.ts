@@ -24,7 +24,7 @@ export const addToDate = (
 /**
  * Format date to string
  * @param {Date} date
- * @param {string} format yyyy:year, M:month, d:day, H:hour, m:minutes, s:seconds, S:milliseconds
+ * @param {string} format yyyy:year, M:month, d:day, HH:hour(24h), H:hour(24h) without padding, m:minutes, s:seconds, S:milliseconds
  */
 export const formatDate = (date: Date, format: string) => {
   date = new Date(date);
@@ -38,9 +38,10 @@ export const formatDate = (date: Date, format: string) => {
     date.getDate().toLocaleString().padStart(2, '0')
   );
   format = format.replace(
-    /H/g,
+    /HH/g,
     date.getHours().toLocaleString().padStart(2, '0')
   );
+  format = format.replace(/H/g, date.getHours().toLocaleString());
   format = format.replace(
     /m/g,
     date.getMinutes().toLocaleString().padStart(2, '0')
