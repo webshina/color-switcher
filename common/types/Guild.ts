@@ -42,6 +42,7 @@ export type GuildItem = Omit<
   coverImageUrl?: string | null;
   availableChannelCnt: number;
   createdChannelCnt: number;
+  lastSyncedAt?: Date;
   categories: ChannelCategoryItem[];
   tags: GuildTagItem[];
   members: GuildMemberItem[];
