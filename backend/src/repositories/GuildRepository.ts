@@ -98,6 +98,16 @@ export class GuildRepository {
       name: post.name,
     }));
 
+    // Fetch Batch Data
+    const batchData = await prisma.guildBatch.findFirst({
+      where: {
+        guildId: guildData.id,
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    });
+
     const guildItem: GuildItem = {
       id: guildData.id,
       discordId: guildData.discordId,
@@ -117,6 +127,7 @@ export class GuildRepository {
       language: guildData.language,
       availableChannelCnt: guildData.availableChannelCnt ?? 0,
       createdChannelCnt: guildData.channels.length,
+      lastSyncedAt: batchData?.updatedAt,
       categories: channelCategoryItems,
       tags: guildTags.map((guildTag) => ({
         id: guildTag.id,

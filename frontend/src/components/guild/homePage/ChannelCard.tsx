@@ -24,10 +24,14 @@ export const ChannelCard: React.FC<Props> = (props) => {
             <ActivityLevel level={props.channel.activityScore!} />
             <div className="h-5" />
             {/* Conversation Summary */}
-            <div className="text-sm font-semibold">AI Summary</div>
-            <div className="h-3" />
-            <ConversationSummaries summaries={props.channel.summaries} />
-            <div className="h-5" />
+            {props.channel.showConversationSummary && (
+              <>
+                <div className="text-sm font-semibold">AI Summary</div>
+                <div className="h-3" />
+                <ConversationSummaries summaries={props.channel.summaries} />
+                <div className="h-5" />
+              </>
+            )}
             {/* Go to channel */}
             <div className="flex justify-end">
               <JumpChannelBtn
