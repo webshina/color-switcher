@@ -11,7 +11,7 @@ export const LandingPage: React.FC<Props> = () => {
   const router = useRouter();
   const screenSize = useScreenSize();
   const classHeading =
-    'text-5xl font-bold text-center leading-normal gradient-text-white-to-dark whitespace-pre-wrap ' +
+    'mx-5 text-5xl font-bold text-center leading-normal gradient-text-white-to-dark whitespace-pre-wrap ' +
     (screenSize === 'sm' ? 'text-xl' : 'text-5xl');
   return (
     <>
