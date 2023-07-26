@@ -33,7 +33,7 @@ export const GuildCoverImageForm: React.FC<Props> = (props) => {
     try {
       const formData = new FormData();
       formData.append('coverImage', coverImage);
-      await post(`/api/guild/update/${props.guild.id}`, formData);
+      await post(`/api/guild/cover-image/update/${props.guild.id}`, formData);
       toast({
         status: 'success',
         description: 'Saved',

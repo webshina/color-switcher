@@ -470,4 +470,30 @@ export class GuildMemberRepository {
     );
     return isMember;
   }
+
+  static async isManager(guildId: number, userId: number) {
+    const guild = await prisma.guild.findUnique({
+      where: {
+        id: guildId,
+      },
+    });
+    if (!guild) {
+      throw new Error('Guild not found');
+    }
+
+    const userItem = await UserRepository.getById(userId);
+    if (!userItem) {
+      throw new Error('User not found');
+    }
+
+    const fetchedMembers = await this.fetchManagementMembersFromBot(
+      guild.discordId
+    );
+
+    const isManager = fetchedMembers.some(
+      (member) => member.id === userItem.discordId
+    );
+
+    return isManager;
+  }
 }
