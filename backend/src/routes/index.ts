@@ -19,7 +19,6 @@ router.get('/api/user/me', withAuth, userController.getMe);
 router.get('/api/user/admin-guilds', withAuth, userController.fetchAdminGuilds);
 
 // Guild
-router.get('/api/guild/:id', guildController.get);
 router.get('/api/guild/mine', withAuth, guildController.getMine);
 router.get(
   '/api/guild/progress/:batchId',
@@ -50,6 +49,7 @@ router.post(
   isGuildManager,
   guildController.toggleAutoGeneration
 );
+router.get('/api/guild/:id', guildController.get);
 
 // Tag
 router.post(

@@ -481,17 +481,14 @@ export class GuildMemberRepository {
       throw new Error('Guild not found');
     }
 
-    const userItem = await UserRepository.getById(userId);
-    if (!userItem) {
-      throw new Error('User not found');
-    }
+    const guildMembers = await prisma.guildMember.findMany({
+      where: {
+        guildId,
+      },
+    });
 
-    const fetchedMembers = await this.fetchManagementMembersFromBot(
-      guild.discordId
-    );
-
-    const isManager = fetchedMembers.some(
-      (member) => member.id === userItem.discordId
+    const isManager = guildMembers.some((member) =>
+      this.hasPermission(Number(member.permissions), 'MANAGE_GUILD')
     );
 
     return isManager;
