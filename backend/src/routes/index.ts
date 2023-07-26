@@ -19,6 +19,13 @@ router.get('/api/user/me', withAuth, userController.getMe);
 router.get('/api/user/admin-guilds', withAuth, userController.fetchAdminGuilds);
 
 // Guild
+router.get('/api/guild/:id', guildController.get);
+router.get('/api/guild/mine', withAuth, guildController.getMine);
+router.get(
+  '/api/guild/progress/:batchId',
+  withAuth,
+  guildController.getBatchProgress
+);
 router.post(
   '/api/guild/:guildDiscordId/generate',
   withAuth,
@@ -32,17 +39,27 @@ router.post(
   guildController.update
 );
 router.post(
+  '/api/guild/cover-image/update/:guildId',
+  withAuth,
+  isGuildManager,
+  guildController.updateCoverImage
+);
+router.post(
   '/api/guild/:guildId/toggle-auto-generation',
   withAuth,
   isGuildManager,
   guildController.toggleAutoGeneration
 );
+
+// Tag
 router.post(
   '/api/guild/tag/:guildId',
   withAuth,
   isGuildManager,
   guildController.updateTag
 );
+
+// Channel
 router.post(
   '/api/guild/:guildId/channel/category',
   withAuth,
@@ -61,6 +78,8 @@ router.post(
   isGuildManager,
   channelController.updateChannel
 );
+
+// Guild Member
 router.post(
   '/api/guild/:guildId/members',
   withAuth,
@@ -71,13 +90,8 @@ router.post(
   withAuth,
   guildMemberController.updatePosts
 );
-router.get('/api/guild/mine', withAuth, guildController.getMine);
-router.get(
-  '/api/guild/progress/:batchId',
-  withAuth,
-  guildController.getBatchProgress
-);
-router.get('/api/guild/:id', guildController.get);
+
+// Announcement
 router.post(
   '/api/guild/:guildId/announcement-to-manager/:announcementId',
   withAuth,
@@ -85,6 +99,7 @@ router.post(
   guildController.updateAnnouncementToManager
 );
 
+// Test
 router.get('/api/test', testController.test);
 
 export { router };

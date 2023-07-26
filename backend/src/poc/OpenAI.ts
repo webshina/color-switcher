@@ -1,23 +1,19 @@
 import { createCompletion } from '@/lib/openAI';
 
 async function summarizeArticle(prompt: string) {
-  // Check that the article isn't longer than the API's character limit
-  if (prompt.length > 2048) {
-    throw new Error('Article exceeds character limit for API.');
-  }
-
   const result = await createCompletion({
     prompt,
-    maxTokens: 512,
+    maxTokens: 1024,
   });
 
   return result;
 }
 
-const prompt = `Create messages to be shared on social networking sites.
--Use below Channel Data.
--Only in Japanese.
--Response within 100 characters or less.
+const prompt = `Create description of Discord server using following channel data. 
+-Describe only in Japanese.
+-Be sure to write within 300 characters or less.
+-Include purpose of the server and characteristics of participants.
+-Never describe individual channels.
 -Use some emojis for easy viewing.
 
 Channel data:

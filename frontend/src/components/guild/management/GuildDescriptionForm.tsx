@@ -46,9 +46,9 @@ export const GuildDescriptionForm: React.FC<Props> = (props) => {
       if (!isValidAll()) {
         return;
       }
-      const formData = new FormData();
-      formData.append('description', description);
-      await post(`/api/guild/update/${props.guild.id}`, formData);
+      await post(`/api/guild/update/${props.guild.id}`, {
+        description,
+      });
       toast({
         status: 'success',
         description: 'Saved',

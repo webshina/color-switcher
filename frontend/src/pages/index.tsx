@@ -8,6 +8,7 @@ const Home: NextPage = () => {
     <DefaultLayout
       showLogo={false}
       bgClassName="bg-gradient-to-b from-[#1F215A] from-5% to-dark to-40%"
+      noPadding
     >
       <LandingPage />
     </DefaultLayout>

@@ -22,11 +22,15 @@ const get = async (req: Request, res: Response) => {
   const isMember = user
     ? await GuildMemberRepository.isMember(Number(id), user.id)
     : false;
+  const isManager = user
+    ? await GuildMemberRepository.isManager(Number(id), user.id)
+    : false;
 
   const responseData: FetchGuildResponse = {
     ...result,
     members: isMember ? result.members : [],
     isMember,
+    isManager,
     announcementsToGuildManager: isMember
       ? result.announcementsToGuildManager
       : [],
@@ -81,14 +85,24 @@ const getBatchProgress = async (req: Request, res: Response) => {
 
 const update = async (req: Request, res: Response) => {
   const { guildId } = req.params;
+  const { description, isPrivate } = req.body;
+
+  await GuildRepository.update(Number(guildId), {
+    description: description as string,
+    isPrivate: isPrivate as boolean,
+  });
+
+  return res.json('success');
+};
+
+const updateCoverImage = async (req: Request, res: Response) => {
+  const { guildId } = req.params;
 
   const form = new Formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
-    const { description } = fields;
     const { coverImage } = files;
     await GuildRepository.update(Number(guildId), {
       coverImage: coverImage as Formidable.File,
-      description: description as string,
     });
 
     return res.json('success');
@@ -160,6 +174,7 @@ export default {
   getMine,
   getBatchProgress,
   update,
+  updateCoverImage,
   toggleAutoGeneration,
   updateTag,
   updateCategory,

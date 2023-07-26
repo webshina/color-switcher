@@ -9,6 +9,7 @@ import { GuildChannelCategoryForm } from './GuildChannelCategoryForm';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
 import { GuildDescriptionForm } from './GuildDescriptionForm';
 import { GuildMembersForm } from './GuildMembersForm';
+import { GuildPublishToggle } from './GuildPublishToggle';
 import { GuildShareMessageForm } from './GuildShareMessageForm';
 import { GuildTagForm } from './GuildTagForm';
 
@@ -31,6 +32,15 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
         <div className="lg:mx-24">
           {/* Announcements */}
           <AnnouncementsToManager guild={props.guild} user={props.user} />
+
+          {/* Publish toggle */}
+          <div className="flex justify-end">
+            <GuildPublishToggle
+              guildId={props.guild.id}
+              isPrivate={props.guild.isPrivate}
+            />
+          </div>
+          <div className="h-12" />
 
           {/* Update by AI */}
           <div className="flex flex-col justify-center items-center py-12 bg-slate-900 rounded-xl">

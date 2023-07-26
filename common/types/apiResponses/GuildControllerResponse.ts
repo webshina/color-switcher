@@ -6,6 +6,7 @@ export type GenerateGuildResponse = {
 };
 export type FetchGuildResponse = GuildItem & {
   isMember?: boolean;
+  isManager?: boolean;
 };
 export type GetBatchProgressResponse = {
   progressRate: number;
