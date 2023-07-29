@@ -31,8 +31,8 @@ const get = async (req: Request, res: Response) => {
     members: isMember ? result.members : [],
     isMember,
     isManager,
-    announcementsToGuildManager: isMember
-      ? result.announcementsToGuildManager
+    notificationsToGuildManager: isMember
+      ? result.notificationsToGuildManager
       : [],
   };
 
@@ -153,12 +153,12 @@ const updateCategory = async (req: Request, res: Response) => {
   return res.json('success');
 };
 
-const updateAnnouncementToManager = async (req: Request, res: Response) => {
-  const { announcementId } = req.params;
+const updateNotificationToManager = async (req: Request, res: Response) => {
+  const { notificationId } = req.params;
   const { isShow } = req.body;
-  await prisma.announcementToGuildManager.update({
+  await prisma.notificationToGuildManager.update({
     where: {
-      id: Number(announcementId),
+      id: Number(notificationId),
     },
     data: {
       isShow: isShow as boolean,
@@ -178,5 +178,5 @@ export default {
   toggleAutoGeneration,
   updateTag,
   updateCategory,
-  updateAnnouncementToManager,
+  updateNotificationToManager,
 };

@@ -91,12 +91,12 @@ router.post(
   guildMemberController.updatePosts
 );
 
-// Announcement
+// Notification
 router.post(
-  '/api/guild/:guildId/announcement-to-manager/:announcementId',
+  '/api/guild/:guildId/notification-to-manager/:notificationId',
   withAuth,
   isGuildManager,
-  guildController.updateAnnouncementToManager
+  guildController.updateNotificationToManager
 );
 
 // Test

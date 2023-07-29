@@ -4,7 +4,7 @@ import { formatDate } from '@/utils/dateHelper';
 import { useRouter } from 'next/router';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdPrecisionManufacturing } from 'react-icons/md';
-import { AnnouncementsToManager } from '../announcements/AnnouncementsToManager';
+import { NotificationsToManager } from '../announcements/NotificationsToManager';
 import { GuildChannelCategoryForm } from './GuildChannelCategoryForm';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
 import { GuildDescriptionForm } from './GuildDescriptionForm';
@@ -30,8 +30,8 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
     <>
       {props.guild && (
         <div className="lg:mx-24">
-          {/* Announcements */}
-          <AnnouncementsToManager guild={props.guild} user={props.user} />
+          {/* Notifications */}
+          <NotificationsToManager guild={props.guild} user={props.user} />
 
           {/* Publish toggle */}
           <div className="flex justify-end">

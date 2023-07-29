@@ -1,10 +1,10 @@
 import {
-  AnnouncementToGuildManager,
   Guild,
   GuildMember,
   GuildPost,
   GuildRole,
   GuildTag,
+  NotificationToGuildManager,
 } from '../../backend/node_modules/.prisma/client';
 import { ChannelCategoryItem } from './Channel';
 
@@ -30,8 +30,8 @@ export type GuildMemberItem = Omit<
   posts: GuildPostItem[];
 };
 
-export type AnnouncementToGuildManagerItem = Omit<
-  AnnouncementToGuildManager,
+export type NotificationToGuildManagerItem = Omit<
+  NotificationToGuildManager,
   'createdAt' | 'updatedAt'
 >;
 
@@ -48,5 +48,5 @@ export type GuildItem = Omit<
   members: GuildMemberItem[];
   managementMembers: GuildMemberItem[];
   posts: GuildPostItem[];
-  announcementsToGuildManager: AnnouncementToGuildManagerItem[];
+  notificationsToGuildManager: NotificationToGuildManagerItem[];
 };

@@ -11,19 +11,19 @@ import {
   ModalOverlay,
 } from '@chakra-ui/react';
 import React from 'react';
-import { AnnouncementCard } from './AnnouncementCard';
+import { NotificationCard } from './NotificationCard';
 
 type Props = {
   guild: GuildItem;
   user?: UserItem | null;
 };
-export const AnnouncementsToManager: React.FC<Props> = (props) => {
+export const NotificationsToManager: React.FC<Props> = (props) => {
   const [isOpenModal, setIsOpenModal] = React.useState<boolean>(
     props.user &&
       props.guild.managementMembers.some(
         (member) => member.discordId === props.user?.discordId
       ) &&
-      props.guild.announcementsToGuildManager?.length > 0
+      props.guild.notificationsToGuildManager?.length > 0
       ? true
       : false
   );
@@ -42,12 +42,12 @@ export const AnnouncementsToManager: React.FC<Props> = (props) => {
         <ModalHeader>ToDo</ModalHeader>
         <ModalBody>
           <div className="flex justify-start overflow-x-auto overflow-y-hidden">
-            {props.guild.announcementsToGuildManager.map((announcement) => (
+            {props.guild.notificationsToGuildManager.map((notification) => (
               <>
-                <div key={announcement.id} className="m-2">
-                  <AnnouncementCard
+                <div key={notification.id} className="m-2">
+                  <NotificationCard
                     guild={props.guild}
-                    announcement={announcement}
+                    notification={notification}
                   />
                 </div>
               </>

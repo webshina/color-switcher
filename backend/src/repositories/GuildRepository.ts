@@ -53,7 +53,7 @@ export class GuildRepository {
           },
         },
         posts: true,
-        announcementsToGuildManager: {
+        notificationsToGuildManager: {
           where: {
             isShow: true,
           },
@@ -139,7 +139,7 @@ export class GuildRepository {
         (guildMember) => guildMember.isManager
       ),
       posts,
-      announcementsToGuildManager: guildData.announcementsToGuildManager,
+      notificationsToGuildManager: guildData.notificationsToGuildManager,
     };
     return guildItem;
   }
@@ -234,8 +234,8 @@ export class GuildRepository {
       create: guildPostData,
     });
 
-    // Create announcements
-    await this.createAnnouncementToGuildManager(guildData.id);
+    // Create notifications
+    await this.createNotificationToGuildManager(guildData.id);
 
     const guildBatch = await prisma.guildBatch.create({
       data: {
@@ -289,8 +289,8 @@ export class GuildRepository {
     };
   }
 
-  static async createAnnouncementToGuildManager(guildId: number) {
-    await prisma.announcementToGuildManager.upsert({
+  static async createNotificationToGuildManager(guildId: number) {
+    await prisma.notificationToGuildManager.upsert({
       where: {
         guildId_name: {
           guildId,
@@ -305,7 +305,7 @@ export class GuildRepository {
       },
     });
 
-    await prisma.announcementToGuildManager.upsert({
+    await prisma.notificationToGuildManager.upsert({
       where: {
         guildId_name: {
           guildId,
