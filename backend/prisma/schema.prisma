@@ -198,6 +198,7 @@ model Channel {
   activityScore           Int?
   showConversationSummary Boolean          @default(true)
   order                   Int              @default(0)
+  isAnnouncementChannel   Boolean          @default(false)
   createdAt               DateTime         @default(now())
   updatedAt               DateTime         @updatedAt
 
@@ -247,6 +248,7 @@ model Message {
   channelId       Int
   batchId         Int
   batch           GuildBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  postedAt        DateTime   @default("1990-01-01T00:00:00.000Z") // TODO: Change to required and no default
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
@@ -265,6 +267,7 @@ model GuildBatch {
   isGuildTagGenerationCompleted          Boolean  @default(false)
   isGuildImageGenerationCompleted        Boolean  @default(false)
   isGuildMemberGenerationCompleted       Boolean  @default(false)
+  isGuildAnnouncementGenerationCompleted Boolean  @default(false)
   createdAt                              DateTime @default(now())
   updatedAt                              DateTime @updatedAt
 

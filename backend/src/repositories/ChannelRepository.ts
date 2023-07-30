@@ -67,6 +67,7 @@ export class ChannelRepository {
       }),
       showConversationSummary: channel.showConversationSummary,
       order: channel.order,
+      isAnnouncementChannel: channel.isAnnouncementChannel,
     };
 
     return channelItem;
@@ -204,7 +205,7 @@ export class ChannelRepository {
       let fetchedMessages: Collection<string, Message<true>>;
       try {
         fetchedMessages = await channel.messages.fetch({
-          limit: 100,
+          limit: 1000,
         });
       } catch (error) {
         if (isDiscordError(error)) {
@@ -233,7 +234,7 @@ export class ChannelRepository {
             authorDiscordId: fetchedMessage.author.id,
             channelId: channelData.id,
             batchId: props.batchId,
-            createdAt: fetchedMessage.createdAt,
+            postedAt: fetchedMessage.createdAt,
           };
           await prisma.message.upsert({
             where: {
@@ -243,7 +244,7 @@ export class ChannelRepository {
               },
             },
             create: data,
-            update: data,
+            update: {},
           });
         }
       }

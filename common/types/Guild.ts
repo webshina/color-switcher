@@ -35,6 +35,18 @@ export type NotificationToGuildManagerItem = Omit<
   'createdAt' | 'updatedAt'
 >;
 
+export type GuildAnnouncementItem = {
+  messageId: number;
+  message: string;
+  author: {
+    id: number;
+    discordId: string;
+    displayName: string;
+    avatarURL: string;
+  };
+  postedAt: Date;
+};
+
 export type GuildItem = Omit<
   Guild,
   'coverImage' | 'createdAt' | 'updatedAt'
@@ -49,4 +61,5 @@ export type GuildItem = Omit<
   managementMembers: GuildMemberItem[];
   posts: GuildPostItem[];
   notificationsToGuildManager: NotificationToGuildManagerItem[];
+  announcements: GuildAnnouncementItem[];
 };

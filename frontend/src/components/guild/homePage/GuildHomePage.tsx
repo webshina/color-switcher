@@ -9,6 +9,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { BsFillPeopleFill } from 'react-icons/bs';
 import { IoChatbubblesSharp } from 'react-icons/io5';
 import { MdManageAccounts } from 'react-icons/md';
+import { Announcements } from './Announcements';
 import { Channels } from './Channels';
 import { Members } from './Members';
 import { ShareButton } from './ShareButton';
@@ -51,8 +52,8 @@ export const GuildHomePage: React.FC<Props> = (props) => {
             <div className="absolute bottom-0 left-10 translate-y-1/2">
               <CircleImage
                 imgSrc={props.guild.iconURL ?? '/images/no_image.jpeg'}
-                width="100px"
-                height="100px"
+                width={100}
+                height={100}
               />
             </div>
           </div>
@@ -87,6 +88,10 @@ export const GuildHomePage: React.FC<Props> = (props) => {
           />
           <div className="h-8" />
           <Members discordMembers={props.guild.managementMembers} />
+          <div className="h-16" />
+
+          {/* Announcements */}
+          <Announcements guild={props.guild} />
           <div className="h-16" />
 
           {/* Channel list */}

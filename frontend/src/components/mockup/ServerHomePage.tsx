@@ -28,8 +28,8 @@ export const ServerHomePage: React.FC<Props> = (props) => {
             <div className="absolute bottom-0 left-10 translate-y-1/2">
               <CircleImage
                 imgSrc={server.iconImgURL}
-                width="100px"
-                height="100px"
+                width={100}
+                height={100}
               />
             </div>
           </div>

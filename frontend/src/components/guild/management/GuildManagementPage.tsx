@@ -4,7 +4,7 @@ import { formatDate } from '@/utils/dateHelper';
 import { useRouter } from 'next/router';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdPrecisionManufacturing } from 'react-icons/md';
-import { NotificationsToManager } from '../announcements/NotificationsToManager';
+import { NotificationsToManager } from '../notification/NotificationsToManager';
 import { GuildChannelCategoryForm } from './GuildChannelCategoryForm';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
 import { GuildDescriptionForm } from './GuildDescriptionForm';
