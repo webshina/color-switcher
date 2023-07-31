@@ -1,5 +1,6 @@
 import { GuildItem } from '#/common/types/Guild';
 import { UserItem } from '#/common/types/User';
+import { useScreenSize } from '@/hooks/utils/useScreenSize';
 import {
   Button,
   Modal,
@@ -18,6 +19,7 @@ type Props = {
   user?: UserItem | null;
 };
 export const NotificationsToManager: React.FC<Props> = (props) => {
+  const screenSize = useScreenSize();
   const [isOpenModal, setIsOpenModal] = React.useState<boolean>(
     props.user &&
       props.guild.managementMembers.some(
@@ -34,6 +36,7 @@ export const NotificationsToManager: React.FC<Props> = (props) => {
       closeOnOverlayClick={true}
       isOpen={isOpenModal}
       onClose={onCloseModal}
+      size={screenSize === 'lg' ? '2xl' : 'sm'}
       isCentered
     >
       <ModalOverlay />
@@ -41,10 +44,10 @@ export const NotificationsToManager: React.FC<Props> = (props) => {
         <ModalCloseButton />
         <ModalHeader>ToDo</ModalHeader>
         <ModalBody>
-          <div className="flex justify-start overflow-x-auto overflow-y-hidden">
+          <div className="flex flex-col justify-start items-center overflow-x-auto overflow-y-hidden">
             {props.guild.notificationsToGuildManager.map((notification) => (
               <>
-                <div key={notification.id} className="m-2">
+                <div key={notification.id} className="my-2 w-full">
                   <NotificationCard
                     guild={props.guild}
                     notification={notification}

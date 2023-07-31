@@ -145,7 +145,7 @@ URL : ${process.env.NEXT_PUBLIC_APP_URL}/guild/${props.guild.id}`;
   };
 
   return (
-    <div className="w-[300px] overflow-y-hidden hover:overflow-y-auto">
+    <div className="overflow-y-hidden hover:overflow-y-auto">
       <div className="px-3 py-3 font-bold text-sm bg-slate-700 rounded-t-xl">
         {title()}
       </div>
