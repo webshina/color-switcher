@@ -205,7 +205,7 @@ export class ChannelRepository {
       let fetchedMessages: Collection<string, Message<true>>;
       try {
         fetchedMessages = await channel.messages.fetch({
-          limit: 1000,
+          limit: 100, // Should be less or equal to 100
         });
       } catch (error) {
         if (isDiscordError(error)) {
