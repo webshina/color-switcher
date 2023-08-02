@@ -33,7 +33,7 @@ import { ChannelRepository } from './ChannelRepository';
 import { GuildMemberRepository } from './GuildMemberRepository';
 
 export class GuildRepository {
-  static async format(guildId: number) {
+  static async format(guildId: number, byOwner = false) {
     const guildData = await prisma.guild.findUnique({
       where: {
         id: guildId,
@@ -113,7 +113,10 @@ export class GuildRepository {
     });
 
     // Fetch Announcements
-    const announcements = await this.getAnnouncementMessages(guildData.id);
+    const announcements = await this.getAnnouncementMessages(
+      guildData.id,
+      byOwner
+    );
 
     const guildItem: GuildItem = {
       id: guildData.id,
@@ -152,7 +155,7 @@ export class GuildRepository {
     return guildItem;
   }
 
-  static async getById(guildId: number) {
+  static async getById(guildId: number, byOwner = false) {
     const guildData = await prisma.guild.findUnique({
       where: {
         id: guildId,
@@ -160,7 +163,7 @@ export class GuildRepository {
     });
     if (!guildData) throw new Error('Guild not found');
 
-    return await this.format(guildData.id);
+    return await this.format(guildData.id, byOwner);
   }
 
   static async getByDiscordId(guildDiscordId: string) {
@@ -192,14 +195,23 @@ export class GuildRepository {
     return guildItems;
   }
 
-  static async getAnnouncementMessages(guildId: number) {
+  static async getAnnouncementMessages(guildId: number, byOwner = false) {
     const channel = await prisma.channel.findFirst({
       where: {
         guildId,
         isAnnouncementChannel: true,
       },
       include: {
-        messages: true,
+        messages: {
+          // hide specified messages if not admin
+          where: byOwner
+            ? undefined
+            : {
+                hideAsAnnouncement: {
+                  not: false,
+                },
+              },
+        },
       },
     });
     if (!channel) return [];
@@ -216,14 +228,17 @@ export class GuildRepository {
       });
       if (!author) continue;
       const formattedMessage: GuildAnnouncementItem = {
-        messageId: message.id,
-        message: message.content,
+        message: {
+          id: message.id,
+          content: message.content,
+        },
         author: {
           id: author.id,
           discordId: author.discordId,
           displayName: author.displayName ?? '',
           avatarURL: author.avatarURL ?? '',
         },
+        hideAsAnnouncement: message.hideAsAnnouncement ?? false,
         postedAt: message.postedAt,
       };
       formattedMessages.push(formattedMessage);

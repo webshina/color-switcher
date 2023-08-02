@@ -15,8 +15,6 @@ import Formidable from 'formidable';
 const get = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const result = await GuildRepository.getById(Number(id));
-
   // Return members if login user is a member of the guild
   const user = await UserRepository.getLoginUser(req);
   const isMember = user
@@ -25,6 +23,8 @@ const get = async (req: Request, res: Response) => {
   const isManager = user
     ? await GuildMemberRepository.isManager(Number(id), user.id)
     : false;
+
+  const result = await GuildRepository.getById(Number(id), isManager);
 
   const responseData: FetchGuildResponse = {
     ...result,

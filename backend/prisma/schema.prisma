@@ -240,17 +240,18 @@ model ChannelCategory {
 
 // Message model
 model Message {
-  id              Int        @id @default(autoincrement())
-  discordId       String
-  content         String     @db.LongText
-  authorDiscordId String
-  channel         Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  channelId       Int
-  batchId         Int
-  batch           GuildBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
-  postedAt        DateTime   @default("1990-01-01T00:00:00.000Z") // TODO: Change to required and no default
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id                 Int        @id @default(autoincrement())
+  discordId          String
+  content            String     @db.LongText
+  authorDiscordId    String
+  channel            Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channelId          Int
+  batchId            Int
+  batch              GuildBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  hideAsAnnouncement Boolean?
+  postedAt           DateTime   @default("1990-01-01T00:00:00.000Z") // TODO: Change to required and no default
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 
   @@unique([channelId, discordId])
 }

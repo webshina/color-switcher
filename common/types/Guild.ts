@@ -36,14 +36,17 @@ export type NotificationToGuildManagerItem = Omit<
 >;
 
 export type GuildAnnouncementItem = {
-  messageId: number;
-  message: string;
+  message: {
+    id: number;
+    content: string;
+  };
   author: {
     id: number;
     discordId: string;
     displayName: string;
     avatarURL: string;
   };
+  hideAsAnnouncement: boolean;
   postedAt: Date;
 };
 

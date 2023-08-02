@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdPrecisionManufacturing } from 'react-icons/md';
 import { NotificationsToManager } from '../notification/NotificationsToManager';
+import { GuildAnnouncementsForm } from './GuildAnnouncementsForm';
 import { GuildChannelCategoryForm } from './GuildChannelCategoryForm';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
 import { GuildDescriptionForm } from './GuildDescriptionForm';
@@ -97,6 +98,10 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
 
           {/* Tags */}
           <GuildTagForm guild={props.guild} />
+          <div className="h-16" />
+
+          {/* Announcements */}
+          <GuildAnnouncementsForm guild={props.guild} />
           <div className="h-16" />
 
           {/* Channel list */}
