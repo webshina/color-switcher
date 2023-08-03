@@ -67,8 +67,8 @@ export const UserProfile: React.FC<Props> = (props) => {
             {props.discordMember.avatarURL && (
               <CircleImage
                 imgSrc={props.discordMember.avatarURL}
-                width="100px"
-                height="100px"
+                width={100}
+                height={100}
               />
             )}
           </div>

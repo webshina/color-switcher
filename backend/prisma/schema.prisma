@@ -80,8 +80,8 @@ model Guild {
   // Posts
   posts GuildPost[]
 
-  // Announcements to Guild Manager
-  announcementsToGuildManager AnnouncementToGuildManager[]
+  // Notifications to Guild Manager
+  notificationsToGuildManager NotificationToGuildManager[]
 }
 
 // GuildMember model
@@ -198,6 +198,7 @@ model Channel {
   activityScore           Int?
   showConversationSummary Boolean          @default(true)
   order                   Int              @default(0)
+  isAnnouncementChannel   Boolean          @default(false)
   createdAt               DateTime         @default(now())
   updatedAt               DateTime         @updatedAt
 
@@ -239,16 +240,18 @@ model ChannelCategory {
 
 // Message model
 model Message {
-  id              Int        @id @default(autoincrement())
-  discordId       String
-  content         String     @db.LongText
-  authorDiscordId String
-  channel         Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  channelId       Int
-  batchId         Int
-  batch           GuildBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id                 Int        @id @default(autoincrement())
+  discordId          String
+  content            String     @db.LongText
+  authorDiscordId    String
+  channel            Channel    @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channelId          Int
+  batchId            Int
+  batch              GuildBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  hideAsAnnouncement Boolean?
+  postedAt           DateTime   @default("1990-01-01T00:00:00.000Z") // TODO: Change to required and no default
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 
   @@unique([channelId, discordId])
 }
@@ -265,6 +268,7 @@ model GuildBatch {
   isGuildTagGenerationCompleted          Boolean  @default(false)
   isGuildImageGenerationCompleted        Boolean  @default(false)
   isGuildMemberGenerationCompleted       Boolean  @default(false)
+  isGuildAnnouncementGenerationCompleted Boolean  @default(false)
   createdAt                              DateTime @default(now())
   updatedAt                              DateTime @updatedAt
 
@@ -272,17 +276,17 @@ model GuildBatch {
   messages Message[]
 }
 
-// Announcement model
-enum AnnouncementName {
+// Notification model
+enum NotificationName {
   INSTRUCTION_FOR_POST_TO_CHANNEL
   INSTRUCTION_FOR_POST_TO_SOCIAL_MEDIA
 }
 
-model AnnouncementToGuildManager {
+model NotificationToGuildManager {
   id        Int              @id @default(autoincrement())
   guild     Guild            @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId   Int
-  name      AnnouncementName
+  name      NotificationName
   isShow    Boolean          @default(true)
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt

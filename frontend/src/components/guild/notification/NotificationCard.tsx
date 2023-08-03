@@ -1,6 +1,6 @@
 import {
-  AnnouncementToGuildManagerItem,
   GuildItem,
+  NotificationToGuildManagerItem,
 } from '#/common/types/Guild';
 import useInputField from '@/hooks/utils/useInputField';
 import { post } from '@/utils/apiHelper';
@@ -10,22 +10,22 @@ import { BiCopy } from 'react-icons/bi';
 import { mutate } from 'swr';
 
 type Props = {
-  announcement: AnnouncementToGuildManagerItem;
+  notification: NotificationToGuildManagerItem;
   guild: GuildItem;
 };
-export const AnnouncementCard: React.FC<Props> = (props) => {
+export const NotificationCard: React.FC<Props> = (props) => {
   const toasts = useToast();
 
   const title = () => {
     let title = '';
-    if (props.announcement.name === 'INSTRUCTION_FOR_POST_TO_CHANNEL') {
+    if (props.notification.name === 'INSTRUCTION_FOR_POST_TO_CHANNEL') {
       if (props.guild.language === 'Japanese') {
         title = 'このページをDiscordでお知らせしましょう !';
       } else {
         title = 'Notify this page in Discord !';
       }
     } else if (
-      props.announcement.name === 'INSTRUCTION_FOR_POST_TO_SOCIAL_MEDIA'
+      props.notification.name === 'INSTRUCTION_FOR_POST_TO_SOCIAL_MEDIA'
     ) {
       if (props.guild.language === 'Japanese') {
         title = 'このページをSNSで紹介しましょう !';
@@ -37,7 +37,7 @@ export const AnnouncementCard: React.FC<Props> = (props) => {
   };
 
   const image = () => {
-    if (props.announcement.name === 'INSTRUCTION_FOR_POST_TO_CHANNEL') {
+    if (props.notification.name === 'INSTRUCTION_FOR_POST_TO_CHANNEL') {
       return (
         <div className="relative">
           <div className="absolute top-10 right-3 z-10 text-lg text-red-500 font-bold text-center">
@@ -45,7 +45,7 @@ export const AnnouncementCard: React.FC<Props> = (props) => {
           </div>
           <div className="relative h-[200px] w-full">
             <Image
-              src={'/images/announcementImages/notify_in_discord.png'}
+              src={'/images/notificationImages/notify_in_discord.png'}
               alt="image"
               layout="fill"
               objectFit="contain"
@@ -54,14 +54,14 @@ export const AnnouncementCard: React.FC<Props> = (props) => {
         </div>
       );
     } else if (
-      props.announcement.name === 'INSTRUCTION_FOR_POST_TO_SOCIAL_MEDIA'
+      props.notification.name === 'INSTRUCTION_FOR_POST_TO_SOCIAL_MEDIA'
     ) {
       return (
         <div className="my-5">
           <div className="relative h-[140px] w-full">
             <Image
               src={
-                '/images/announcementImages/undraw_share_opinion_re_4qk7.svg'
+                '/images/notificationImages/undraw_share_opinion_re_4qk7.svg'
               }
               alt="image"
               layout="fill"
@@ -75,7 +75,7 @@ export const AnnouncementCard: React.FC<Props> = (props) => {
 
   const initMessage = () => {
     let message = '';
-    if (props.announcement.name === 'INSTRUCTION_FOR_POST_TO_CHANNEL') {
+    if (props.notification.name === 'INSTRUCTION_FOR_POST_TO_CHANNEL') {
       if (props.guild.language === 'Japanese') {
         message = `- このコミュニティに入ったばかりの方
 - コミュニティの最近の活動が知りたい方
@@ -98,7 +98,7 @@ Take a look here first!
 URL : ${process.env.NEXT_PUBLIC_APP_URL}/guild/${props.guild.id}`;
       }
     } else if (
-      props.announcement.name === 'INSTRUCTION_FOR_POST_TO_SOCIAL_MEDIA'
+      props.notification.name === 'INSTRUCTION_FOR_POST_TO_SOCIAL_MEDIA'
     ) {
       message = props.guild.shareMessage ?? '';
     }
@@ -126,7 +126,7 @@ URL : ${process.env.NEXT_PUBLIC_APP_URL}/guild/${props.guild.id}`;
   const done = async () => {
     try {
       await post(
-        `/api/guild/${props.guild.id}/announcement-to-manager/${props.announcement.id}`,
+        `/api/guild/${props.guild.id}/notification-to-manager/${props.notification.id}`,
         {
           isShow: false,
         }
@@ -145,7 +145,7 @@ URL : ${process.env.NEXT_PUBLIC_APP_URL}/guild/${props.guild.id}`;
   };
 
   return (
-    <div className="w-[300px] overflow-y-hidden hover:overflow-y-auto">
+    <div className="overflow-y-hidden hover:overflow-y-auto">
       <div className="px-3 py-3 font-bold text-sm bg-slate-700 rounded-t-xl">
         {title()}
       </div>

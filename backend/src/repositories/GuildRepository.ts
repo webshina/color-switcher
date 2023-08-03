@@ -1,11 +1,16 @@
 import { messages } from '#/common/constants/messages';
 import { AutoGenerateTarget } from '#/common/types/AutoGenerateTarget';
 import { ChannelCategoryItem, ChannelItem } from '#/common/types/Channel';
-import { GuildItem, GuildPostItem } from '#/common/types/Guild';
+import {
+  GuildAnnouncementItem,
+  GuildItem,
+  GuildPostItem,
+} from '#/common/types/Guild';
 import { GetBatchProgressResponse } from '#/common/types/apiResponses/GuildControllerResponse';
 import { getBot } from '@/lib/discord';
 import { createCompletion } from '@/lib/openAI';
 import { prisma } from '@/lib/prisma';
+import { fetchImageFromUnsplash } from '@/lib/unsplash';
 import {
   copyRandomImage,
   deleteFile,
@@ -16,7 +21,7 @@ import {
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
 import { Language, PostName } from '@prisma/client';
-import axios, { isAxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 import {
   ChannelType,
   Collection,
@@ -29,7 +34,7 @@ import { ChannelRepository } from './ChannelRepository';
 import { GuildMemberRepository } from './GuildMemberRepository';
 
 export class GuildRepository {
-  static async format(guildId: number) {
+  static async format(guildId: number, byOwner = false) {
     const guildData = await prisma.guild.findUnique({
       where: {
         id: guildId,
@@ -53,7 +58,7 @@ export class GuildRepository {
           },
         },
         posts: true,
-        announcementsToGuildManager: {
+        notificationsToGuildManager: {
           where: {
             isShow: true,
           },
@@ -108,6 +113,12 @@ export class GuildRepository {
       },
     });
 
+    // Fetch Announcements
+    const announcements = await this.getAnnouncementMessages(
+      guildData.id,
+      byOwner
+    );
+
     const guildItem: GuildItem = {
       id: guildData.id,
       discordId: guildData.discordId,
@@ -139,12 +150,13 @@ export class GuildRepository {
         (guildMember) => guildMember.isManager
       ),
       posts,
-      announcementsToGuildManager: guildData.announcementsToGuildManager,
+      notificationsToGuildManager: guildData.notificationsToGuildManager,
+      announcements,
     };
     return guildItem;
   }
 
-  static async getById(guildId: number) {
+  static async getById(guildId: number, byOwner = false) {
     const guildData = await prisma.guild.findUnique({
       where: {
         id: guildId,
@@ -152,7 +164,7 @@ export class GuildRepository {
     });
     if (!guildData) throw new Error('Guild not found');
 
-    return await this.format(guildData.id);
+    return await this.format(guildData.id, byOwner);
   }
 
   static async getByDiscordId(guildDiscordId: string) {
@@ -182,6 +194,66 @@ export class GuildRepository {
       })
     );
     return guildItems;
+  }
+
+  static async getAnnouncementMessages(
+    guildId: number,
+    byOwner = false,
+    limit = 3
+  ) {
+    const channel = await prisma.channel.findFirst({
+      where: {
+        guildId,
+        isAnnouncementChannel: true,
+      },
+      include: {
+        messages: {
+          // hide specified messages if not admin
+          where: byOwner
+            ? undefined
+            : {
+                hideAsAnnouncement: {
+                  not: false,
+                },
+              },
+          take: limit,
+          orderBy: {
+            postedAt: 'desc',
+          },
+        },
+      },
+    });
+    if (!channel) return [];
+
+    const formattedMessages: GuildAnnouncementItem[] = [];
+    for (const message of channel.messages) {
+      const author = await prisma.guildMember.findUnique({
+        where: {
+          guildId_discordId: {
+            guildId,
+            discordId: message.authorDiscordId,
+          },
+        },
+      });
+      if (!author) continue;
+      const formattedMessage: GuildAnnouncementItem = {
+        message: {
+          id: message.id,
+          content: message.content,
+        },
+        author: {
+          id: author.id,
+          discordId: author.discordId,
+          displayName: author.displayName ?? '',
+          avatarURL: author.avatarURL ?? '',
+        },
+        hideAsAnnouncement: message.hideAsAnnouncement ?? false,
+        postedAt: message.postedAt,
+      };
+      formattedMessages.push(formattedMessage);
+    }
+
+    return formattedMessages;
   }
 
   static async generate(discordId: string, createdByUserId: number) {
@@ -234,8 +306,8 @@ export class GuildRepository {
       create: guildPostData,
     });
 
-    // Create announcements
-    await this.createAnnouncementToGuildManager(guildData.id);
+    // Create notifications
+    await this.createNotificationToGuildManager(guildData.id);
 
     const guildBatch = await prisma.guildBatch.create({
       data: {
@@ -255,18 +327,19 @@ export class GuildRepository {
         guildId: guildData.id,
         batchId: guildBatch.id,
       });
+
       // Generate Tags data
       this.generateTags({
         guildId: guildData.id,
         batchId: guildBatch.id,
       }).then(() => {
         // Generate InviteLink data
-        this.generateInviteLink(guildData.id, fetchedChannels).then(() => {
-          // Generate ShareMessage data
-          this.generateShareMessage({
-            guildId: guildData.id,
-            batchId: guildBatch.id,
-          });
+        this.generateInviteLink(guildData.id, fetchedChannels);
+
+        // Generate ShareMessage data
+        this.generateShareMessage({
+          guildId: guildData.id,
+          batchId: guildBatch.id,
         });
 
         // Generate GuildImage data
@@ -275,9 +348,16 @@ export class GuildRepository {
           batchId: guildBatch.id,
         });
       });
+
       // Generate Member data
       GuildMemberRepository.generate({
         fetchedGuild: fetchedGuild,
+        guildId: guildData.id,
+        batchId: guildBatch.id,
+      });
+
+      // Generate Announcement data
+      this.findAnnouncementChannel({
         guildId: guildData.id,
         batchId: guildBatch.id,
       });
@@ -289,8 +369,8 @@ export class GuildRepository {
     };
   }
 
-  static async createAnnouncementToGuildManager(guildId: number) {
-    await prisma.announcementToGuildManager.upsert({
+  static async createNotificationToGuildManager(guildId: number) {
+    await prisma.notificationToGuildManager.upsert({
       where: {
         guildId_name: {
           guildId,
@@ -305,7 +385,7 @@ export class GuildRepository {
       },
     });
 
-    await prisma.announcementToGuildManager.upsert({
+    await prisma.notificationToGuildManager.upsert({
       where: {
         guildId_name: {
           guildId,
@@ -325,26 +405,28 @@ export class GuildRepository {
     guildId: number,
     fetchedChannels: Collection<string, NonThreadGuildBasedChannel | null>
   ) {
-    const channel = (await fetchedChannels
-      .filter(
-        (fetchedChannel) => fetchedChannel?.type === ChannelType.GuildText
-      )
-      .first()
-      ?.fetch()) as TextChannel;
-    const inviteData = await channel?.createInvite({
-      maxAge: 0,
-      maxUses: 0,
-      unique: true,
-    });
-
-    await prisma.guild.update({
-      where: {
-        id: guildId,
-      },
-      data: {
-        inviteURL: inviteData?.url,
-      },
-    });
+    for (const fetchedChannel of fetchedChannels.values()) {
+      if (fetchedChannel?.type === ChannelType.GuildText) {
+        try {
+          const channel = (await fetchedChannel.fetch()) as TextChannel;
+          const inviteData = await channel?.createInvite({
+            maxAge: 0,
+            maxUses: 0,
+            unique: true,
+          });
+          await prisma.guild.update({
+            where: {
+              id: guildId,
+            },
+            data: {
+              inviteURL: inviteData.url,
+            },
+          });
+        } catch (error) {
+          continue;
+        }
+      }
+    }
   }
 
   static async generateDescription(props: {
@@ -535,6 +617,7 @@ ${hashtags}
       const languageName = await detectLanguage(materialsForTags);
       const prompt = `-Create keywords of this Discord server using following channel data.
 -Separated by ",".
+-Don't surround it with quotations, etc.
 -Only in ${languageName}.
 -List at most 5.
 -In order of relevance.
@@ -598,18 +681,23 @@ Keywords:
       let imageName: string | null = null;
       for (const tag of existingGuildData?.tags) {
         try {
-          const res = await axios(
-            `https://api.unsplash.com/search/photos?query=${tag.name}&page=1&per_page=1`,
-            {
-              method: 'GET',
-              headers: {
-                'Accept-Version': 'v1',
-                Authorization: `Client-ID ${process.env.UNSPLASH_API_ACCESS_KEY}`,
-              },
-            }
-          );
+          // Fetch a keyword from channel
+          const prompt = `Extract a english word from '${tag}' .
 
-          const imageUrl = res.data.results[0]?.urls.regular;
+- In lower case.
+- Return only one word.
+
+Word:
+`;
+          const englishTagName = await createCompletion({
+            prompt,
+            maxTokens: 4,
+          });
+
+          const imageUrl = await fetchImageFromUnsplash(
+            englishTagName ?? tag.name,
+            'regular'
+          );
           if (imageUrl) {
             const { fileName: savedImageName } = await saveFileFromUrl({
               url: imageUrl,
@@ -656,6 +744,63 @@ Keywords:
     });
   }
 
+  static async findAnnouncementChannel(props: {
+    guildId: number;
+    batchId: number;
+  }) {
+    // Update batch progress
+    const updateBatchProgress = async () => {
+      await prisma.guildBatch.update({
+        where: {
+          id: props.batchId,
+        },
+        data: {
+          isGuildAnnouncementGenerationCompleted: true,
+        },
+      });
+    };
+
+    const guildData = await prisma.guild.findUnique({
+      where: {
+        id: props.guildId,
+      },
+      include: {
+        channels: true,
+      },
+    });
+
+    // Find announcement channel
+    // // Include text related to 'announce' in channel name
+    const announcementChannel = guildData?.channels.find((channel) => {
+      const relatedTexts = [
+        'announce',
+        'news',
+        'update',
+        'アナウンス',
+        'お知らせ',
+        'ニュース',
+      ];
+      for (const text of relatedTexts) {
+        if (channel.name.toLowerCase().includes(text)) {
+          return true;
+        }
+      }
+    });
+
+    if (announcementChannel) {
+      await prisma.channel.update({
+        where: {
+          id: announcementChannel.id,
+        },
+        data: {
+          isAnnouncementChannel: true,
+        },
+      });
+    }
+
+    updateBatchProgress();
+  }
+
   static async getBatchProgress(batchId: number) {
     const guildBatch = await prisma.guildBatch.findFirst({
       where: {
@@ -674,14 +819,16 @@ Keywords:
     };
 
     // Calculate progress rate
-    let allWorkCnt = (guildBatch.totalChannelCnt ?? 0) + 6;
-    // List of works
-    // // isChannelGenerationCompleted
-    // // isGuildDescriptionGenerationCompleted
-    // // isGuildShareMessageGenerationCompleted
-    // // isGuildTagGenerationCompleted
-    // // isGuildImageGenerationCompleted
-    // // isGuildMemberGenerationCompleted
+    let allWorkCnt =
+      (guildBatch.totalChannelCnt ?? 0) +
+      1 + // isChannelGenerationCompleted
+      1 + // isGuildDescriptionGenerationCompleted
+      1 + // isGuildShareMessageGenerationCompleted
+      1 + // isGuildTagGenerationCompleted
+      1 + // isGuildImageGenerationCompleted
+      1 + // isGuildMemberGenerationCompleted
+      1; // isGuildAnnouncementGenerationCompleted
+
     let completedWorkCnt =
       (guildBatch.completedChannelCnt ?? 0) +
       (guildBatch.isChannelGenerationCompleted ? 1 : 0) +
@@ -689,7 +836,8 @@ Keywords:
       (guildBatch.isGuildShareMessageGenerationCompleted ? 1 : 0) +
       (guildBatch.isGuildTagGenerationCompleted ? 1 : 0) +
       (guildBatch.isGuildImageGenerationCompleted ? 1 : 0) +
-      (guildBatch.isGuildMemberGenerationCompleted ? 1 : 0);
+      (guildBatch.isGuildMemberGenerationCompleted ? 1 : 0) +
+      (guildBatch.isGuildAnnouncementGenerationCompleted ? 1 : 0);
     result.progressRate = Number((completedWorkCnt / allWorkCnt).toFixed(2));
 
     return result;

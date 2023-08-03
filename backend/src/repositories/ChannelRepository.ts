@@ -1,6 +1,7 @@
 import { ChannelItem, ChannelSummaryItem } from '#/common/types/Channel';
 import { createCompletion } from '@/lib/openAI';
 import { prisma } from '@/lib/prisma';
+import { fetchImageFromUnsplash } from '@/lib/unsplash';
 import { standardize } from '@/utils/calcutationHelper';
 import {
   copyRandomImage,
@@ -13,7 +14,6 @@ import {
 import { detectLanguage } from '@/utils/languageHelper';
 import { isDiscordError } from '@/utils/typeNarrower';
 import { Channel, ChannelCategory } from '@prisma/client';
-import axios from 'axios';
 import {
   Collection,
   Message,
@@ -67,6 +67,7 @@ export class ChannelRepository {
       }),
       showConversationSummary: channel.showConversationSummary,
       order: channel.order,
+      isAnnouncementChannel: channel.isAnnouncementChannel,
     };
 
     return channelItem;
@@ -204,7 +205,7 @@ export class ChannelRepository {
       let fetchedMessages: Collection<string, Message<true>>;
       try {
         fetchedMessages = await channel.messages.fetch({
-          limit: 100,
+          limit: 100, // Should be less or equal to 100
         });
       } catch (error) {
         if (isDiscordError(error)) {
@@ -233,7 +234,7 @@ export class ChannelRepository {
             authorDiscordId: fetchedMessage.author.id,
             channelId: channelData.id,
             batchId: props.batchId,
-            createdAt: fetchedMessage.createdAt,
+            postedAt: fetchedMessage.createdAt,
           };
           await prisma.message.upsert({
             where: {
@@ -243,7 +244,7 @@ export class ChannelRepository {
               },
             },
             create: data,
-            update: data,
+            update: {},
           });
         }
       }
@@ -254,10 +255,10 @@ export class ChannelRepository {
         fetchedMessages
       );
 
-      if (messagesPerDay > 0) {
-        // Generate channel image
-        await this.generateImageOfChannel(channelData.id);
+      // Generate channel image
+      await this.generateImageOfChannel(channelData.id);
 
+      if (messagesPerDay > 0) {
         // Create summary
         await this.generateSummary(channelData.id, props.batchId);
       }
@@ -305,28 +306,36 @@ export class ChannelRepository {
     }
     if (existingChannelData.image) return;
 
-    let imageName: string | null = null;
-    const res = await axios(
-      `https://api.unsplash.com/search/photos?query=${existingChannelData.name}&page=1&per_page=1`,
-      {
-        method: 'GET',
-        headers: {
-          'Accept-Version': 'v1',
-          Authorization: `Client-ID ${process.env.UNSPLASH_API_ACCESS_KEY}`,
-        },
-      }
-    );
+    // Fetch a keyword from channel
+    const prompt = `Extract a english keyword from '${existingChannelData.name}' .
 
-    // delete existing image
-    const imageUrl = res.data.results[0]?.urls.small;
-    if (imageUrl) {
-      const { fileName: savedImageName } = await saveFileFromUrl({
-        url: imageUrl,
-        dir: 'channelImages',
-        fileName: uuid(),
-      });
-      imageName = savedImageName;
-    } else {
+- In lower case.
+- Return only one word.
+
+Keyword:
+`;
+    const channelKeyword = await createCompletion({
+      prompt,
+      maxTokens: 4,
+    });
+
+    // Fetch image from unsplash
+    let imageName: string | null = null;
+    if (channelKeyword) {
+      const imageUrl = await fetchImageFromUnsplash(channelKeyword, 'small');
+
+      if (imageUrl) {
+        const { fileName: savedImageName } = await saveFileFromUrl({
+          url: imageUrl,
+          dir: 'channelImages',
+          fileName: uuid(),
+        });
+        imageName = savedImageName;
+      }
+    }
+
+    // If image is not found, copy random image
+    if (!imageName) {
       imageName = `${uuid()}.jpg`;
       await copyRandomImage('channelImages', imageName);
     }

@@ -2,6 +2,7 @@ import authController from '@/controllers/authController';
 import channelController from '@/controllers/channelController';
 import guildController from '@/controllers/guildController';
 import guildMemberController from '@/controllers/guildMemberController';
+import guildMessageController from '@/controllers/guildMessageController';
 import testController from '@/controllers/testController';
 import userController from '@/controllers/userController';
 import { withAuth } from '@/middleware/auth';
@@ -79,6 +80,14 @@ router.post(
   channelController.updateChannel
 );
 
+// Guild Message
+router.post(
+  '/api/guild/:guildId/message/:messageId',
+  withAuth,
+  isGuildManager,
+  guildMessageController.update
+);
+
 // Guild Member
 router.post(
   '/api/guild/:guildId/members',
@@ -91,12 +100,12 @@ router.post(
   guildMemberController.updatePosts
 );
 
-// Announcement
+// Notification
 router.post(
-  '/api/guild/:guildId/announcement-to-manager/:announcementId',
+  '/api/guild/:guildId/notification-to-manager/:notificationId',
   withAuth,
   isGuildManager,
-  guildController.updateAnnouncementToManager
+  guildController.updateNotificationToManager
 );
 
 // Test
