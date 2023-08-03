@@ -18,8 +18,11 @@ export const Announcements: React.FC<Props> = (props) => {
         {props.guild.announcements.length > 0 &&
           props.guild.announcements.map((announcement) => {
             return (
-              <div key={announcement.messageId} className="my-2">
-                <AnnouncementCard announcement={announcement} />
+              <div key={announcement.message.id} className="my-2">
+                <AnnouncementCard
+                  announcement={announcement}
+                  guildId={props.guild.id}
+                />
               </div>
             );
           })}
