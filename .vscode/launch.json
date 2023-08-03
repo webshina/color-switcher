@@ -38,22 +38,22 @@
         "TS_NODE_PROJECT": "./backend/tsconfig.json"
       },
       "skipFiles": ["<node_internals>/**"]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Express(PRD)",
-      "runtimeExecutable": "nodemon",
-      "program": "${workspaceFolder}/backend/src/app.ts",
-      "restart": true,
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "runtimeArgs": ["-q", "-r", "./backend/ts-node-require"],
-      "env": {
-        "NODE_ENV": "development",
-        "TS_NODE_PROJECT": "./backend/tsconfig.json"
-      },
-      "skipFiles": ["<node_internals>/**"]
     }
+    // {
+    //   "type": "node",
+    //   "request": "launch",
+    //   "name": "Express(PRD)",
+    //   "runtimeExecutable": "nodemon",
+    //   "program": "${workspaceFolder}/backend/src/app.ts",
+    //   "restart": true,
+    //   "console": "integratedTerminal",
+    //   "internalConsoleOptions": "neverOpen",
+    //   "runtimeArgs": ["-q", "-r", "./backend/ts-node-require"],
+    //   "env": {
+    //     "NODE_ENV": "development",
+    //     "TS_NODE_PROJECT": "./backend/tsconfig.json"
+    //   },
+    //   "skipFiles": ["<node_internals>/**"]
+    // }
   ]
 }

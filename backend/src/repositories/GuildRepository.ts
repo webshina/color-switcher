@@ -10,6 +10,7 @@ import { GetBatchProgressResponse } from '#/common/types/apiResponses/GuildContr
 import { getBot } from '@/lib/discord';
 import { createCompletion } from '@/lib/openAI';
 import { prisma } from '@/lib/prisma';
+import { fetchImageFromUnsplash } from '@/lib/unsplash';
 import {
   copyRandomImage,
   deleteFile,
@@ -20,7 +21,7 @@ import {
 } from '@/utils/fileHelper';
 import { detectLanguage } from '@/utils/languageHelper';
 import { Language, PostName } from '@prisma/client';
-import axios, { isAxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 import {
   ChannelType,
   Collection,
@@ -195,7 +196,11 @@ export class GuildRepository {
     return guildItems;
   }
 
-  static async getAnnouncementMessages(guildId: number, byOwner = false) {
+  static async getAnnouncementMessages(
+    guildId: number,
+    byOwner = false,
+    limit = 3
+  ) {
     const channel = await prisma.channel.findFirst({
       where: {
         guildId,
@@ -211,6 +216,10 @@ export class GuildRepository {
                   not: false,
                 },
               },
+          take: limit,
+          orderBy: {
+            postedAt: 'desc',
+          },
         },
       },
     });
@@ -318,18 +327,19 @@ export class GuildRepository {
         guildId: guildData.id,
         batchId: guildBatch.id,
       });
+
       // Generate Tags data
       this.generateTags({
         guildId: guildData.id,
         batchId: guildBatch.id,
       }).then(() => {
         // Generate InviteLink data
-        this.generateInviteLink(guildData.id, fetchedChannels).then(() => {
-          // Generate ShareMessage data
-          this.generateShareMessage({
-            guildId: guildData.id,
-            batchId: guildBatch.id,
-          });
+        this.generateInviteLink(guildData.id, fetchedChannels);
+
+        // Generate ShareMessage data
+        this.generateShareMessage({
+          guildId: guildData.id,
+          batchId: guildBatch.id,
         });
 
         // Generate GuildImage data
@@ -395,26 +405,28 @@ export class GuildRepository {
     guildId: number,
     fetchedChannels: Collection<string, NonThreadGuildBasedChannel | null>
   ) {
-    const channel = (await fetchedChannels
-      .filter(
-        (fetchedChannel) => fetchedChannel?.type === ChannelType.GuildText
-      )
-      .first()
-      ?.fetch()) as TextChannel;
-    const inviteData = await channel?.createInvite({
-      maxAge: 0,
-      maxUses: 0,
-      unique: true,
-    });
-
-    await prisma.guild.update({
-      where: {
-        id: guildId,
-      },
-      data: {
-        inviteURL: inviteData?.url,
-      },
-    });
+    for (const fetchedChannel of fetchedChannels.values()) {
+      if (fetchedChannel?.type === ChannelType.GuildText) {
+        try {
+          const channel = (await fetchedChannel.fetch()) as TextChannel;
+          const inviteData = await channel?.createInvite({
+            maxAge: 0,
+            maxUses: 0,
+            unique: true,
+          });
+          await prisma.guild.update({
+            where: {
+              id: guildId,
+            },
+            data: {
+              inviteURL: inviteData.url,
+            },
+          });
+        } catch (error) {
+          continue;
+        }
+      }
+    }
   }
 
   static async generateDescription(props: {
@@ -605,6 +617,7 @@ ${hashtags}
       const languageName = await detectLanguage(materialsForTags);
       const prompt = `-Create keywords of this Discord server using following channel data.
 -Separated by ",".
+-Don't surround it with quotations, etc.
 -Only in ${languageName}.
 -List at most 5.
 -In order of relevance.
@@ -668,18 +681,23 @@ Keywords:
       let imageName: string | null = null;
       for (const tag of existingGuildData?.tags) {
         try {
-          const res = await axios(
-            `https://api.unsplash.com/search/photos?query=${tag.name}&page=1&per_page=1`,
-            {
-              method: 'GET',
-              headers: {
-                'Accept-Version': 'v1',
-                Authorization: `Client-ID ${process.env.UNSPLASH_API_ACCESS_KEY}`,
-              },
-            }
-          );
+          // Fetch a keyword from channel
+          const prompt = `Extract a english word from '${tag}' .
 
-          const imageUrl = res.data.results[0]?.urls.regular;
+- In lower case.
+- Return only one word.
+
+Word:
+`;
+          const englishTagName = await createCompletion({
+            prompt,
+            maxTokens: 4,
+          });
+
+          const imageUrl = await fetchImageFromUnsplash(
+            englishTagName ?? tag.name,
+            'regular'
+          );
           if (imageUrl) {
             const { fileName: savedImageName } = await saveFileFromUrl({
               url: imageUrl,

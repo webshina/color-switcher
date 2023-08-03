@@ -4,6 +4,7 @@ import ISO6391 from 'iso-639-1';
 export const detectLanguage = async (sentence: string) => {
   const cldFactory = await loadModule();
   const langId = cldFactory.create(0);
+
   try {
     const languageData = langId.findMostFrequentLanguages(
       JSON.stringify(sentence),
