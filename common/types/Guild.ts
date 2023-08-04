@@ -61,6 +61,7 @@ export type GuildItem = Omit<
   categories: ChannelCategoryItem[];
   tags: GuildTagItem[];
   members: GuildMemberItem[];
+  membersCnt: number;
   managementMembers: GuildMemberItem[];
   posts: GuildPostItem[];
   notificationsToGuildManager: NotificationToGuildManagerItem[];

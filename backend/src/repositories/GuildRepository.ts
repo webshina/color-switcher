@@ -34,7 +34,10 @@ import { ChannelRepository } from './ChannelRepository';
 import { GuildMemberRepository } from './GuildMemberRepository';
 
 export class GuildRepository {
-  static async format(guildId: number, byOwner = false) {
+  static async format(
+    guildId: number,
+    option?: { byManager?: boolean; membersCnt?: number }
+  ) {
     const guildData = await prisma.guild.findUnique({
       where: {
         id: guildId,
@@ -95,7 +98,22 @@ export class GuildRepository {
     });
 
     // Fetch members
-    const guildMembers = await GuildMemberRepository.getByGuildId(guildData.id);
+    const guildMembers = await GuildMemberRepository.getByGuildId(
+      guildData.id,
+      {
+        membersCnt: option?.membersCnt,
+      }
+    );
+    const membersCnt = await prisma.guildMember.count({
+      where: {
+        guildId: guildData.id,
+      },
+    });
+
+    // Fetch management members
+    const managementMembers = await GuildMemberRepository.getManagersByGuildId(
+      guildData.id
+    );
 
     const posts: GuildPostItem[] = guildData.posts.map((post) => ({
       id: post.id,
@@ -116,7 +134,7 @@ export class GuildRepository {
     // Fetch Announcements
     const announcements = await this.getAnnouncementMessages(
       guildData.id,
-      byOwner
+      option?.byManager ?? false
     );
 
     const guildItem: GuildItem = {
@@ -145,10 +163,9 @@ export class GuildRepository {
         name: guildTag.name,
         guildId: guildTag.guildId,
       })),
-      members: guildMembers.filter((guildMember) => !guildMember.isManager),
-      managementMembers: guildMembers.filter(
-        (guildMember) => guildMember.isManager
-      ),
+      members: guildMembers,
+      membersCnt,
+      managementMembers: managementMembers,
       posts,
       notificationsToGuildManager: guildData.notificationsToGuildManager,
       announcements,
@@ -156,7 +173,13 @@ export class GuildRepository {
     return guildItem;
   }
 
-  static async getById(guildId: number, byOwner = false) {
+  static async getById(
+    guildId: number,
+    option?: {
+      byManager?: boolean;
+      membersCnt?: number;
+    }
+  ) {
     const guildData = await prisma.guild.findUnique({
       where: {
         id: guildId,
@@ -164,7 +187,7 @@ export class GuildRepository {
     });
     if (!guildData) throw new Error('Guild not found');
 
-    return await this.format(guildData.id, byOwner);
+    return await this.format(guildData.id, option);
   }
 
   static async getByDiscordId(guildDiscordId: string) {

@@ -71,13 +71,52 @@ export class GuildMemberRepository {
     return guildMember;
   }
 
-  static async getByGuildId(guildId: number) {
+  static async getByGuildId(
+    guildId: number,
+    options?: {
+      membersCnt?: number;
+      onlyMember?: boolean;
+      onlyManager?: boolean;
+    }
+  ) {
     const membersData = await prisma.guildMember.findMany({
       where: {
         guildId,
       },
+      take: options?.membersCnt ?? 20,
       orderBy: [{ order: 'asc' }, { activityScore: 'desc' }],
     });
+    const members: GuildMemberItem[] = [];
+    for (const memberData of membersData) {
+      const member = await this.format(memberData.id);
+      members.push(member);
+    }
+
+    return members;
+  }
+
+  static async getManagersByGuildId(guildId: number) {
+    const membersData = await prisma.guildMember.findMany({
+      where: {
+        guildId,
+        postRelations: {
+          some: {
+            guildPost: {
+              name: 'MANAGER',
+            },
+          },
+        },
+      },
+      include: {
+        postRelations: {
+          include: {
+            guildPost: true,
+          },
+        },
+      },
+    });
+
+    // Format data
     const members: GuildMemberItem[] = [];
     for (const memberData of membersData) {
       const member = await this.format(memberData.id);
