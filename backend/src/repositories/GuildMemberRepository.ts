@@ -76,9 +76,7 @@ export class GuildMemberRepository {
       where: {
         guildId,
       },
-      orderBy: {
-        order: 'asc',
-      },
+      orderBy: [{ order: 'asc' }, { activityScore: 'desc' }],
     });
     const members: GuildMemberItem[] = [];
     for (const memberData of membersData) {
