@@ -244,7 +244,7 @@ export class ChannelRepository {
               },
             },
             create: data,
-            update: {},
+            update: data,
           });
         }
       }

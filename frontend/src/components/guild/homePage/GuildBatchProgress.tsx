@@ -1,3 +1,4 @@
+import { LoadingSpinner } from '@/components/utils/LoadingSpinner';
 import 'react-datepicker/dist/react-datepicker.css';
 import { animated, useSpring } from 'react-spring';
 
@@ -12,21 +13,23 @@ export const GuildBatchProgress: React.FC<Props> = (props) => {
   });
 
   return (
-    <>
-      <div className="flex flex-col items-center p-8 bg-slate-800 rounded-xl">
-        <div className="">
-          Generating your <span className="font-bold">Discord HOME</span>...
-        </div>
-        <div className="h-2" />
+    <div className="flex flex-col items-center p-8 bg-slate-800 rounded-xl">
+      <div className="">
+        Generating your <span className="font-bold">Discord HOME</span>...
+      </div>
+      <div className="h-2" />
+      <div className="flex">
         <div className="w-[250px] h-[15px] bg-slate-700 rounded">
           <animated.div
             className="h-full gradient-bg-purple-to-pink rounded"
             style={springStyle}
           ></animated.div>
         </div>
-        <div className="h-2" />
-        {props.progressRate * 100}%
+        <div className="w-2" />
+        <LoadingSpinner />
       </div>
-    </>
+      <div className="h-2" />
+      <div>{props.progressRate * 100}%</div>
+    </div>
   );
 };

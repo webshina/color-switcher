@@ -48,6 +48,8 @@ const generate = async (req: Request, res: Response) => {
     const { guildId, guildBatchId } = await GuildRepository.generate(
       guildDiscordId,
       user!.id
+      // '1085873064018968656',
+      // 1
     );
 
     const responseData: GenerateGuildResponse = {

@@ -16,6 +16,7 @@ export const getBot = async () => {
         'GuildMessageReactions',
         'MessageContent',
         'GuildPresences',
+        'GuildMembers',
       ],
     });
     await bot.login(process.env.DISCORD_BOT_TOKEN);

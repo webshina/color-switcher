@@ -103,7 +103,7 @@ export class GuildMemberRepository {
       throw new Error('Guild not found');
     }
 
-    const fetchedMembers = props.fetchedGuild.members.cache;
+    const fetchedMembers = await props.fetchedGuild.members.fetch();
     await Promise.all(
       fetchedMembers.map(async (member) => {
         const fetchedMember = await member.fetch();
@@ -230,17 +230,8 @@ export class GuildMemberRepository {
         id: guildMemberId,
       },
     });
-    const lastMessage = await prisma.message.findFirst({
-      where: {
-        authorDiscordId: guildMemberData?.discordId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
     const messagesData = await prisma.message.findMany({
       where: {
-        batchId: lastMessage?.batchId,
         authorDiscordId: guildMemberData?.discordId,
       },
       orderBy: {
@@ -313,7 +304,7 @@ export class GuildMemberRepository {
       score: standardize(
         member.messagesPerDay!,
         filteredMembers.map((member) => member.messagesPerDay!),
-        10,
+        1000,
         1
       ),
     }));
@@ -324,11 +315,9 @@ export class GuildMemberRepository {
     }));
     let activityScore = 0;
     for (const scoreData of correctedScores) {
+      const member = guildMembers.find((member) => member.id === scoreData.id);
       if (guildMembers.length < 2) {
         // If number of channels is a little, evaluate activityScore on an absolute scale
-        const member = guildMembers.find(
-          (member) => member.id === scoreData.id
-        );
         const messagesPerDay = member!.messagesPerDay!;
         if (messagesPerDay === 0) {
           activityScore = 0;
@@ -344,13 +333,17 @@ export class GuildMemberRepository {
           activityScore = 5;
         }
       } else {
-        activityScore = Math.round(
-          standardize(
-            scoreData.score,
-            correctedScores.map((data) => data.score),
-            5
-          )
-        );
+        activityScore =
+          member!.messagesPerDay! !== 0
+            ? Math.round(
+                standardize(
+                  scoreData.score,
+                  correctedScores.map((data) => data.score),
+                  5,
+                  1
+                )
+              )
+            : 0;
       }
       await prisma.guildMember.update({
         where: {

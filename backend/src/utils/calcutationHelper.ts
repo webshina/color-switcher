@@ -10,3 +10,26 @@ export const standardize = (
 
   return ((value - min) / (max - min)) * (rangeMax - rangeMin) + rangeMin;
 };
+
+export const adjustOutliers = (
+  values: number[],
+  topExclude: number = 0.05,
+  bottomExclude: number = 0.05
+) => {
+  // Exclude outliers
+  const sorted = values.sort((a, b) => a - b);
+  const top = Math.floor(values.length * (1 - topExclude));
+  const bottom = Math.floor(values.length * bottomExclude);
+  const filtered = sorted.slice(bottom, top);
+
+  // Adjust outliers
+  const filteredMin = Math.min(...filtered);
+  const filteredMax = Math.max(...filtered);
+  const adjusted = values.map((value) => {
+    if (value < filteredMin) return filteredMin;
+    if (value > filteredMax) return filteredMax;
+    return value;
+  });
+
+  return adjusted;
+};
