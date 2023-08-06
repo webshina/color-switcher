@@ -457,6 +457,29 @@ export class GuildRepository {
     guildId: number;
     batchId: number;
   }) {
+    const updateBatchProgress = async () => {
+      // Update batch progress
+      await prisma.guildBatch.update({
+        where: {
+          id: props.batchId,
+        },
+        data: {
+          isGuildDescriptionGenerationCompleted: true,
+        },
+      });
+    };
+
+    // If channel is not updated, skip
+    const updatedMessage = await prisma.message.findFirst({
+      where: {
+        batchId: props.batchId,
+      },
+    });
+    if (!updatedMessage) {
+      await updateBatchProgress();
+      return;
+    }
+
     const guildData = await prisma.guild.findUnique({
       where: {
         id: props.guildId,
@@ -501,7 +524,7 @@ export class GuildRepository {
 -Be sure to write within 300 characters or less.
 -Include purpose of the server and characteristics of participants.
 -Never describe individual channels.
--Use some emojis for easy viewing.
+-Use some emojis and line breaks for easy viewing.
 
 Channel data:
 ${materialsForDescription}
@@ -510,31 +533,23 @@ Description:
 
 `;
 
-      const summary = await createCompletion({
+      const description = await createCompletion({
         prompt,
         maxTokens: 1024,
       });
-      if (summary) {
+      if (description) {
         await prisma.guild.update({
           where: {
             id: props.guildId,
           },
           data: {
-            description: summary,
+            description,
           },
         });
       }
     }
 
-    // Update batch progress
-    await prisma.guildBatch.update({
-      where: {
-        id: props.batchId,
-      },
-      data: {
-        isGuildDescriptionGenerationCompleted: true,
-      },
-    });
+    await updateBatchProgress();
   }
 
   static async generateShareMessage(props: {
@@ -613,6 +628,28 @@ ${hashtags}
   }
 
   static async generateTags(props: { guildId: number; batchId: number }) {
+    const updateBatchProgress = async () => {
+      await prisma.guildBatch.update({
+        where: {
+          id: props.batchId,
+        },
+        data: {
+          isGuildTagGenerationCompleted: true,
+        },
+      });
+    };
+
+    // If channel is not updated, skip
+    const updatedMessage = await prisma.message.findFirst({
+      where: {
+        batchId: props.batchId,
+      },
+    });
+    if (!updatedMessage) {
+      await updateBatchProgress();
+      return;
+    }
+
     const guildData = await prisma.guild.findUnique({
       where: {
         id: props.guildId,
@@ -631,19 +668,18 @@ ${hashtags}
       const materialsForTags = JSON.stringify(
         guildData.channels.map((channel) => {
           return {
-            channelName: channel.name,
-            channelSummaries: channel.channelSummaries.map((summary) => {
+            name: channel.name,
+            summaries: channel.channelSummaries.map((summary) => {
               return summary.content;
             }),
           };
         })
       );
       const languageName = await detectLanguage(materialsForTags);
-      const prompt = `-Create keywords of this Discord server using following channel data.
+      const prompt = `-Create 5 or fewer keywords of this Discord server using following channel data.
 -Separated by ",".
 -Don't surround it with quotations, etc.
 -Only in ${languageName}.
--List at most 5.
 -In order of relevance.
 
 Channel data:
@@ -677,15 +713,7 @@ Keywords:
       }
     }
 
-    // Update batch progress
-    await prisma.guildBatch.update({
-      where: {
-        id: props.batchId,
-      },
-      data: {
-        isGuildTagGenerationCompleted: true,
-      },
-    });
+    await updateBatchProgress();
   }
 
   static async generateCoverImage(props: { guildId: number; batchId: number }) {
@@ -706,7 +734,7 @@ Keywords:
       for (const tag of existingGuildData?.tags) {
         try {
           // Fetch a keyword from channel
-          const prompt = `Extract a english word from '${tag}' .
+          const prompt = `Extract a english word from '${tag.name}' .
 
 - In lower case.
 - Return only one word.
