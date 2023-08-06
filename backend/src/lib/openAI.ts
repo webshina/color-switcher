@@ -13,7 +13,7 @@ export const createCompletion = async (props: {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       data: {
-        model: 'gpt-4',
+        model: process.env.APP_ENV === 'production' ? 'gpt-4' : 'gpt-3.5-turbo',
         messages: [
           {
             role: 'user',
