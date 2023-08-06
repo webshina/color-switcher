@@ -260,6 +260,7 @@ model GuildBatch {
   id                                     Int      @id @default(autoincrement())
   guild                                  Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId                                Int
+  isStarted                              Boolean  @default(false)
   isChannelGenerationCompleted           Boolean  @default(false)
   totalChannelCnt                        Int?
   completedChannelCnt                    Int?

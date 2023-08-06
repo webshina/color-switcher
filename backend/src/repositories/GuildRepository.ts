@@ -313,6 +313,13 @@ export class GuildRepository {
       },
     });
 
+    const guildBatch = await prisma.guildBatch.create({
+      data: {
+        guildId: guildData.id,
+        isStarted: true,
+      },
+    });
+
     // Create guild posts
     const guildPostData: {
       guildId: number;
@@ -331,12 +338,6 @@ export class GuildRepository {
 
     // Create notifications
     await this.createNotificationToGuildManager(guildData.id);
-
-    const guildBatch = await prisma.guildBatch.create({
-      data: {
-        guildId: guildData.id,
-      },
-    });
 
     // Generate channels data
     const fetchedChannels = await fetchedGuild.channels.fetch();
@@ -843,6 +844,7 @@ Word:
 
     // Calculate progress rate
     let allWorkCnt =
+      1 + // isStarted
       (guildBatch.totalChannelCnt ?? 0) +
       1 + // isChannelGenerationCompleted
       1 + // isGuildDescriptionGenerationCompleted
@@ -853,6 +855,7 @@ Word:
       1; // isGuildAnnouncementGenerationCompleted
 
     let completedWorkCnt =
+      (guildBatch.isStarted ? 1 : 0) +
       (guildBatch.completedChannelCnt ?? 0) +
       (guildBatch.isChannelGenerationCompleted ? 1 : 0) +
       (guildBatch.isGuildDescriptionGenerationCompleted ? 1 : 0) +

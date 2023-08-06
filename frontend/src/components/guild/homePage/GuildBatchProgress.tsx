@@ -18,7 +18,7 @@ export const GuildBatchProgress: React.FC<Props> = (props) => {
         Generating your <span className="font-bold">Discord HOME</span>...
       </div>
       <div className="h-2" />
-      <div className="flex">
+      <div className="flex items-center">
         <div className="w-[250px] h-[15px] bg-slate-700 rounded">
           <animated.div
             className="h-full gradient-bg-purple-to-pink rounded"
@@ -29,7 +29,7 @@ export const GuildBatchProgress: React.FC<Props> = (props) => {
         <LoadingSpinner />
       </div>
       <div className="h-2" />
-      <div>{props.progressRate * 100}%</div>
+      <div>{(props.progressRate * 100).toFixed(0)}%</div>
     </div>
   );
 };
