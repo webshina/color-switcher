@@ -4,15 +4,43 @@ import { GuildRepository } from '@/repositories/GuildRepository';
 import { exit } from 'process';
 
 const execute = async () => {
-  const guilds = await prisma.guild.findMany();
+  // Get args from command line
+  const args = process.argv.slice(2);
+  const guildDiscordId = args[0];
+
+  const guilds = await prisma.guild.findMany({
+    where: {
+      discordId: guildDiscordId,
+    },
+  });
 
   for (const guild of guilds) {
     logger.info(`Generating guild id: ${guild.id}`);
 
-    await GuildRepository.generate(guild.discordId, guild.createdByUserId!);
+    const startedAt = new Date();
 
-    // Wait 1 minutes
-    await new Promise((resolve) => setTimeout(resolve, 60000));
+    const { guildId, guildBatchId } = await GuildRepository.generate(
+      guild.discordId,
+      guild.createdByUserId!
+    );
+
+    let batchProgressRate = 0;
+
+    // Wait for batch to finish
+    while (batchProgressRate < 1) {
+      batchProgressRate = (await GuildRepository.getBatchProgress(guildBatchId))
+        .progressRate;
+
+      // If the process takes over 10 min, exit
+      if (new Date().getTime() - startedAt.getTime() > 1000 * 60 * 10) {
+        logger.error('Batch process took over 10 min');
+        exit(1);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    logger.info(`Finished generating guild id: ${guild.id}`);
   }
 
   logger.info('Finished generating guilds');
@@ -20,4 +48,10 @@ const execute = async () => {
   exit(0);
 };
 
-execute();
+try {
+  execute();
+} catch (error) {
+  console.log(error);
+  logger.error(error);
+  exit(1);
+}

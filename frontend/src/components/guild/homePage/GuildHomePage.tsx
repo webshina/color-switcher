@@ -11,6 +11,7 @@ import { IoChatbubblesSharp } from 'react-icons/io5';
 import { MdManageAccounts } from 'react-icons/md';
 import { Announcements } from './Announcements';
 import { Channels } from './Channels';
+import { ManagementMembers } from './ManagementMembers';
 import { Members } from './Members';
 import { ShareButton } from './ShareButton';
 import { TagCards } from './TagCards';
@@ -87,7 +88,7 @@ export const GuildHomePage: React.FC<Props> = (props) => {
             icon={<MdManageAccounts color="white" />}
           />
           <div className="h-8" />
-          <Members discordMembers={props.guild.managementMembers} />
+          <ManagementMembers members={props.guild.managementMembers} />
           <div className="h-16" />
 
           {/* Announcements */}

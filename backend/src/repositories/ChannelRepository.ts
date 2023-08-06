@@ -399,24 +399,32 @@ Keyword:
   }
 
   static async generateSummary(channelId: number, batchId: number) {
-    const messages = await prisma.message.findMany({
+    // If channel is not updated, skip
+    const updatedMessage = await prisma.message.findFirst({
       where: {
         channelId,
         batchId,
       },
-      orderBy: {
-        createdAt: 'asc',
+    });
+    if (!updatedMessage) return;
+
+    const messages = await prisma.message.findMany({
+      where: {
+        channelId,
       },
+      orderBy: {
+        postedAt: 'desc',
+      },
+      take: 5,
     });
     const messagesForSummary = messages
       .map((message) => message.content)
-      .slice(0, 12)
       .reverse();
     if (messagesForSummary.length === 0) return;
 
     //// Summary by OpenAI
     const languageName = await detectLanguage(messagesForSummary.join('\n'));
-    const prompt = `-Summarize following chat in bullet points with "-" as the initial letter.
+    const prompt = `-Summarize following chat in 3 bullet points with "-" as the initial letter.
 -Summarize only in ${languageName}.
 -Summarize in 20 words at most and if the word count is going to be high, old conversations can be ignored.
 

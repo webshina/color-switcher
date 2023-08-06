@@ -12,7 +12,7 @@ import React from 'react';
 import { UserProfile } from './UserProfile';
 
 type Props = {
-  discordMember: GuildMemberItem;
+  member: GuildMemberItem;
 };
 
 export const UserProfileCard: React.FC<Props> = (props) => {
@@ -34,7 +34,7 @@ export const UserProfileCard: React.FC<Props> = (props) => {
         <ModalOverlay />
         <ModalContent bgColor="transparent">
           <ModalBody className="flex justify-center items-center">
-            <UserProfile discordMember={props.discordMember} />
+            <UserProfile discordMember={props.member} />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -45,7 +45,7 @@ export const UserProfileCard: React.FC<Props> = (props) => {
             {/* User image */}
             <div className="relative w-[150px]">
               <Image
-                src={props.discordMember.avatarURL ?? '/images/no_image.jpeg'}
+                src={props.member.avatarURL ?? '/images/no_image.jpeg'}
                 alt="image"
                 layout="fill"
                 objectFit="cover"
@@ -54,15 +54,13 @@ export const UserProfileCard: React.FC<Props> = (props) => {
             </div>
             <div className="flex flex-col items-start w-[200px] p-3 bg-slate-900 rounded-r-xl">
               <div className="text-base font-bold">
-                {props.discordMember.displayName}{' '}
-                <span className="text-xs font-light">
-                  {props.discordMember.name}
-                </span>
+                {props.member.displayName}{' '}
+                <span className="text-xs font-light">{props.member.name}</span>
               </div>
               <div className="h-2" />
 
               {/* Active */}
-              <ActivityLevel level={props.discordMember.activityScore ?? 0} />
+              <ActivityLevel level={props.member.activityScore ?? 0} />
             </div>
           </div>
         </div>

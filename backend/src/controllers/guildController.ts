@@ -14,6 +14,7 @@ import Formidable from 'formidable';
 
 const get = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { membersCnt } = req.query;
 
   // Return members if login user is a member of the guild
   const user = await UserRepository.getLoginUser(req);
@@ -24,7 +25,10 @@ const get = async (req: Request, res: Response) => {
     ? await GuildMemberRepository.isManager(Number(id), user.id)
     : false;
 
-  const result = await GuildRepository.getById(Number(id), isManager);
+  const result = await GuildRepository.getById(Number(id), {
+    byManager: isManager,
+    membersCnt: membersCnt ? Number(membersCnt) : undefined,
+  });
 
   const responseData: FetchGuildResponse = {
     ...result,
@@ -46,8 +50,10 @@ const generate = async (req: Request, res: Response) => {
 
   try {
     const { guildId, guildBatchId } = await GuildRepository.generate(
-      guildDiscordId,
-      user!.id
+      // guildDiscordId,
+      // user!.id
+      '1085873064018968656',
+      1
     );
 
     const responseData: GenerateGuildResponse = {
