@@ -36,7 +36,11 @@ import { GuildMemberRepository } from './GuildMemberRepository';
 export class GuildRepository {
   static async format(
     guildId: number,
-    option?: { byManager?: boolean; membersCnt?: number }
+    option?: {
+      byManager?: boolean;
+      announcementsCnt?: number;
+      membersCnt?: number;
+    }
   ) {
     const guildData = await prisma.guild.findUnique({
       where: {
@@ -132,10 +136,12 @@ export class GuildRepository {
     });
 
     // Fetch Announcements
-    const announcements = await this.getAnnouncementMessages(
-      guildData.id,
-      option?.byManager ?? false
-    );
+    const { announcements, totalCnt: totalAnnouncementsCnt } =
+      await this.getAnnouncementMessages(
+        guildData.id,
+        option?.byManager ?? false,
+        option?.announcementsCnt
+      );
 
     const guildItem: GuildItem = {
       id: guildData.id,
@@ -164,11 +170,12 @@ export class GuildRepository {
         guildId: guildTag.guildId,
       })),
       members: guildMembers,
-      membersCnt,
+      totalMembersCnt: membersCnt,
       managementMembers: managementMembers,
       posts,
       notificationsToGuildManager: guildData.notificationsToGuildManager,
       announcements,
+      totalAnnouncementsCnt,
     };
     return guildItem;
   }
@@ -177,6 +184,7 @@ export class GuildRepository {
     guildId: number,
     option?: {
       byManager?: boolean;
+      announcementsCnt?: number;
       membersCnt?: number;
     }
   ) {
@@ -223,8 +231,11 @@ export class GuildRepository {
     guildId: number,
     byOwner = false,
     limit = 3
-  ) {
-    const channel = await prisma.channel.findFirst({
+  ): Promise<{
+    announcements: GuildAnnouncementItem[];
+    totalCnt: number;
+  }> {
+    const announcementChannel = await prisma.channel.findFirst({
       where: {
         guildId,
         isAnnouncementChannel: true,
@@ -246,10 +257,15 @@ export class GuildRepository {
         },
       },
     });
-    if (!channel) return [];
+    if (!announcementChannel) {
+      return {
+        announcements: [],
+        totalCnt: 0,
+      };
+    }
 
     const formattedMessages: GuildAnnouncementItem[] = [];
-    for (const message of channel.messages) {
+    for (const message of announcementChannel.messages) {
       const author = await prisma.guildMember.findUnique({
         where: {
           guildId_discordId: {
@@ -276,7 +292,16 @@ export class GuildRepository {
       formattedMessages.push(formattedMessage);
     }
 
-    return formattedMessages;
+    const totalCnt = await prisma.message.count({
+      where: {
+        channelId: announcementChannel.id,
+      },
+    });
+
+    return {
+      announcements: formattedMessages,
+      totalCnt,
+    };
   }
 
   static async generate(discordId: string, createdByUserId: number) {

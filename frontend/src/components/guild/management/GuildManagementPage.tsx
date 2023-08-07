@@ -101,7 +101,10 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
           <div className="h-16" />
 
           {/* Announcements */}
-          <GuildAnnouncementsForm guild={props.guild} />
+          <GuildAnnouncementsForm
+            guildId={props.guild.id}
+            announcements={props.guild.announcements}
+          />
           <div className="h-16" />
 
           {/* Channel list */}
@@ -109,9 +112,7 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
           <div className="h-16" />
 
           {/* Member list */}
-          <GuildMembersForm
-            members={[...props.guild.managementMembers, ...props.guild.members]}
-          />
+          <GuildMembersForm members={props.guild.members} />
 
           <div className="h-16" />
         </div>
