@@ -92,7 +92,10 @@ export const GuildHomePage: React.FC<Props> = (props) => {
           <div className="h-16" />
 
           {/* Announcements */}
-          <Announcements guild={props.guild} />
+          <Announcements
+            guildId={props.guild.id}
+            announcements={props.guild.announcements}
+          />
           <div className="h-16" />
 
           {/* Channel list */}

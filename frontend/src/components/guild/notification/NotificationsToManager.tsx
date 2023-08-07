@@ -46,14 +46,12 @@ export const NotificationsToManager: React.FC<Props> = (props) => {
         <ModalBody>
           <div className="flex flex-col justify-start items-center overflow-x-auto overflow-y-hidden">
             {props.guild.notificationsToGuildManager.map((notification) => (
-              <>
-                <div key={notification.id} className="my-2 w-full">
-                  <NotificationCard
-                    guild={props.guild}
-                    notification={notification}
-                  />
-                </div>
-              </>
+              <div key={notification.id} className="my-2 w-full">
+                <NotificationCard
+                  guild={props.guild}
+                  notification={notification}
+                />
+              </div>
             ))}
           </div>
         </ModalBody>

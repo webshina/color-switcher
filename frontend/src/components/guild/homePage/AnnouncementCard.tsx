@@ -11,11 +11,13 @@ type Props = {
   guildId: number;
   announcement: GuildAnnouncementItem;
   editable?: boolean;
+  onChange?: () => void;
 };
 export const AnnouncementCard: React.FC<Props> = ({
   guildId,
   announcement,
   editable = false,
+  onChange,
 }) => {
   const toast = useToast();
 
@@ -25,6 +27,7 @@ export const AnnouncementCard: React.FC<Props> = ({
         hideAsAnnouncement: value,
       });
       await mutate('useGuild');
+      onChange?.();
       toast({
         status: 'success',
         description: 'Saved',
