@@ -22,10 +22,10 @@ export const GuildAnnouncementsForm: React.FC<Props> = (props) => {
     null
   );
 
-  const fetchAdditionalAnnouncements = async () => {
+  const fetchAdditionalAnnouncements = async (cnt: number = 3) => {
     setLoading(true);
     const res = await get('/api/guild/' + props.guildId, {
-      announcementsCnt: announcements.length + 5,
+      announcementsCnt: announcements.length + cnt,
     });
     const guild = res.data as FetchGuildResponse;
     setAnnouncements(guild.announcements);
@@ -43,6 +43,9 @@ export const GuildAnnouncementsForm: React.FC<Props> = (props) => {
             guildId={props.guildId}
             announcement={announcement}
             editable
+            onChange={() => {
+              fetchAdditionalAnnouncements(0);
+            }}
           />
         </div>
       ))}
