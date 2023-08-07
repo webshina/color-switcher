@@ -3,7 +3,7 @@ import { FetchGuildResponse } from '#/common/types/apiResponses/GuildControllerR
 import { LoadingSpinner } from '@/components/utils/LoadingSpinner';
 import Title from '@/components/utils/Title';
 import { get } from '@/utils/apiHelper';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AiFillDownCircle, AiOutlineNotification } from 'react-icons/ai';
 import { AnnouncementCard } from './AnnouncementCard';
 
@@ -31,6 +31,10 @@ export const Announcements: React.FC<Props> = (props) => {
     setAnnouncementsCnt(guild.totalAnnouncementsCnt);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchAdditionalAnnouncements();
+  }, []);
 
   return (
     <>

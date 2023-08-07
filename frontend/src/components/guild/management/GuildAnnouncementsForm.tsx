@@ -3,7 +3,7 @@ import { FetchGuildResponse } from '#/common/types/apiResponses/GuildControllerR
 import { LoadingSpinner } from '@/components/utils/LoadingSpinner';
 import Title from '@/components/utils/Title';
 import { get } from '@/utils/apiHelper';
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { AiFillDownCircle } from 'react-icons/ai';
 import { AnnouncementCard } from '../homePage/AnnouncementCard';
@@ -33,6 +33,10 @@ export const GuildAnnouncementsForm: React.FC<Props> = (props) => {
     setLoading(false);
   };
 
+  useEffect(() => {
+    fetchAdditionalAnnouncements();
+  }, []);
+
   return (
     <>
       <Title title="Announcements" />
@@ -54,7 +58,11 @@ export const GuildAnnouncementsForm: React.FC<Props> = (props) => {
           {loading ? (
             <LoadingSpinner />
           ) : (
-            <button onClick={fetchAdditionalAnnouncements}>
+            <button
+              onClick={() => {
+                fetchAdditionalAnnouncements();
+              }}
+            >
               <AiFillDownCircle size={30} />
             </button>
           )}
