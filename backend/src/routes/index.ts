@@ -88,6 +88,12 @@ router.post(
   guildMessageController.update
 );
 
+// Guild Announcement
+router.get(
+  '/api/guild/:guildId/announcements',
+  guildController.getAnnouncements
+);
+
 // Guild Member
 router.post(
   '/api/guild/:guildId/members',

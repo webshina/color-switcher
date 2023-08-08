@@ -136,15 +136,6 @@ export class GuildRepository {
       },
     });
 
-    // Fetch Announcements
-    const { announcements, totalCnt: totalAnnouncementsCnt } =
-      await this.getAnnouncementMessages(
-        guildData.id,
-        option?.byManager ?? false,
-        option?.announcementsPageIdx ?? 0,
-        option?.announcementsPageSize ?? 3
-      );
-
     const guildItem: GuildItem = {
       id: guildData.id,
       discordId: guildData.discordId,
@@ -176,8 +167,6 @@ export class GuildRepository {
       managementMembers: managementMembers,
       posts,
       notificationsToGuildManager: guildData.notificationsToGuildManager,
-      announcements,
-      totalAnnouncementsCnt,
     };
     return guildItem;
   }
@@ -235,10 +224,7 @@ export class GuildRepository {
     byOwner = false,
     pageIdx = 0,
     pageSize = 3
-  ): Promise<{
-    announcements: GuildAnnouncementItem[];
-    totalCnt: number;
-  }> {
+  ) {
     const announcementChannel = await prisma.channel.findFirst({
       where: {
         guildId,
@@ -263,10 +249,7 @@ export class GuildRepository {
       },
     });
     if (!announcementChannel) {
-      return {
-        announcements: [],
-        totalCnt: 0,
-      };
+      return [];
     }
 
     const formattedMessages: GuildAnnouncementItem[] = [];
@@ -297,16 +280,7 @@ export class GuildRepository {
       formattedMessages.push(formattedMessage);
     }
 
-    const totalCnt = await prisma.message.count({
-      where: {
-        channelId: announcementChannel.id,
-      },
-    });
-
-    return {
-      announcements: formattedMessages,
-      totalCnt,
-    };
+    return formattedMessages;
   }
 
   static async generate(discordId: string, createdByUserId: number) {

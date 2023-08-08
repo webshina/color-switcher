@@ -65,6 +65,4 @@ export type GuildItem = Omit<
   managementMembers: GuildMemberItem[];
   posts: GuildPostItem[];
   notificationsToGuildManager: NotificationToGuildManagerItem[];
-  announcements: GuildAnnouncementItem[];
-  totalAnnouncementsCnt: number;
 };

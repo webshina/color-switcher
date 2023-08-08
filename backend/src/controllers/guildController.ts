@@ -3,6 +3,7 @@ import {
   FetchGuildResponse,
   GenerateGuildResponse,
   GetBatchProgressResponse,
+  GetGuildAnnouncementsResponse,
 } from '#/common/types/apiResponses/GuildControllerResponse';
 import { prisma } from '@/lib/prisma';
 import { GuildMemberRepository } from '@/repositories/GuildMemberRepository';
@@ -91,6 +92,27 @@ const getBatchProgress = async (req: Request, res: Response) => {
     await GuildRepository.getBatchProgress(Number(batchId));
 
   return res.json(response);
+};
+
+const getAnnouncements = async (req: Request, res: Response) => {
+  const { guildId } = req.params;
+  const { pageIdx, pageSize } = req.query;
+  console.log(pageIdx, pageSize);
+
+  const user = await UserRepository.getLoginUser(req);
+  const isManager = user
+    ? await GuildMemberRepository.isManager(Number(guildId), user.id)
+    : false;
+
+  const result: GetGuildAnnouncementsResponse =
+    await GuildRepository.getAnnouncementMessages(
+      Number(guildId),
+      isManager,
+      pageIdx ? Number(pageIdx) : undefined,
+      pageSize ? Number(pageSize) : undefined
+    );
+
+  return res.json(result);
 };
 
 const update = async (req: Request, res: Response) => {
@@ -183,6 +205,7 @@ export default {
   get,
   getMine,
   getBatchProgress,
+  getAnnouncements,
   update,
   updateCoverImage,
   toggleAutoGeneration,

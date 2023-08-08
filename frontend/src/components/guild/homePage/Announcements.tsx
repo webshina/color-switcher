@@ -1,12 +1,9 @@
 import React from 'react';
 import { AiFillDownCircle, AiOutlineNotification } from 'react-icons/ai';
 
-import { GuildAnnouncementItem } from '#/common/types/Guild';
-import { FetchGuildResponse } from '#/common/types/apiResponses/GuildControllerResponse';
-import { useInfiniteLoad } from '@/components/hooks/utils/useInfiniteLoad';
 import { LoadingSpinner } from '@/components/utils/LoadingSpinner';
 import Title from '@/components/utils/Title';
-import { get } from '@/utils/apiHelper';
+import { useAnnouncements } from '@/hooks/repository/useAnnouncements';
 import { AnnouncementCard } from './AnnouncementCard';
 
 type Props = {
@@ -14,24 +11,10 @@ type Props = {
 };
 
 export const Announcements: React.FC<Props> = (props) => {
-  const {
-    data: announcementsPages,
-    isLoadingMore,
-    isEnd,
-    size,
-    setSize,
-  } = useInfiniteLoad<GuildAnnouncementItem>(
-    `/api/guild/${props.guildId}`,
-    async (url, index, pageSize) => {
-      const res = await get(url, {
-        announcementsPageIdx: index,
-        announcementsPageSize: pageSize,
-      });
-      const guild = res.data as FetchGuildResponse;
-      return guild.announcements;
-    },
-    3
-  );
+  const { announcementsPages, isLoadingMore, isEnd, size, setSize } =
+    useAnnouncements({
+      guildId: props.guildId,
+    });
 
   return (
     <>
