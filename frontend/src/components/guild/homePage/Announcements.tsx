@@ -14,19 +14,24 @@ type Props = {
 };
 
 export const Announcements: React.FC<Props> = (props) => {
-  const { data, isLoadingMore, isEnd, size, setSize } =
-    useInfiniteLoad<GuildAnnouncementItem>(
-      `/api/guild/${props.guildId}`,
-      async (url, index, pageSize) => {
-        const res = await get(url, {
-          announcementsPageIdx: index,
-          announcementsPageSize: pageSize,
-        });
-        const guild = res.data as FetchGuildResponse;
-        return guild.announcements;
-      },
-      3
-    );
+  const {
+    data: announcementsPages,
+    isLoadingMore,
+    isEnd,
+    size,
+    setSize,
+  } = useInfiniteLoad<GuildAnnouncementItem>(
+    `/api/guild/${props.guildId}`,
+    async (url, index, pageSize) => {
+      const res = await get(url, {
+        announcementsPageIdx: index,
+        announcementsPageSize: pageSize,
+      });
+      const guild = res.data as FetchGuildResponse;
+      return guild.announcements;
+    },
+    3
+  );
 
   return (
     <>
@@ -36,7 +41,7 @@ export const Announcements: React.FC<Props> = (props) => {
       />
       <div className="h-8" />
       <div>
-        {data?.map((page, i) =>
+        {announcementsPages?.map((page, i) =>
           page.map((announcement) => (
             <div key={announcement.message.id} className="my-2">
               <AnnouncementCard

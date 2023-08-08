@@ -1,9 +1,10 @@
 import { GuildAnnouncementItem } from '#/common/types/Guild';
 import { FetchGuildResponse } from '#/common/types/apiResponses/GuildControllerResponse';
+import { useInfiniteLoad } from '@/components/hooks/utils/useInfiniteLoad';
 import { LoadingSpinner } from '@/components/utils/LoadingSpinner';
 import Title from '@/components/utils/Title';
 import { get } from '@/utils/apiHelper';
-import React, { useEffect } from 'react';
+import React from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { AiFillDownCircle } from 'react-icons/ai';
 import { AnnouncementCard } from '../homePage/AnnouncementCard';
@@ -13,61 +14,53 @@ type Props = {
   announcements: GuildAnnouncementItem[];
 };
 export const GuildAnnouncementsForm: React.FC<Props> = (props) => {
-  const [loading, setLoading] = React.useState<boolean>(false);
-
-  const [announcements, setAnnouncements] = React.useState<
-    GuildAnnouncementItem[]
-  >(props.announcements);
-  const [announcementsCnt, setAnnouncementsCnt] = React.useState<number | null>(
-    null
+  const {
+    data: announcementsPages,
+    isLoadingMore,
+    isEnd,
+    size,
+    setSize,
+  } = useInfiniteLoad<GuildAnnouncementItem>(
+    `/api/guild/${props.guildId}`,
+    async (url, index, pageSize) => {
+      const res = await get(url, {
+        announcementsPageIdx: index,
+        announcementsPageSize: pageSize,
+      });
+      const guild = res.data as FetchGuildResponse;
+      return guild.announcements;
+    },
+    1
   );
-
-  const fetchAdditionalAnnouncements = async (cnt: number = 3) => {
-    setLoading(true);
-    const res = await get('/api/guild/' + props.guildId, {
-      announcementsCnt: announcements.length + cnt,
-    });
-    const guild = res.data as FetchGuildResponse;
-    setAnnouncements(guild.announcements);
-    setAnnouncementsCnt(guild.totalAnnouncementsCnt);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchAdditionalAnnouncements();
-  }, []);
 
   return (
     <>
       <Title title="Announcements" />
       <div className="h-5" />
-      {announcements.map((announcement, index) => (
-        <div key={index} className="m-2">
-          <AnnouncementCard
-            guildId={props.guildId}
-            announcement={announcement}
-            editable
-            onChange={() => {
-              fetchAdditionalAnnouncements(0);
-            }}
-          />
-        </div>
-      ))}
-      {(!announcementsCnt || announcements.length < announcementsCnt) && (
-        <div className="flex justify-center">
-          {loading ? (
-            <LoadingSpinner />
-          ) : (
-            <button
-              onClick={() => {
-                fetchAdditionalAnnouncements();
-              }}
-            >
+      <div>
+        {announcementsPages?.map((page, i) =>
+          page.map((announcement) => (
+            <div key={announcement.message.id} className="my-2">
+              <AnnouncementCard
+                announcement={announcement}
+                guildId={props.guildId}
+                editable
+              />
+            </div>
+          ))
+        )}
+      </div>
+      <div className="flex justify-center">
+        {isLoadingMore ? (
+          <LoadingSpinner />
+        ) : (
+          !isEnd && (
+            <button onClick={() => setSize(size + 1)}>
               <AiFillDownCircle size={30} />
             </button>
-          )}
-        </div>
-      )}
+          )
+        )}
+      </div>
     </>
   );
 };
