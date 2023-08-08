@@ -5,9 +5,12 @@ export const useInfiniteLoad = <T>(
   fetcher: (url: string, index: number, pageSize: number) => Promise<any>,
   pageSize: number
 ) => {
-  const { data, error, size, setSize } = useSWRInfinite<T[]>(
+  const { data, error, size, setSize, mutate } = useSWRInfinite<T[]>(
     (index) => [url, index, pageSize],
-    fetcher
+    fetcher,
+    {
+      revalidateOnFocus: false,
+    }
   );
 
   const isLoadingInitialData = !data && !error;
@@ -26,5 +29,6 @@ export const useInfiniteLoad = <T>(
     isEnd,
     size,
     setSize,
+    mutate,
   };
 };

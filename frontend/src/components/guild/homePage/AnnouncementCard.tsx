@@ -5,7 +5,6 @@ import { post } from '@/utils/apiHelper';
 import { formatDate } from '@/utils/dateHelper';
 import { convertTextToHtml } from '@/utils/htmlHelper';
 import { Switch, useToast } from '@chakra-ui/react';
-import { mutate } from 'swr';
 
 type Props = {
   guildId: number;
@@ -26,7 +25,6 @@ export const AnnouncementCard: React.FC<Props> = ({
       await post(`/api/guild/${guildId}/message/${announcement.message.id}`, {
         hideAsAnnouncement: value,
       });
-      await mutate('useGuild');
       onChange?.();
       toast({
         status: 'success',

@@ -10,6 +10,7 @@ export const useAnnouncements = (props: { guildId: number }) => {
     isEnd,
     size,
     setSize,
+    mutate,
   } = useInfiniteLoad<GuildAnnouncementItem>(
     `/api/guild/${props.guildId}/announcements`,
     async (url, pageIdx, pageSize) => {
@@ -29,5 +30,6 @@ export const useAnnouncements = (props: { guildId: number }) => {
     isEnd,
     size,
     setSize,
+    mutate,
   };
 };

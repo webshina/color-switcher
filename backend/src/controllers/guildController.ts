@@ -97,7 +97,6 @@ const getBatchProgress = async (req: Request, res: Response) => {
 const getAnnouncements = async (req: Request, res: Response) => {
   const { guildId } = req.params;
   const { pageIdx, pageSize } = req.query;
-  console.log(pageIdx, pageSize);
 
   const user = await UserRepository.getLoginUser(req);
   const isManager = user
