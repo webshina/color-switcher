@@ -38,7 +38,8 @@ export class GuildRepository {
     guildId: number,
     option?: {
       byManager?: boolean;
-      announcementsCnt?: number;
+      announcementsPageIdx?: number;
+      announcementsPageSize?: number;
       membersCnt?: number;
     }
   ) {
@@ -140,7 +141,8 @@ export class GuildRepository {
       await this.getAnnouncementMessages(
         guildData.id,
         option?.byManager ?? false,
-        option?.announcementsCnt
+        option?.announcementsPageIdx ?? 0,
+        option?.announcementsPageSize ?? 3
       );
 
     const guildItem: GuildItem = {
@@ -184,7 +186,8 @@ export class GuildRepository {
     guildId: number,
     option?: {
       byManager?: boolean;
-      announcementsCnt?: number;
+      announcementsPageIdx?: number;
+      announcementsPageSize?: number;
       membersCnt?: number;
     }
   ) {
@@ -230,7 +233,8 @@ export class GuildRepository {
   static async getAnnouncementMessages(
     guildId: number,
     byOwner = false,
-    limit = 3
+    pageIdx = 0,
+    pageSize = 3
   ): Promise<{
     announcements: GuildAnnouncementItem[];
     totalCnt: number;
@@ -250,7 +254,8 @@ export class GuildRepository {
                   not: false,
                 },
               },
-          take: limit,
+          skip: pageIdx * pageSize,
+          take: pageSize,
           orderBy: {
             postedAt: 'desc',
           },

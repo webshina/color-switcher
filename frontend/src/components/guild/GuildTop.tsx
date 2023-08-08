@@ -1,7 +1,7 @@
 import { useGuild } from '@/hooks/repository/useGuild';
 import { useMe } from '@/hooks/repository/useMe';
-import { useRouter } from 'next/router';
 import 'react-datepicker/dist/react-datepicker.css';
+import { LoadingSpinner } from '../utils/LoadingSpinner';
 import { GuildHomePageSwitch, Page } from './GuildHomePageSwitch';
 import { GuildHomePage } from './homePage/GuildHomePage';
 import { GuildManagementPage } from './management/GuildManagementPage';
@@ -11,12 +11,15 @@ type Props = {
   guildId: number;
 };
 export const GuildTop: React.FC<Props> = (props) => {
-  const router = useRouter();
-  const { data: guild } = useGuild({ guildId: props.guildId });
+  const { data: guild, isValidating } = useGuild({ guildId: props.guildId });
   const { data: user } = useMe();
   const isOwner = guild?.managementMembers.some(
     (member) => member.discordId === user?.discordId
   );
+
+  if (isValidating) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>

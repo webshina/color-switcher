@@ -14,7 +14,7 @@ import Formidable from 'formidable';
 
 const get = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { announcementsCnt, membersCnt } = req.query;
+  const { announcementsPageIdx, announcementsPageSize, membersCnt } = req.query;
 
   // Return members if login user is a member of the guild
   const user = await UserRepository.getLoginUser(req);
@@ -27,7 +27,12 @@ const get = async (req: Request, res: Response) => {
 
   const result = await GuildRepository.getById(Number(id), {
     byManager: isManager,
-    announcementsCnt: announcementsCnt ? Number(announcementsCnt) : undefined,
+    announcementsPageIdx: announcementsPageIdx
+      ? Number(announcementsPageIdx)
+      : undefined,
+    announcementsPageSize: announcementsPageSize
+      ? Number(announcementsPageSize)
+      : undefined,
     membersCnt: membersCnt ? Number(membersCnt) : undefined,
   });
 
