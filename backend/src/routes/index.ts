@@ -95,6 +95,7 @@ router.get(
 );
 
 // Guild Member
+router.get('/api/guild/:guildId/members', guildMemberController.getMembers);
 router.post(
   '/api/guild/:guildId/members',
   withAuth,

@@ -102,19 +102,6 @@ export class GuildRepository {
       },
     });
 
-    // Fetch members
-    const guildMembers = await GuildMemberRepository.getByGuildId(
-      guildData.id,
-      {
-        membersCnt: option?.membersCnt,
-      }
-    );
-    const membersCnt = await prisma.guildMember.count({
-      where: {
-        guildId: guildData.id,
-      },
-    });
-
     // Fetch management members
     const managementMembers = await GuildMemberRepository.getManagersByGuildId(
       guildData.id
@@ -162,8 +149,6 @@ export class GuildRepository {
         name: guildTag.name,
         guildId: guildTag.guildId,
       })),
-      members: guildMembers,
-      totalMembersCnt: membersCnt,
       managementMembers: managementMembers,
       posts,
       notificationsToGuildManager: guildData.notificationsToGuildManager,

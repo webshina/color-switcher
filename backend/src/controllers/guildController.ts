@@ -39,7 +39,6 @@ const get = async (req: Request, res: Response) => {
 
   const responseData: FetchGuildResponse = {
     ...result,
-    members: isMember ? result.members : [],
     isMember,
     isManager,
     notificationsToGuildManager: isMember

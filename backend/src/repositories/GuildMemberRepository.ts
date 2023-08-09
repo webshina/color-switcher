@@ -74,16 +74,18 @@ export class GuildMemberRepository {
   static async getByGuildId(
     guildId: number,
     options?: {
-      membersCnt?: number;
       onlyMember?: boolean;
       onlyManager?: boolean;
+      pageIdx?: number;
+      pageSize?: number;
     }
   ) {
     const membersData = await prisma.guildMember.findMany({
       where: {
         guildId,
       },
-      take: options?.membersCnt ?? 20,
+      skip: options ? (options.pageIdx ?? 0) * (options.pageSize ?? 20) : 0,
+      take: options?.pageSize ?? 20,
       orderBy: [{ order: 'asc' }, { activityScore: 'desc' }],
     });
     const members: GuildMemberItem[] = [];

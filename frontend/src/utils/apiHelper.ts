@@ -20,7 +20,7 @@ const _convertObjectToQuery = (params?: { [key: string]: any }) => {
   let query = '';
   if (params) {
     for (const [key, value] of Object.entries(params)) {
-      if (value) {
+      if (value !== undefined && value !== null) {
         if (value instanceof Array) {
           for (const item of value) {
             query += `${key}=${item}&`;

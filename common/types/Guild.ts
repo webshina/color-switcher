@@ -60,8 +60,6 @@ export type GuildItem = Omit<
   lastSyncedAt?: Date;
   categories: ChannelCategoryItem[];
   tags: GuildTagItem[];
-  members: GuildMemberItem[];
-  totalMembersCnt: number;
   managementMembers: GuildMemberItem[];
   posts: GuildPostItem[];
   notificationsToGuildManager: NotificationToGuildManagerItem[];

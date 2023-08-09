@@ -3,15 +3,11 @@ import { LoadingSpinner } from './LoadingSpinner';
 
 type Props = {
   loadMore: () => void;
+  isEnd: boolean;
   onLoadCompleted?: () => void;
-  items: any[];
-  itemMaxCnt: number | null;
 };
 export const InfiniteLoader: React.FC<Props> = (props) => {
   const loaderRef = useRef(null);
-
-  const isLoadCompleted =
-    props.itemMaxCnt && props.items.length >= props.itemMaxCnt;
 
   // For infinite scroll
   useEffect(() => {
@@ -39,11 +35,11 @@ export const InfiniteLoader: React.FC<Props> = (props) => {
     return () => {
       observer.disconnect();
     };
-  }, [props.items.length, props.itemMaxCnt]);
+  }, []);
 
   return (
     <>
-      {!isLoadCompleted && (
+      {!props.isEnd && (
         <div ref={loaderRef} className="flex justify-center">
           <LoadingSpinner />
         </div>

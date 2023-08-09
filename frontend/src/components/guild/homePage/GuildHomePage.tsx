@@ -92,10 +92,7 @@ export const GuildHomePage: React.FC<Props> = (props) => {
           <div className="h-16" />
 
           {/* Announcements */}
-          <Announcements
-            guildId={props.guild.id}
-            announcements={props.guild.announcements}
-          />
+          <Announcements guildId={props.guild.id} />
           <div className="h-16" />
 
           {/* Channel list */}
@@ -115,11 +112,7 @@ export const GuildHomePage: React.FC<Props> = (props) => {
           <Title title={'Members'} icon={<BsFillPeopleFill color="white" />} />
           <div className="h-8" />
           {props.guild.isMember ? (
-            props.guild.members && props.guild.members.length > 0 ? (
-              <Members discordMembers={props.guild.members} />
-            ) : (
-              <div>No members ...</div>
-            )
+            <Members guildId={props.guild.id} />
           ) : (
             <div className="flex flex-col items-center p-16 bg-dark-light rounded-lg">
               <div className="text-xl">Only visible to community members</div>
