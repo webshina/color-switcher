@@ -7,7 +7,8 @@ export const useGuild = (props: { guildId: number }) => {
     props.guildId ? 'useGuild' : null,
     async () => {
       const res = await get('/api/guild/' + props.guildId);
-      return res.data as FetchGuildResponse;
+      const guild = res.data as FetchGuildResponse;
+      return guild;
     },
     {
       revalidateOnFocus: false,

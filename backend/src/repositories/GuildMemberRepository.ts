@@ -84,8 +84,11 @@ export class GuildMemberRepository {
       where: {
         guildId,
       },
-      skip: options ? (options.pageIdx ?? 0) * (options.pageSize ?? 20) : 0,
-      take: options?.pageSize ?? 20,
+      skip:
+        options?.pageIdx && options?.pageSize
+          ? options.pageIdx * options.pageSize
+          : undefined,
+      take: options?.pageSize,
       orderBy: [{ order: 'asc' }, { activityScore: 'desc' }],
     });
     const members: GuildMemberItem[] = [];

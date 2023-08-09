@@ -23,7 +23,9 @@ export const ToggleAutoGeneration: React.FC<Props> = (props) => {
         channelId: props.channelId,
         memberId: props.memberId,
       });
-      await mutate('useGuild');
+      if (props.target !== 'member') {
+        await mutate('useGuild');
+      }
 
       toast({
         status: 'success',

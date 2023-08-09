@@ -1,6 +1,6 @@
 import { InfiniteLoader } from '@/components/utils/InfiniteLoader';
 import { LoadingSpinner } from '@/components/utils/LoadingSpinner';
-import { useMembers } from '@/hooks/repository/useMembers';
+import { useMembersInfiniteLoad } from '@/hooks/repository/useMembersInfiniteLoad';
 import React from 'react';
 import { UserProfileCard } from './UserProfileCard';
 
@@ -8,9 +8,10 @@ type Props = {
   guildId: number;
 };
 export const Members: React.FC<Props> = (props) => {
-  const { membersPages, isLoadingMore, isEnd, size, setSize } = useMembers({
-    guildId: props.guildId,
-  });
+  const { membersPages, isLoadingMore, isEnd, size, setSize } =
+    useMembersInfiniteLoad({
+      guildId: props.guildId,
+    });
 
   return (
     <>

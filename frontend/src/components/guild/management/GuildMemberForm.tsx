@@ -1,29 +1,19 @@
 import { GuildMemberItem } from '#/common/types/Guild';
 import { ToggleAutoGeneration } from '@/components/common/ToggleAutoGeneration';
-import { useGuild } from '@/hooks/repository/useGuild';
 import Image from 'next/image';
 import { useState } from 'react';
-import { DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 import 'react-datepicker/dist/react-datepicker.css';
-import { MdDragIndicator } from 'react-icons/md';
-import { GuildMemberPostForm } from './GuildMemberPostForm';
 
 type Props = {
   member: GuildMemberItem;
-  dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+  onChange: () => void;
 };
 export const GuildMemberForm: React.FC<Props> = (props) => {
-  const { data: guild } = useGuild({ guildId: props.member.guildId });
-
   const [generateAuto, setGenerateAuto] = useState(props.member.autoGenerate);
 
   return (
     <div key={props.member.id} className="flex flex-col w-[250px]">
-      <div
-        className="flex justify-center items-center p-2 bg-slate-600 rounded-t-xl"
-        {...props.dragHandleProps}
-      >
-        <MdDragIndicator size={20} />
+      <div className="flex justify-center items-center p-2 bg-slate-600 rounded-t-xl">
         <div className="flex-1 text-center">{props.member.name}</div>
       </div>
 
@@ -50,19 +40,9 @@ export const GuildMemberForm: React.FC<Props> = (props) => {
             isChecked={generateAuto}
             onChange={(value) => {
               setGenerateAuto(value);
+              props.onChange();
             }}
           />
-        </div>
-        <div className="h-1" />
-        <div className="p-2 border-[1px] border-gray-500 rounded">
-          {guild?.posts.map((post) => (
-            <GuildMemberPostForm
-              key={post.id}
-              post={post}
-              member={props.member}
-              disabled={generateAuto}
-            />
-          ))}
         </div>
       </div>
     </div>

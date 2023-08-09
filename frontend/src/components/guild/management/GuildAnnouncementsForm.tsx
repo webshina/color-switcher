@@ -1,4 +1,3 @@
-import { GuildAnnouncementItem } from '#/common/types/Guild';
 import { LoadingSpinner } from '@/components/utils/LoadingSpinner';
 import Title from '@/components/utils/Title';
 import { useAnnouncements } from '@/hooks/repository/useAnnouncements';
@@ -9,7 +8,6 @@ import { AnnouncementCard } from '../homePage/AnnouncementCard';
 
 type Props = {
   guildId: number;
-  announcements: GuildAnnouncementItem[];
 };
 export const GuildAnnouncementsForm: React.FC<Props> = (props) => {
   const { announcementsPages, isLoadingMore, isEnd, size, setSize, mutate } =

@@ -15,8 +15,8 @@ const getMembers = async (req: Request, res: Response) => {
   const result: GetGuildMembersResponse = isMember
     ? await GuildMemberRepository.getByGuildId(Number(guildId), {
         onlyMember: true,
-        pageIdx: Number(pageIdx),
-        pageSize: Number(pageSize),
+        pageIdx: pageIdx ? Number(pageIdx) : undefined,
+        pageSize: pageSize ? Number(pageSize) : undefined,
       })
     : [];
 
