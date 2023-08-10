@@ -1,5 +1,4 @@
 import { GuildMemberItem } from '#/common/types/Guild';
-import { ToggleAutoGeneration } from '@/components/common/ToggleAutoGeneration';
 import Image from 'next/image';
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -28,21 +27,6 @@ export const GuildMemberForm: React.FC<Props> = (props) => {
               className="rounded-xl"
             />
           </div>
-        </div>
-        <div className="h-4" />
-
-        <div className="flex justify-between">
-          <div className="text-sm">Post</div>
-          <ToggleAutoGeneration
-            guildId={props.member.guildId}
-            memberId={props.member.id}
-            target="member"
-            isChecked={generateAuto}
-            onChange={(value) => {
-              setGenerateAuto(value);
-              props.onChange();
-            }}
-          />
         </div>
       </div>
     </div>
