@@ -52,7 +52,9 @@ export const UserProfileCard: React.FC<Props> = (props) => {
             {/* User image */}
             <div className="relative w-[150px]">
               <Image
-                src={props.member.avatarURL ?? '/images/no_image.jpeg'}
+                src={
+                  props.member.avatarURL ?? '/images/snsIcons/Discord_dark.svg'
+                }
                 alt="image"
                 layout="fill"
                 objectFit="cover"
