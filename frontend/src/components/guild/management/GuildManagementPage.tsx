@@ -101,10 +101,7 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
           <div className="h-16" />
 
           {/* Management Members */}
-          <GuildManagementMemberForm
-            guildId={props.guild.id}
-            managementMembers={props.guild.managementMembers}
-          />
+          <GuildManagementMemberForm guildId={props.guild.id} />
           <div className="h-16" />
 
           {/* Announcements */}

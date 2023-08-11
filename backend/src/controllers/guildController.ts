@@ -23,7 +23,7 @@ const get = async (req: Request, res: Response) => {
     ? await GuildMemberRepository.isMember(Number(id), user.id)
     : false;
   const isManager = user
-    ? await GuildMemberRepository.isManager(Number(id), user.id)
+    ? await GuildMemberRepository.hasManagePermission(Number(id), user.id)
     : false;
 
   const result = await GuildRepository.getById(Number(id), {
@@ -99,7 +99,7 @@ const getAnnouncements = async (req: Request, res: Response) => {
 
   const user = await UserRepository.getLoginUser(req);
   const isManager = user
-    ? await GuildMemberRepository.isManager(Number(guildId), user.id)
+    ? await GuildMemberRepository.hasManagePermission(Number(guildId), user.id)
     : false;
 
   const result: GetGuildAnnouncementsResponse =

@@ -1,6 +1,6 @@
-import { GuildMemberItem } from '#/common/types/Guild';
 import { ToggleAutoGeneration } from '@/components/common/ToggleAutoGeneration';
 import Title from '@/components/utils/Title';
+import { useManagementMembers } from '@/hooks/repository/useManagementMembers';
 import { useMembers } from '@/hooks/repository/useMembers';
 import useInputField from '@/hooks/utils/useInputField';
 import { post } from '@/utils/apiHelper';
@@ -23,11 +23,13 @@ import { UserProfileCard } from '../homePage/UserProfileCard';
 
 type Props = {
   guildId: number;
-  managementMembers: GuildMemberItem[];
 };
 export const GuildManagementMemberForm: React.FC<Props> = (props) => {
   const toast = useToast();
 
+  const { data: managementMembers } = useManagementMembers({
+    guildId: props.guildId,
+  });
   const { data: members } = useMembers({
     guildId: props.guildId,
   });
@@ -61,7 +63,7 @@ export const GuildManagementMemberForm: React.FC<Props> = (props) => {
       await post(
         `/api/guild/${props.guildId}/member/${addingMemberId}/management-member/add`
       );
-      await mutate('useGuild');
+      await mutate('useManagementMembers');
       toast({
         status: 'success',
         description: 'Saved',
@@ -80,7 +82,7 @@ export const GuildManagementMemberForm: React.FC<Props> = (props) => {
       await post(
         `/api/guild/${props.guildId}/member/${deleteMemberId}/management-member/delete`
       );
-      await mutate('useGuild');
+      await mutate('useManagementMembers');
       toast({
         status: 'success',
         description: 'Saved',
@@ -172,7 +174,7 @@ export const GuildManagementMemberForm: React.FC<Props> = (props) => {
       </div>
       <div className="h-5" />
       <div className="flex flex-wrap justify-center lg:justify-start items-center">
-        {props.managementMembers.map((member) => (
+        {managementMembers?.map((member) => (
           <div className="relative m-1">
             <button
               className="absolute right-2 top-2"

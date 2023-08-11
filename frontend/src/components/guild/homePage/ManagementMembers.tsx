@@ -1,13 +1,17 @@
-import { GuildMemberItem } from '#/common/types/Guild';
+import { useManagementMembers } from '@/hooks/repository/useManagementMembers';
 import { UserProfileCard } from './UserProfileCard';
 
 type Props = {
-  members: GuildMemberItem[];
+  guildId: number;
 };
 export const ManagementMembers: React.FC<Props> = (props) => {
+  const { data: members } = useManagementMembers({
+    guildId: props.guildId,
+  });
+
   return (
     <div className="flex flex-wrap justify-center lg:justify-start">
-      {props.members.map((member) => (
+      {members?.map((member) => (
         <div className="m-2" key={member.id}>
           <UserProfileCard member={member} />
         </div>

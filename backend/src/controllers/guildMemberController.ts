@@ -24,6 +24,15 @@ const getMembers = async (req: Request, res: Response) => {
   return res.json(result);
 };
 
+const getManagementMembers = async (req: Request, res: Response) => {
+  const { guildId } = req.params;
+
+  const result: GetGuildMembersResponse =
+    await GuildMemberRepository.getManagersByGuildId(Number(guildId));
+
+  return res.json(result);
+};
+
 const addAsManagementMember = async (req: Request, res: Response) => {
   const { guildId, memberId } = req.params;
 
@@ -81,6 +90,7 @@ const updateMembers = async (req: Request, res: Response) => {
 
 export default {
   getMembers,
+  getManagementMembers,
   addAsManagementMember,
   deleteAsManagementMember,
   updateMembers,

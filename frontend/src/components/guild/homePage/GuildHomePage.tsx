@@ -88,7 +88,7 @@ export const GuildHomePage: React.FC<Props> = (props) => {
             icon={<MdManageAccounts color="white" />}
           />
           <div className="h-8" />
-          <ManagementMembers members={props.guild.managementMembers} />
+          <ManagementMembers guildId={props.guild.id} />
           <div className="h-16" />
 
           {/* Announcements */}

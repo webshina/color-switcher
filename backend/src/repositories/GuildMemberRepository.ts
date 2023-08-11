@@ -119,6 +119,17 @@ export class GuildMemberRepository {
           },
         },
       },
+      orderBy: [
+        {
+          order: 'asc',
+        },
+        {
+          activityScore: 'desc',
+        },
+        {
+          id: 'asc',
+        },
+      ],
     });
 
     // Format data
@@ -506,7 +517,7 @@ export class GuildMemberRepository {
     return isMember;
   }
 
-  static async isManager(guildId: number, userId: number) {
+  static async hasManagePermission(guildId: number, userId: number) {
     const guild = await prisma.guild.findUnique({
       where: {
         id: guildId,
