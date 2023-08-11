@@ -100,7 +100,7 @@ export class GuildMemberRepository {
     return members;
   }
 
-  static async getManagersByGuildId(guildId: number) {
+  static async getManagementMembersByGuildId(guildId: number) {
     const membersData = await prisma.guildMember.findMany({
       where: {
         guildId,
@@ -207,7 +207,7 @@ export class GuildMemberRepository {
         }
 
         // Upsert posts
-        if (newGuildMemberData.autoGenerate) {
+        if (guildData.autoGenerateManagerPost) {
           const postIds = [];
           if (
             this.hasPermission(
@@ -533,8 +533,10 @@ export class GuildMemberRepository {
       },
     });
 
-    const isManager = guildMembers.some((member) =>
-      this.hasPermission(Number(member.permissions), 'MANAGE_GUILD')
+    const isManager = guildMembers.some(
+      (member) =>
+        this.hasPermission(Number(member.permissions), 'MANAGE_GUILD') &&
+        member.userId === userId
     );
 
     return isManager;

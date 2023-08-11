@@ -38,6 +38,7 @@ const DynamicDragDropContext = dynamic(
 
 type Props = {
   guildId: number;
+  autoGenerate: boolean;
 };
 export const GuildManagementMembersForm: React.FC<Props> = (props) => {
   const toast = useToast();
@@ -58,7 +59,8 @@ export const GuildManagementMembersForm: React.FC<Props> = (props) => {
     setManagementMembers(managementMembersData ?? []);
   }, [JSON.stringify(managementMembersData)]);
 
-  const [generateAuto, setGenerateAuto] = useState<boolean>(false);
+  // Auto Generation
+  const [generateAuto, setGenerateAuto] = useState<boolean>(props.autoGenerate);
 
   const saveOrder = async (result: DropResult) => {
     if (!managementMembersData) return;
@@ -168,7 +170,7 @@ export const GuildManagementMembersForm: React.FC<Props> = (props) => {
       <div className="flex justify-end">
         <ToggleAutoGeneration
           guildId={props.guildId}
-          target="description"
+          target="managementMembers"
           isChecked={generateAuto}
           onChange={(value) => {
             setGenerateAuto(value);
@@ -207,6 +209,7 @@ export const GuildManagementMembersForm: React.FC<Props> = (props) => {
                       <GuildManagementMemberForm
                         key={member.id}
                         member={member}
+                        editable={!generateAuto}
                         dragHandleProps={provided.dragHandleProps}
                       />
                     </div>
@@ -215,12 +218,14 @@ export const GuildManagementMembersForm: React.FC<Props> = (props) => {
               ))}
 
               {/* Add Button */}
-              <button
-                className="flex justify-center items-center m-5 w-[50px] h-[50px] bg-slate-600 rounded-full"
-                onClick={onOpenAddModal}
-              >
-                <FaPlus size={30} />
-              </button>
+              {!generateAuto && (
+                <button
+                  className="flex justify-center items-center m-5 w-[50px] h-[50px] bg-slate-600 rounded-full"
+                  onClick={onOpenAddModal}
+                >
+                  <FaPlus size={30} />
+                </button>
+              )}
             </div>
           )}
         </DynamicDroppable>

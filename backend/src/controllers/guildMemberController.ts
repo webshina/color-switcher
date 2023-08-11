@@ -28,7 +28,7 @@ const getManagementMembers = async (req: Request, res: Response) => {
   const { guildId } = req.params;
 
   const result: GetGuildMembersResponse =
-    await GuildMemberRepository.getManagersByGuildId(Number(guildId));
+    await GuildMemberRepository.getManagementMembersByGuildId(Number(guildId));
 
   return res.json(result);
 };

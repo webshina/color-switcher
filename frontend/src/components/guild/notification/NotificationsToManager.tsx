@@ -20,12 +20,11 @@ type Props = {
 };
 export const NotificationsToManager: React.FC<Props> = (props) => {
   const screenSize = useScreenSize();
+  const isOwner = props.user?.guilds.some(
+    (guild) => guild.id === props.guild.id && guild.isOwner
+  );
   const [isOpenModal, setIsOpenModal] = React.useState<boolean>(
-    props.user &&
-      props.guild.managementMembers.some(
-        (member) => member.discordId === props.user?.discordId
-      ) &&
-      props.guild.notificationsToGuildManager?.length > 0
+    isOwner && props.guild.notificationsToGuildManager?.length > 0
       ? true
       : false
   );

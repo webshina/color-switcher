@@ -2,4 +2,5 @@ export type AutoGenerateTarget =
   | 'description'
   | 'shareMessage'
   | 'tags'
-  | 'member';
+  | 'member'
+  | 'managementMembers';

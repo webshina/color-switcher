@@ -1,9 +1,9 @@
 import { messages } from '#/common/constants/messages';
-import { GuildItem } from '#/common/types/Guild';
+import { prisma } from '@/lib/prisma';
 import { GuildMemberRepository } from '@/repositories/GuildMemberRepository';
-import { GuildRepository } from '@/repositories/GuildRepository';
 import { UserRepository } from '@/repositories/UserRepository';
 import { isError } from '@/utils/typeNarrower';
+import { Guild } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
 export const isGuildManager = async (
@@ -15,30 +15,60 @@ export const isGuildManager = async (
   const userItem = await UserRepository.getLoginUser(req);
   if (!userItem) return res.status(401).json('Unauthorized');
 
-  // Check if guild id exists
+  // Check if guild id exists in params
   const paramGuildId = req.params.guildId;
   const paramGuildDiscordId = req.params.guildDiscordId;
   if (!paramGuildId && !paramGuildDiscordId)
     return res.status(400).json('Guild ID is required');
 
+  // Fetch Guild Data
+  let guildData: Guild | null = null;
+  if (paramGuildId) {
+    guildData = await prisma.guild.findUnique({
+      where: {
+        id: Number(paramGuildId),
+      },
+    });
+  } else if (paramGuildDiscordId) {
+    guildData = await prisma.guild.findUnique({
+      where: {
+        discordId: paramGuildDiscordId,
+      },
+    });
+  }
+  if (!guildData) {
+    return res.status(404).json('Guild not found');
+  }
+
   // Fetch guild management members
-  let guildData: GuildItem | null = null;
   let managementMembers: { discordId: string }[] = [];
   if (paramGuildId) {
-    guildData = await GuildRepository.getById(Number(paramGuildId));
-    managementMembers = guildData!.managementMembers.map(
-      (managementMember) => ({
-        discordId: managementMember.discordId,
-      })
-    );
+    const members = await prisma.guildMember.findMany({
+      where: {
+        guildId: guildData.id,
+      },
+    });
+    managementMembers = members
+      .filter((member) =>
+        GuildMemberRepository.hasPermission(member.id, 'MANAGE_GUILD')
+      )
+      .map((member) => ({
+        discordId: member.discordId,
+      }));
   } else if (paramGuildDiscordId) {
     try {
-      guildData = await GuildRepository.getByDiscordId(paramGuildDiscordId);
-      managementMembers = guildData!.managementMembers.map(
-        (managementMember) => ({
-          discordId: managementMember.discordId,
-        })
-      );
+      const members = await prisma.guildMember.findMany({
+        where: {
+          guildId: guildData.id,
+        },
+      });
+      managementMembers = members
+        .filter((member) =>
+          GuildMemberRepository.hasPermission(member.id, 'MANAGE_GUILD')
+        )
+        .map((member) => ({
+          discordId: member.discordId,
+        }));
     } catch (error) {
       // pass
     }

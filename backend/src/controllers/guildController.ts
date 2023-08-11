@@ -147,7 +147,8 @@ const toggleAutoGeneration = async (req: Request, res: Response) => {
   if (
     target === 'tags' ||
     target === 'description' ||
-    target === 'shareMessage'
+    target === 'shareMessage' ||
+    target === 'managementMembers'
   ) {
     await GuildRepository.toggleAutoGeneration(Number(guildId), {
       target,

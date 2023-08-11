@@ -1,7 +1,6 @@
 import { useGuild } from '@/hooks/repository/useGuild';
 import { useMe } from '@/hooks/repository/useMe';
 import 'react-datepicker/dist/react-datepicker.css';
-import { LoadingSpinner } from '../utils/LoadingSpinner';
 import { GuildHomePageSwitch, Page } from './GuildHomePageSwitch';
 import { GuildHomePage } from './homePage/GuildHomePage';
 import { GuildManagementPage } from './management/GuildManagementPage';
@@ -11,20 +10,20 @@ type Props = {
   guildId: number;
 };
 export const GuildTop: React.FC<Props> = (props) => {
-  const { data: guild, isValidating } = useGuild({ guildId: props.guildId });
+  const { data: guild } = useGuild({ guildId: props.guildId });
   const { data: user } = useMe();
-  const isOwner = guild?.managementMembers.some(
-    (member) => member.discordId === user?.discordId
+  const isOwner = user?.guilds.some(
+    (guild) => guild.id === props.guildId && guild.isOwner
   );
-
-  if (isValidating) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <>
       {guild && (
-        <>
+        <div
+          style={{
+            visibility: props.guildId === guild.id ? 'visible' : 'hidden', // Hide if loading
+          }}
+        >
           {/* Home Page */}
           {props.page === 'home' && <GuildHomePage guild={guild} user={user} />}
 
@@ -43,7 +42,7 @@ export const GuildTop: React.FC<Props> = (props) => {
               />
             </div>
           )}
-        </>
+        </div>
       )}
     </>
   );

@@ -47,6 +47,29 @@ const discordConnect = async (req: Request, res: Response) => {
     create: savingUserData,
   });
 
+  // Relate user to guildMembers
+  const guildMembers = await prisma.guildMember.findMany({
+    where: {
+      discordId: authData.id,
+    },
+  });
+  await Promise.all(
+    guildMembers.map((guildMember) =>
+      prisma.guildMember.update({
+        where: {
+          id: guildMember.id,
+        },
+        data: {
+          user: {
+            connect: {
+              id: user.id,
+            },
+          },
+        },
+      })
+    )
+  );
+
   // Set cookie
   res.cookie('accessToken', tokenData.access_token, {
     httpOnly: true,
