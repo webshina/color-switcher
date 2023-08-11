@@ -192,7 +192,7 @@ export const GuildManagementMembersForm: React.FC<Props> = (props) => {
             <div
               {...provided.droppableProps}
               ref={provided.innerRef}
-              className="flex flex-col lg:flex-row justify-start items-center"
+              className="flex flex-col lg:flex-row justify-start items-center overflow-auto"
             >
               {managementMembers.map((member, index) => (
                 <DynamicDraggable
