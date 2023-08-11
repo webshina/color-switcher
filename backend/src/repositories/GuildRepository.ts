@@ -220,9 +220,14 @@ export class GuildRepository {
           where: byOwner
             ? undefined
             : {
-                hideAsAnnouncement: {
-                  not: false,
-                },
+                OR: [
+                  {
+                    hideAsAnnouncement: false,
+                  },
+                  {
+                    hideAsAnnouncement: null,
+                  },
+                ],
               },
           skip: pageIdx * pageSize,
           take: pageSize,
