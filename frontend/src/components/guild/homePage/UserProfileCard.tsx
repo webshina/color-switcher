@@ -13,6 +13,7 @@ import { UserProfile } from './UserProfile';
 
 type Props = {
   member: GuildMemberItem;
+  canOpenDetail?: boolean;
 };
 
 export const UserProfileCard: React.FC<Props> = (props) => {
@@ -39,7 +40,13 @@ export const UserProfileCard: React.FC<Props> = (props) => {
         </ModalContent>
       </Modal>
 
-      <button id="user-profile-card" onClick={onOpenModal}>
+      <button
+        id="user-profile-card"
+        style={{
+          cursor: props.canOpenDetail ?? true ? 'pointer' : 'default',
+        }}
+        onClick={props.canOpenDetail ?? true ? onOpenModal : undefined}
+      >
         <div className="flex flex-col rounded-xl">
           <div className="flex h-[150px]">
             {/* User image */}
@@ -53,7 +60,7 @@ export const UserProfileCard: React.FC<Props> = (props) => {
               />
             </div>
             <div className="flex flex-col items-start w-[200px] p-3 bg-slate-900 rounded-r-xl">
-              <div className="text-base font-bold">
+              <div className="text-left text-base font-bold">
                 {props.member.displayName}{' '}
                 <span className="text-xs font-light">{props.member.name}</span>
               </div>

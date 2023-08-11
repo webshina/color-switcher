@@ -102,9 +102,16 @@ router.post(
   guildMemberController.updateMembers
 );
 router.post(
-  '/api/guild/:guildId/member/:memberId/posts',
+  '/api/guild/:guildId/member/:memberId/management-member/add',
   withAuth,
-  guildMemberController.updatePosts
+  isGuildManager,
+  guildMemberController.addAsManagementMember
+);
+router.post(
+  '/api/guild/:guildId/member/:memberId/management-member/delete',
+  withAuth,
+  isGuildManager,
+  guildMemberController.deleteAsManagementMember
 );
 
 // Notification

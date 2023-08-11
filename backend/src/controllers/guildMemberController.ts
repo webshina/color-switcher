@@ -1,4 +1,5 @@
 import { GetGuildMembersResponse } from '#/common/types/apiResponses/GuildMemberControllerResponse';
+import { prisma } from '@/lib/prisma';
 import { GuildMemberRepository } from '@/repositories/GuildMemberRepository';
 import { UserRepository } from '@/repositories/UserRepository';
 import { Request, Response } from 'express';
@@ -23,6 +24,47 @@ const getMembers = async (req: Request, res: Response) => {
   return res.json(result);
 };
 
+const addAsManagementMember = async (req: Request, res: Response) => {
+  const { guildId, memberId } = req.params;
+
+  const managerPost = await prisma.guildPost.findUnique({
+    where: {
+      guildId_name: {
+        guildId: Number(guildId),
+        name: 'MANAGER',
+      },
+    },
+  });
+
+  await GuildMemberRepository.updatePosts(Number(memberId), [
+    Number(managerPost!.id),
+  ]);
+
+  return res.json('success');
+};
+
+const deleteAsManagementMember = async (req: Request, res: Response) => {
+  const { guildId, memberId } = req.params;
+
+  const managerPost = await prisma.guildPost.findUnique({
+    where: {
+      guildId_name: {
+        guildId: Number(guildId),
+        name: 'MANAGER',
+      },
+    },
+  });
+
+  await prisma.guildMemberPostRelation.deleteMany({
+    where: {
+      guildMemberId: Number(memberId),
+      guildPostId: managerPost!.id,
+    },
+  });
+
+  return res.json('success');
+};
+
 const updateMembers = async (req: Request, res: Response) => {
   const { guildId } = req.params;
   const { orders } = req.body;
@@ -37,13 +79,9 @@ const updateMembers = async (req: Request, res: Response) => {
   return res.json('success');
 };
 
-const updatePosts = async (req: Request, res: Response) => {
-  const { memberId } = req.params;
-  const { posts } = req.body;
-
-  await GuildMemberRepository.updatePosts(Number(memberId), posts);
-
-  return res.json('success');
+export default {
+  getMembers,
+  addAsManagementMember,
+  deleteAsManagementMember,
+  updateMembers,
 };
-
-export default { getMembers, updatePosts, updateMembers };
