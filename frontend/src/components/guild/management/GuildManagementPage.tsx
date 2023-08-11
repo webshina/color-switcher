@@ -9,7 +9,7 @@ import { GuildAnnouncementsForm } from './GuildAnnouncementsForm';
 import { GuildChannelCategoryForm } from './GuildChannelCategoryForm';
 import { GuildCoverImageForm } from './GuildCoverImageForm';
 import { GuildDescriptionForm } from './GuildDescriptionForm';
-import { GuildManagementMemberForm } from './GuildManagementMembersForm';
+import { GuildManagementMembersForm } from './GuildManagementMembersForm';
 import { GuildPublishToggle } from './GuildPublishToggle';
 import { GuildShareMessageForm } from './GuildShareMessageForm';
 import { GuildTagForm } from './GuildTagForm';
@@ -101,7 +101,7 @@ export const GuildManagementPage: React.FC<Props> = (props) => {
           <div className="h-16" />
 
           {/* Management Members */}
-          <GuildManagementMemberForm guildId={props.guild.id} />
+          <GuildManagementMembersForm guildId={props.guild.id} />
           <div className="h-16" />
 
           {/* Announcements */}

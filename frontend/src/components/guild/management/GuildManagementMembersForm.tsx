@@ -1,8 +1,10 @@
+import { GuildMemberItem } from '#/common/types/Guild';
 import { ToggleAutoGeneration } from '@/components/common/ToggleAutoGeneration';
 import Title from '@/components/utils/Title';
 import { useManagementMembers } from '@/hooks/repository/useManagementMembers';
 import { useMembers } from '@/hooks/repository/useMembers';
 import useInputField from '@/hooks/utils/useInputField';
+import { useScreenSize } from '@/hooks/utils/useScreenSize';
 import { post } from '@/utils/apiHelper';
 import {
   Button,
@@ -14,55 +16,69 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+import { DropResult } from 'react-beautiful-dnd';
 import 'react-datepicker/dist/react-datepicker.css';
-import { AiFillDelete } from 'react-icons/ai';
 import { FaPlus } from 'react-icons/fa';
 import { mutate } from 'swr';
-import { UserProfileCard } from '../homePage/UserProfileCard';
+import { GuildManagementMemberForm } from './GuildManagementMemberForm';
+const DynamicDroppable = dynamic(
+  () => import('react-beautiful-dnd').then((mod) => mod.Droppable),
+  { ssr: false }
+);
+const DynamicDraggable = dynamic(
+  () => import('react-beautiful-dnd').then((mod) => mod.Draggable),
+  { ssr: false }
+);
+const DynamicDragDropContext = dynamic(
+  () => import('react-beautiful-dnd').then((mod) => mod.DragDropContext),
+  { ssr: false }
+);
 
 type Props = {
   guildId: number;
 };
-export const GuildManagementMemberForm: React.FC<Props> = (props) => {
+export const GuildManagementMembersForm: React.FC<Props> = (props) => {
   const toast = useToast();
 
-  const { data: managementMembers } = useManagementMembers({
+  const screenSize = useScreenSize();
+
+  const { data: managementMembersData } = useManagementMembers({
     guildId: props.guildId,
   });
-  const { data: members } = useMembers({
+  const { data: membersData } = useMembers({
     guildId: props.guildId,
   });
+
+  const [managementMembers, setManagementMembers] = useState<GuildMemberItem[]>(
+    []
+  );
+  useEffect(() => {
+    setManagementMembers(managementMembersData ?? []);
+  }, [JSON.stringify(managementMembersData)]);
+
   const [generateAuto, setGenerateAuto] = useState<boolean>(false);
 
-  const {
-    isOpen: isOpenAddModal,
-    onOpen: onOpenAddModal,
-    onClose: onCloseAddModal,
-  } = useDisclosure();
-  const {
-    isOpen: isOpenDeleteModal,
-    onOpen: onOpenDeleteModal,
-    onClose: onCloseDeleteModal,
-  } = useDisclosure();
+  const saveOrder = async (result: DropResult) => {
+    if (!managementMembersData) return;
 
-  const { inputField: addingMemberInputField, valueState: addingMemberId } =
-    useInputField({
-      id: 'add-member-id',
-      type: 'select',
-      options:
-        members?.map((member) => ({
-          label: member.name as string,
-          value: member.id,
-        })) ?? [],
+    // Sort on screen
+    const newMembers = Array.from(managementMembersData);
+    const [recordedItem] = newMembers.splice(result.source.index, 1);
+    newMembers.splice(result.destination!.index, 0, recordedItem);
+    setManagementMembers(newMembers);
+    const orders = newMembers.map((member, index) => {
+      return {
+        id: member.id,
+        order: index,
+      };
     });
-  const [deleteMemberId, setDeleteMemberId] = useState<number>();
 
-  const addManagementMember = async () => {
     try {
-      await post(
-        `/api/guild/${props.guildId}/member/${addingMemberId}/management-member/add`
-      );
+      await post(`/api/guild/${props.guildId}/members`, {
+        orders,
+      });
       await mutate('useManagementMembers');
       toast({
         status: 'success',
@@ -77,10 +93,27 @@ export const GuildManagementMemberForm: React.FC<Props> = (props) => {
     }
   };
 
-  const deleteManagementMember = async () => {
+  const {
+    isOpen: isOpenAddModal,
+    onOpen: onOpenAddModal,
+    onClose: onCloseAddModal,
+  } = useDisclosure();
+
+  const { inputField: addingMemberInputField, valueState: addingMemberId } =
+    useInputField({
+      id: 'add-member-id',
+      type: 'select',
+      options:
+        membersData?.map((member) => ({
+          label: member.name as string,
+          value: member.id,
+        })) ?? [],
+    });
+
+  const addManagementMember = async () => {
     try {
       await post(
-        `/api/guild/${props.guildId}/member/${deleteMemberId}/management-member/delete`
+        `/api/guild/${props.guildId}/member/${addingMemberId}/management-member/add`
       );
       await mutate('useManagementMembers');
       toast({
@@ -130,36 +163,6 @@ export const GuildManagementMemberForm: React.FC<Props> = (props) => {
         </ModalContent>
       </Modal>
 
-      {/* Delete Modal */}
-      <Modal
-        closeOnOverlayClick={true}
-        isOpen={isOpenDeleteModal}
-        onClose={onCloseDeleteModal}
-        isCentered
-      >
-        <ModalOverlay />
-        <ModalContent bgColor="#222">
-          <ModalCloseButton />
-          <ModalBody>
-            <div className="flex flex-col justify-center items-center p-8">
-              Are you sure you want to delete this member from the manager?
-              <div className="h-5" />
-              <div className="w-full text-right">
-                <Button
-                  colorScheme="pink"
-                  onClick={async () => {
-                    await deleteManagementMember();
-                    onCloseDeleteModal();
-                  }}
-                >
-                  Delete
-                </Button>
-              </div>
-            </div>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
       <Title title="Management Members" />
       <div className="h-5" />
       <div className="flex justify-end">
@@ -173,28 +176,55 @@ export const GuildManagementMemberForm: React.FC<Props> = (props) => {
         />
       </div>
       <div className="h-5" />
-      <div className="flex flex-wrap justify-center lg:justify-start items-center">
-        {managementMembers?.map((member) => (
-          <div className="relative m-1">
-            <button
-              className="absolute right-2 top-2"
-              onClick={() => {
-                setDeleteMemberId(member.id);
-                onOpenDeleteModal();
-              }}
-            >
-              <AiFillDelete size={20} color="#fe4a49" />
-            </button>
-            <UserProfileCard member={member} canOpenDetail={false} />
-          </div>
-        ))}
-        <button
-          className="flex justify-center items-center m-5 w-[50px] h-[50px] bg-slate-600 rounded-full"
-          onClick={onOpenAddModal}
+
+      <DynamicDragDropContext
+        onDragEnd={(result) => {
+          saveOrder(result);
+        }}
+      >
+        <DynamicDroppable
+          droppableId="category"
+          direction={screenSize === 'lg' ? 'horizontal' : 'vertical'}
         >
-          <FaPlus size={30} />
-        </button>
-      </div>
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="flex flex-col lg:flex-row justify-start items-center"
+            >
+              {managementMembers.map((member, index) => (
+                <DynamicDraggable
+                  key={member.id}
+                  draggableId={member.id.toString()}
+                  index={index}
+                >
+                  {(provided) => (
+                    <div
+                      className="m-1"
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                    >
+                      <GuildManagementMemberForm
+                        key={member.id}
+                        member={member}
+                        dragHandleProps={provided.dragHandleProps}
+                      />
+                    </div>
+                  )}
+                </DynamicDraggable>
+              ))}
+
+              {/* Add Button */}
+              <button
+                className="flex justify-center items-center m-5 w-[50px] h-[50px] bg-slate-600 rounded-full"
+                onClick={onOpenAddModal}
+              >
+                <FaPlus size={30} />
+              </button>
+            </div>
+          )}
+        </DynamicDroppable>
+      </DynamicDragDropContext>
     </>
   );
 };
