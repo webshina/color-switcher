@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import axios from 'axios';
 import { Request, Response, Router } from 'express';
+import { adminUserData } from 'prisma/seeds/data';
 import { stringify } from 'querystring';
 const router = Router();
 
@@ -80,6 +81,31 @@ const discordConnect = async (req: Request, res: Response) => {
   res.json({ user });
 };
 
+const testLogin = async (req: Request, res: Response) => {
+  const { discordAccessToken, discordRefreshToken } = req.body;
+  if (
+    discordAccessToken !== adminUserData.discordAccessToken ||
+    discordRefreshToken !== adminUserData.discordRefreshToken
+  ) {
+    return res.status(401).json('Invalid credentials');
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      discordId: adminUserData.discordId,
+    },
+  });
+  if (!user) return res.status(401).json('Not found');
+
+  res.cookie('accessToken', user.discordAccessToken, {
+    httpOnly: true,
+    secure: process.env.APP_ENV !== 'development',
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+  });
+
+  res.json({ user });
+};
+
 const logout = async (req: Request, res: Response) => {
   const { accessToken } = req.cookies;
   if (accessToken) {
@@ -98,4 +124,4 @@ const logout = async (req: Request, res: Response) => {
   res.json({ success: true });
 };
 
-export default { discordConnect, logout };
+export default { discordConnect, testLogin, logout };

@@ -11,6 +11,7 @@ export const DiscordConnectBtn: React.FC<Props> = (props) => {
   };
   return !user && !loadingUser ? (
     <button
+      id="discord-connect-btn"
       className="flex justify-center items-center bg-discord-purple rounded-lg px-4 py-2"
       onClick={redirect}
     >

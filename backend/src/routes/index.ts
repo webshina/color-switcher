@@ -6,6 +6,7 @@ import guildMessageController from '@/controllers/guildMessageController';
 import testController from '@/controllers/testController';
 import userController from '@/controllers/userController';
 import { withAuth } from '@/middleware/auth';
+import { isAdmin } from '@/middleware/isAdmin';
 import { isGuildManager } from '@/middleware/isGuildManager';
 import { Router } from 'express';
 
@@ -13,6 +14,7 @@ const router = Router();
 
 // Auth
 router.post('/api/auth/discord', authController.discordConnect);
+router.post('/api/auth/test-login', authController.testLogin);
 router.post('/api/auth/logout', withAuth, authController.logout);
 
 // User
@@ -128,5 +130,6 @@ router.post(
 
 // Test
 router.get('/api/test', testController.test);
+router.post('/api/test/seed', withAuth, isAdmin, testController.seed);
 
 export { router };

@@ -2,7 +2,11 @@ import { User } from '../../backend/node_modules/.prisma/client';
 
 export type UserItem = Omit<
   User,
-  'discordTokenExpiresAt' | 'discordRefreshToken' | 'createdAt' | 'updatedAt'
+  | 'discordTokenExpiresAt'
+  | 'discordRefreshToken'
+  | 'isAdmin'
+  | 'createdAt'
+  | 'updatedAt'
 > & {
   guilds: {
     id: number;

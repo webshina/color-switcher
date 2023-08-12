@@ -26,6 +26,7 @@ model User {
   discordAccessToken    String?   @unique
   discordRefreshToken   String?   @unique
   discordTokenExpiresAt DateTime?
+  isAdmin               Boolean   @default(false)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
