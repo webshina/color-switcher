@@ -52,8 +52,10 @@ export const isGuildManager = async (
       .map((member) => ({
         discordId: member.discordId,
       }));
-  } else {
-    // If guild is not registered, fetch management members from bot
+  }
+
+  if (!guildData || managementMembers.length === 0) {
+    // If Guilds or GuildMembers is not registered, fetch management members from bot
     try {
       const fetchedManagementMembers =
         await GuildMemberRepository.fetchManagementMembersFromBot(
