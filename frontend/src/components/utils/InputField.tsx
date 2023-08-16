@@ -156,7 +156,14 @@ const InputField: React.FC<InputFieldProps> = (props) => {
             <>
               {props.options.map((option) => {
                 return (
-                  <option key={option.label} value={option.value}>
+                  <option
+                    key={option.label}
+                    value={option.value}
+                    style={{
+                      backgroundColor: props.disabled ? '#111' : '#222',
+                      color: props.disabled ? '#777' : '#fff',
+                    }}
+                  >
                     {option.label}
                   </option>
                 );
