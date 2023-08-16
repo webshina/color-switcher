@@ -9,7 +9,14 @@ export class UserRepository {
   static async format(user: User) {
     const guildMembers = await prisma.guildMember.findMany({
       where: {
-        userId: user.id,
+        OR: [
+          {
+            userId: user.id,
+          },
+          {
+            discordId: user.discordId,
+          },
+        ],
       },
       include: {
         guild: true,

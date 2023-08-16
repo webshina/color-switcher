@@ -36,13 +36,10 @@ export const isGuildManager = async (
       },
     });
   }
-  if (!guildData) {
-    return res.status(404).json('Guild not found');
-  }
 
   // Fetch guild management members
   let managementMembers: { discordId: string }[] = [];
-  if (paramGuildId) {
+  if (guildData) {
     const members = await prisma.guildMember.findMany({
       where: {
         guildId: guildData.id,
@@ -55,39 +52,20 @@ export const isGuildManager = async (
       .map((member) => ({
         discordId: member.discordId,
       }));
-  } else if (paramGuildDiscordId) {
-    try {
-      const members = await prisma.guildMember.findMany({
-        where: {
-          guildId: guildData.id,
-        },
-      });
-      managementMembers = members
-        .filter((member) =>
-          GuildMemberRepository.hasPermission(member.id, 'MANAGE_GUILD')
-        )
-        .map((member) => ({
-          discordId: member.discordId,
-        }));
-    } catch (error) {
-      // pass
-    }
-
+  } else {
     // If guild is not registered, fetch management members from bot
-    if (managementMembers.length === 0) {
-      try {
-        const fetchedManagementMembers =
-          await GuildMemberRepository.fetchManagementMembersFromBot(
-            paramGuildDiscordId
-          );
-        managementMembers = fetchedManagementMembers.map((member) => ({
-          discordId: member.id,
-        }));
-      } catch (error) {
-        if (isError(error)) {
-          if (error.message === messages.botNotInstalled) {
-            return res.status(400).json(messages.botNotInstalled);
-          }
+    try {
+      const fetchedManagementMembers =
+        await GuildMemberRepository.fetchManagementMembersFromBot(
+          paramGuildDiscordId
+        );
+      managementMembers = fetchedManagementMembers.map((member) => ({
+        discordId: member.id,
+      }));
+    } catch (error) {
+      if (isError(error)) {
+        if (error.message === messages.botNotInstalled) {
+          return res.status(400).json(messages.botNotInstalled);
         }
       }
     }
