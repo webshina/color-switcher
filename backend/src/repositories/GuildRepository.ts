@@ -1005,15 +1005,12 @@ Word:
     }
   }
 
-  static async updateCategory(
-    guildId: number,
-    params: {
-      categoryOrders: {
-        id: number;
-        order: number;
-      }[];
-    }
-  ) {
+  static async updateCategory(params: {
+    categoryOrders: {
+      id: number;
+      order: number;
+    }[];
+  }) {
     await Promise.all(
       params.categoryOrders.map((categoryOrder) =>
         prisma.channelCategory.update({

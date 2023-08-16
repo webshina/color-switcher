@@ -176,10 +176,9 @@ const updateTag = async (req: Request, res: Response) => {
 };
 
 const updateCategory = async (req: Request, res: Response) => {
-  const { guildId } = req.params;
   const { categoryOrders } = req.body;
 
-  await GuildRepository.updateCategory(Number(guildId), { categoryOrders });
+  await GuildRepository.updateCategory({ categoryOrders });
 
   return res.json('success');
 };
