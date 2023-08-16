@@ -82,17 +82,16 @@ const discordConnect = async (req: Request, res: Response) => {
 };
 
 const testLogin = async (req: Request, res: Response) => {
-  const { discordAccessToken, discordRefreshToken } = req.body;
-  if (
-    discordAccessToken !== adminUserData.discordAccessToken ||
-    discordRefreshToken !== adminUserData.discordRefreshToken
-  ) {
-    return res.status(401).json('Invalid credentials');
-  }
-
-  const user = await prisma.user.findUnique({
+  const discordTokenExpiresAt = new Date();
+  discordTokenExpiresAt.setFullYear(discordTokenExpiresAt.getFullYear() + 1);
+  const user = await prisma.user.update({
     where: {
       discordId: adminUserData.discordId,
+    },
+    data: {
+      discordAccessToken: adminUserData.discordAccessToken,
+      discordRefreshToken: adminUserData.discordRefreshToken,
+      discordTokenExpiresAt,
     },
   });
   if (!user) return res.status(401).json('Not found');

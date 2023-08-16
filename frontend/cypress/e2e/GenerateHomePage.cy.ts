@@ -1,19 +1,21 @@
 /// <reference types="cypress" />
 
-import { sampleGuilds } from 'cypress/fixtures/sampleData/guild';
 import { LoginPage } from 'cypress/pages/LoginPage';
 import { deleteData } from 'cypress/plugins/testDataHandler';
+import { sampleGuilds } from '../../../backend/prisma/seeds/sampleData/data';
 
 describe('GenerateHomePage', () => {
   before(() => {
     LoginPage.testLogin();
     deleteData('Guild', { discordId: sampleGuilds.guild1.discordId });
-    cy.visit('/');
+    cy.visit('/guild/create');
   });
 
   beforeEach(() => {});
 
-  context('Validation', () => {
-    it('Can not login with wrong password', () => {});
+  context('Generate', () => {
+    it('Target guild can be selected', () => {
+      cy.get('#guild-id').select(sampleGuilds.guild1.discordId);
+    });
   });
 });

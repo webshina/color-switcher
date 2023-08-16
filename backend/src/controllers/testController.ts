@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { Request, Response } from 'express';
+import { seed } from 'prisma/seeds/seed';
 
 const test = async (req: Request, res: Response) => {
   throw new Error('test error');
@@ -11,7 +12,7 @@ const getModelByName = <T>(modelName: T) => {
   return (prisma as any)[modelName];
 };
 
-const seed = async (req: Request, res: Response) => {
+const handleTestData = async (req: Request, res: Response) => {
   if (process.env.NODE_ENV !== 'development') {
     return res.status(400).json(`Not allowed in ${process.env.NODE_ENV}`);
   }
@@ -32,7 +33,7 @@ const seed = async (req: Request, res: Response) => {
   const prisma = getModelByName(model);
 
   if (method === 'init') {
-    // await initSampleData();
+    await seed();
     return res.json('success');
   } else if (method === 'create') {
     await prisma.create({
@@ -61,4 +62,4 @@ const seed = async (req: Request, res: Response) => {
   }
 };
 
-export default { test, seed };
+export default { test, seed: handleTestData };

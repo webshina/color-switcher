@@ -3,12 +3,12 @@ import { mailTemplate } from './mailTemplate';
 import { createAdmin } from './user';
 const prisma = new PrismaClient();
 
-async function main() {
+async function seed() {
   await mailTemplate();
   await createAdmin();
 }
 
-main()
+seed()
   .catch((e) => {
     console.error(e);
   })
