@@ -1,9 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/winston';
 import axios from 'axios';
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 import { stringify } from 'querystring';
-const router = Router();
 
 const discordConnect = async (req: Request, res: Response) => {
   const { code } = req.body;

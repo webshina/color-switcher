@@ -186,20 +186,17 @@ export class GuildRepository {
   }
 
   static async getByUserId(userId: number) {
-    const guildDataList = await prisma.guild.findMany({
+    const guildMembers = await prisma.guildMember.findMany({
       where: {
-        createdByUserId: userId,
+        userId,
       },
     });
-    if (guildDataList.length === 0) {
-      return [];
-    }
-
     const guildItems = await Promise.all(
-      guildDataList.map(async (guildData) => {
-        return await this.format(guildData.id);
+      guildMembers.map(async (guildMember) => {
+        return await this.format(guildMember.guildId);
       })
     );
+
     return guildItems;
   }
 
