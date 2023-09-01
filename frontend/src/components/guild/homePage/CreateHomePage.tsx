@@ -9,6 +9,7 @@ import { useDisclosure } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
+import { BsFillExclamationCircleFill } from 'react-icons/bs';
 import { MdPrecisionManufacturing } from 'react-icons/md';
 import { mutate } from 'swr';
 import { GuildBatchProgress } from './GuildBatchProgress';
@@ -37,6 +38,10 @@ export const CreateHomePage: React.FC<Props> = (props) => {
         value: guild.discordId,
       })) ?? [],
     value: props.guildDiscordId ?? adminGuilds?.[0]?.discordId,
+    placeholder:
+      adminGuilds && adminGuilds?.length > 0
+        ? 'Select a server'
+        : 'No administrative servers',
   });
 
   // Generate
@@ -103,7 +108,16 @@ export const CreateHomePage: React.FC<Props> = (props) => {
           objectFit="contain"
         />
         <div className="flex flex-col items-center">
-          {selectedGuildDiscordIdInputField}
+          <div>{selectedGuildDiscordIdInputField}</div>
+          <div className="h-8" />
+          <div className="flex ">
+            <BsFillExclamationCircleFill size={20} />
+            <div className="w-2" />
+            <div className="text-gray-200">
+              Only servers with <span className="font-bold">MANAGEMENT</span>{' '}
+              privileges are displayed
+            </div>
+          </div>
           <div className="h-8" />
           {loading ? (
             <GuildBatchProgress
