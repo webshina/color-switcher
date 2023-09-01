@@ -1,21 +1,29 @@
 /// <reference types="cypress" />
 
 import { LoginPage } from 'cypress/pages/LoginPage';
-import { deleteData } from 'cypress/plugins/testDataHandler';
 import { sampleGuilds } from '../../../backend/prisma/seeds/sampleData/data';
 
 describe('GenerateHomePage', () => {
-  before(() => {
-    LoginPage.testLogin();
-    deleteData('Guild', { discordId: sampleGuilds.guild1.discordId });
+  beforeEach(() => {
+    cy.session('login', () => {
+      LoginPage.testLogin();
+    });
+  });
+
+  beforeEach(() => {
     cy.visit('/guild/create');
   });
 
-  beforeEach(() => {});
+  it('Generate button is not shown if no guild is selected', () => {
+    cy.get('#guild-id').select('');
+    cy.get('#generate-btn').should('not.exist');
+  });
 
-  context('Generate', () => {
-    it('Target guild can be selected', () => {
-      cy.get('#guild-id').select(sampleGuilds.guild1.discordId);
-    });
+  it('Can generate homepage', () => {
+    cy.get('#guild-id').select(sampleGuilds.guild1.discordId);
+    cy.get('#generate-btn').click();
+
+    cy.get('#generate-btn').should('not.exist');
+    cy.contains('Homepage generated successfully');
   });
 });

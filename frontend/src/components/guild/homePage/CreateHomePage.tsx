@@ -110,14 +110,18 @@ export const CreateHomePage: React.FC<Props> = (props) => {
               progressRate={progressData?.progressRate ?? 0}
             />
           ) : (
-            <button
-              className="flex justify-center items-center px-8 py-4 gradient-bg-purple-to-pink rounded-xl border border-gray-600 font-bold text-lg"
-              onClick={generate}
-            >
-              <MdPrecisionManufacturing size={30} />
-              <div className="w-2" />
-              Generate
-            </button>
+            selectedGuildDiscordId && (
+              <button
+                id="generate-btn"
+                className="flex justify-center items-center px-8 py-4  disabled:bg-slate-900 gradient-bg-purple-to-pink rounded-xl border border-gray-600 font-bold text-lg"
+                onClick={generate}
+                disabled={!selectedGuildDiscordId}
+              >
+                <MdPrecisionManufacturing size={30} />
+                <div className="w-2" />
+                Generate
+              </button>
+            )
           )}
         </div>
       </div>

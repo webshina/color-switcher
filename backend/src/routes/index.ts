@@ -14,7 +14,6 @@ const router = Router();
 
 // Auth
 router.post('/api/auth/discord', authController.discordConnect);
-router.post('/api/auth/test-login', authController.testLogin);
 router.post('/api/auth/logout', withAuth, authController.logout);
 
 // User
