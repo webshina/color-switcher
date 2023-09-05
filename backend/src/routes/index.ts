@@ -127,6 +127,11 @@ router.post(
   guildController.updateNotificationToManager
 );
 
+// Health Check
+router.get('/api/health-check', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Test
 router.get('/api/test', testController.test);
 router.post('/api/test/seed', withAuth, isAdmin, testController.seed);
