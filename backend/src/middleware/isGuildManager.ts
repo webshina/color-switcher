@@ -37,33 +37,44 @@ export const isGuildManager = async (
     });
   }
 
-  // Fetch guild management members
-  let managementMembers: { discordId: string }[] = [];
-  if (guildData) {
-    const members = await prisma.guildMember.findMany({
-      where: {
-        guildId: guildData.id,
-      },
-    });
-    managementMembers = members
-      .filter((member) =>
-        GuildMemberRepository.hasPermission(member.id, 'MANAGE_GUILD')
-      )
-      .map((member) => ({
-        discordId: member.discordId,
-      }));
+  // Fetch my guild member data
+  const myGuildMemberData = await prisma.guildMember.findFirst({
+    where: {
+      guildId: guildData?.id,
+      userId: userItem.id,
+    },
+  });
+
+  if (myGuildMemberData) {
+    const isManager = GuildMemberRepository.hasPermission(
+      Number(myGuildMemberData.permissions),
+      'MANAGE_GUILD'
+    );
+    if (!isManager) {
+      return res.status(401).json('You are not the manager of this guild.');
+    }
   }
 
-  if (!guildData || managementMembers.length === 0) {
-    // If Guilds or GuildMembers is not registered, fetch management members from bot
+  // If Guilds or GuildMembers is not registered, fetch management members from Bot
+  if (!guildData || !myGuildMemberData) {
     try {
       const fetchedManagementMembers =
         await GuildMemberRepository.fetchManagementMembersFromBot(
           paramGuildDiscordId
         );
-      managementMembers = fetchedManagementMembers.map((member) => ({
+      const managementMembers = fetchedManagementMembers.map((member) => ({
         discordId: member.id,
       }));
+
+      // Check if user is management member
+      const isGuildManager = managementMembers.find((managementMember) => {
+        return managementMember.discordId === userItem.discordId;
+      })
+        ? true
+        : false;
+      if (!isGuildManager) {
+        return res.status(401).json('You are not the manager of this guild.');
+      }
     } catch (error) {
       if (isError(error)) {
         if (error.message === messages.botNotInstalled) {
@@ -71,16 +82,6 @@ export const isGuildManager = async (
         }
       }
     }
-  }
-
-  // Check if user is management member
-  const isGuildManager = managementMembers.find((managementMember) => {
-    return managementMember.discordId === userItem.discordId;
-  })
-    ? true
-    : false;
-  if (!isGuildManager) {
-    return res.status(401).json('You are not the manager of this guild.');
   }
 
   next();
