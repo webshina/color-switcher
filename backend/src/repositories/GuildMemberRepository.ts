@@ -157,111 +157,107 @@ export class GuildMemberRepository {
     }
 
     const fetchedMembers = await props.fetchedGuild.members.fetch();
-    await Promise.all(
-      fetchedMembers.map(async (member) => {
-        const fetchedMember = await member.fetch();
+    for (const fetchedMember of fetchedMembers.values()) {
+      // Skip bots
+      if (fetchedMember.user.bot) {
+        return;
+      }
 
-        // Skip bots
-        if (fetchedMember.user.bot) {
-          return;
-        }
-
-        const existingGuildMember = await prisma.guildMember.findUnique({
-          where: {
-            guildId_discordId: {
-              guildId: props.guildId,
-              discordId: fetchedMember.id,
-            },
+      const existingGuildMember = await prisma.guildMember.findUnique({
+        where: {
+          guildId_discordId: {
+            guildId: props.guildId,
+            discordId: fetchedMember.id,
           },
+        },
+      });
+
+      const data = {
+        discordId: fetchedMember.id,
+        guildId: props.guildId,
+        name: fetchedMember.user.username,
+        permissions: Number(fetchedMember.permissions),
+        displayName: fetchedMember.displayName,
+        avatarURL: fetchedMember.user.avatarURL(),
+        joinedAt: fetchedMember.joinedAt,
+      };
+      let newGuildMemberData: GuildMember;
+      if (existingGuildMember) {
+        if (existingGuildMember.autoGenerate) {
+          newGuildMemberData = await prisma.guildMember.update({
+            where: {
+              guildId_discordId: {
+                guildId: props.guildId,
+                discordId: fetchedMember.id,
+              },
+            },
+            data: {
+              ...data,
+            },
+          });
+        }
+        newGuildMemberData = existingGuildMember;
+      } else {
+        newGuildMemberData = await prisma.guildMember.create({
+          data,
+        });
+      }
+
+      // Upsert posts
+      if (guildData.autoGenerateManagerPost) {
+        const postIds = [];
+        if (
+          this.hasPermission(
+            Number(newGuildMemberData.permissions),
+            'MANAGE_GUILD'
+          )
+        ) {
+          const postData = await prisma.guildPost.findFirst({
+            where: {
+              name: 'MANAGER',
+            },
+          });
+          if (postData) {
+            postIds.push(postData.id);
+          }
+        }
+        await this.updatePosts(newGuildMemberData.id, postIds);
+      }
+
+      // Fetch roles
+      for (const role of fetchedMember.roles.cache.values()) {
+        const data1 = {
+          discordId: role.id,
+          guildId: props.guildId,
+          name: role.name,
+          permissions: role.permissions.bitfield,
+          hexColor: role.hexColor,
+          position: role.position,
+        };
+        const guildRoleData = await prisma.guildRole.upsert({
+          where: {
+            discordId: role.id,
+          },
+          update: data1,
+          create: data1,
         });
 
-        const data = {
-          discordId: fetchedMember.id,
-          guildId: props.guildId,
-          name: fetchedMember.user.username,
-          permissions: Number(fetchedMember.permissions),
-          displayName: fetchedMember.displayName,
-          avatarURL: fetchedMember.user.avatarURL(),
-          joinedAt: fetchedMember.joinedAt,
+        const data2 = {
+          guildMemberId: newGuildMemberData.id,
+          guildRoleId: guildRoleData.id,
         };
-        let newGuildMemberData: GuildMember;
-        if (existingGuildMember) {
-          if (existingGuildMember.autoGenerate) {
-            newGuildMemberData = await prisma.guildMember.update({
-              where: {
-                guildId_discordId: {
-                  guildId: props.guildId,
-                  discordId: fetchedMember.id,
-                },
-              },
-              data: {
-                ...data,
-              },
-            });
-          }
-          newGuildMemberData = existingGuildMember;
-        } else {
-          newGuildMemberData = await prisma.guildMember.create({
-            data,
-          });
-        }
-
-        // Upsert posts
-        if (guildData.autoGenerateManagerPost) {
-          const postIds = [];
-          if (
-            this.hasPermission(
-              Number(newGuildMemberData.permissions),
-              'MANAGE_GUILD'
-            )
-          ) {
-            const postData = await prisma.guildPost.findFirst({
-              where: {
-                name: 'MANAGER',
-              },
-            });
-            if (postData) {
-              postIds.push(postData.id);
-            }
-          }
-          await this.updatePosts(newGuildMemberData.id, postIds);
-        }
-
-        // Fetch roles
-        for (const role of fetchedMember.roles.cache.values()) {
-          const data1 = {
-            discordId: role.id,
-            guildId: props.guildId,
-            name: role.name,
-            permissions: role.permissions.bitfield,
-            hexColor: role.hexColor,
-            position: role.position,
-          };
-          const guildRoleData = await prisma.guildRole.upsert({
-            where: {
-              discordId: role.id,
+        await prisma.guildMemberRoleRelation.upsert({
+          where: {
+            guildMemberId_guildRoleId: {
+              guildMemberId: newGuildMemberData.id,
+              guildRoleId: guildRoleData.id,
             },
-            update: data1,
-            create: data1,
-          });
-
-          const data2 = {
-            guildMemberId: newGuildMemberData.id,
-            guildRoleId: guildRoleData.id,
-          };
-          await prisma.guildMemberRoleRelation.upsert({
-            where: {
-              guildMemberId_guildRoleId: {
-                guildMemberId: newGuildMemberData.id,
-                guildRoleId: guildRoleData.id,
-              },
-            },
-            create: data2,
-            update: data2,
-          });
-        }
-      })
-    );
+          },
+          create: data2,
+          update: data2,
+        });
+      }
+    }
 
     // calculate active score
     this.calculateActivityLevel(props.guildId);
