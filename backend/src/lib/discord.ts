@@ -1,7 +1,7 @@
 import { Client } from 'discord.js';
 
 // This is a hack to make the bot a singleton
-const globalForDiscord = global as unknown as { bot: Client };
+const globalForDiscord = global as unknown as { bot: Client | null };
 
 export const getBot = async () => {
   if (globalForDiscord.bot) {
@@ -24,5 +24,12 @@ export const getBot = async () => {
     globalForDiscord.bot = bot;
 
     return bot;
+  }
+};
+
+export const destroyBot = () => {
+  if (globalForDiscord.bot) {
+    globalForDiscord.bot.destroy();
+    globalForDiscord.bot = null;
   }
 };

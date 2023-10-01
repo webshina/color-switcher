@@ -5,7 +5,7 @@ import { useMyAdminGuilds } from '@/hooks/repository/useMyAdminGuilds';
 import useInputField from '@/hooks/utils/useInputField';
 import { post } from '@/utils/apiHelper';
 import { isAxiosError } from '@/utils/typeNarrower';
-import { useDisclosure } from '@chakra-ui/react';
+import { useDisclosure, useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -20,6 +20,7 @@ type Props = {
 };
 export const CreateHomePage: React.FC<Props> = (props) => {
   const router = useRouter();
+  const toast = useToast();
   const { data: adminGuilds } = useMyAdminGuilds();
   const [loading, setLoading] = useState(false);
   const [guildId, setGuildId] = useState<number>();
@@ -58,6 +59,14 @@ export const CreateHomePage: React.FC<Props> = (props) => {
       if (isAxiosError(error)) {
         if (error.response?.data === messages.botNotInstalled) {
           onOpenInstallBotModal();
+        } else if (error.response?.data === messages.guildNotAvailable) {
+          toast({
+            title: 'Guild not available',
+            description: 'Please try again',
+            status: 'error',
+            isClosable: true,
+          });
+          setLoading(false);
         }
       }
     }

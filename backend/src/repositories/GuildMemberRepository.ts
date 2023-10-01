@@ -2,9 +2,9 @@ import { messages } from '#/common/constants/messages';
 import { GuildMemberItem } from '#/common/types/Guild';
 import { getBot } from '@/lib/discord';
 import { prisma } from '@/lib/prisma';
+import { haveGaps } from '@/utils/arrayHelper';
 import { standardize } from '@/utils/calcutationHelper';
 import { addToDate } from '@/utils/dateHelper';
-import { GuildMember } from '@prisma/client';
 import { Guild } from 'discord.js';
 import { UserRepository } from './UserRepository';
 
@@ -156,11 +156,11 @@ export class GuildMemberRepository {
       throw new Error('Guild not found');
     }
 
-    const fetchedMembers = await props.fetchedGuild.members.fetch();
-    for (const fetchedMember of fetchedMembers.values()) {
+    const fetchedMembers = (await props.fetchedGuild.members.fetch()).values();
+    for (const fetchedMember of fetchedMembers) {
       // Skip bots
       if (fetchedMember.user.bot) {
-        return;
+        continue;
       }
 
       const existingGuildMember = await prisma.guildMember.findUnique({
@@ -170,9 +170,17 @@ export class GuildMemberRepository {
             discordId: fetchedMember.id,
           },
         },
+        include: {
+          roleRelations: {
+            include: {
+              guildRole: true,
+            },
+          },
+        },
       });
 
-      const data = {
+      // Skip if the member is not updated
+      const guildMemberData = {
         discordId: fetchedMember.id,
         guildId: props.guildId,
         name: fetchedMember.user.username,
@@ -181,81 +189,95 @@ export class GuildMemberRepository {
         avatarURL: fetchedMember.user.avatarURL(),
         joinedAt: fetchedMember.joinedAt,
       };
-      let newGuildMemberData: GuildMember;
-      if (existingGuildMember) {
-        if (existingGuildMember.autoGenerate) {
-          newGuildMemberData = await prisma.guildMember.update({
+      const fetchedRoles = fetchedMember.roles.cache.values();
+      let newGuildMemberData;
+      if (
+        existingGuildMember?.name !== guildMemberData.name ||
+        Number(existingGuildMember.permissions) !==
+          Number(guildMemberData.permissions) ||
+        existingGuildMember.displayName !== guildMemberData.displayName ||
+        existingGuildMember.avatarURL !== guildMemberData.avatarURL ||
+        haveGaps(
+          existingGuildMember.roleRelations.map(
+            (roleRelation) => roleRelation.guildRole.discordId
+          ),
+          fetchedMember.roles.cache.map((role) => role.id)
+        )
+      ) {
+        if (existingGuildMember) {
+          if (existingGuildMember.autoGenerate) {
+            newGuildMemberData = await prisma.guildMember.update({
+              where: {
+                guildId_discordId: {
+                  guildId: props.guildId,
+                  discordId: fetchedMember.id,
+                },
+              },
+              data: {
+                ...guildMemberData,
+              },
+            });
+          }
+        } else {
+          newGuildMemberData = await prisma.guildMember.create({
+            data: guildMemberData,
+          });
+        }
+
+        // Upsert posts
+        if (guildData.autoGenerateManagerPost) {
+          const postIds = [];
+          if (
+            this.hasPermission(
+              Number(guildMemberData.permissions),
+              'MANAGE_GUILD'
+            )
+          ) {
+            const postData = await prisma.guildPost.findFirst({
+              where: {
+                name: 'MANAGER',
+              },
+            });
+            if (postData) {
+              postIds.push(postData.id);
+            }
+          }
+          await this.updatePosts(newGuildMemberData!.id, postIds);
+        }
+
+        // Fetch roles
+        for (const role of fetchedRoles) {
+          const data1 = {
+            discordId: role.id,
+            guildId: props.guildId,
+            name: role.name,
+            permissions: role.permissions.bitfield,
+            hexColor: role.hexColor,
+            position: role.position,
+          };
+          const guildRoleData = await prisma.guildRole.upsert({
             where: {
-              guildId_discordId: {
-                guildId: props.guildId,
-                discordId: fetchedMember.id,
+              discordId: role.id,
+            },
+            update: data1,
+            create: data1,
+          });
+
+          const data2 = {
+            guildMemberId: newGuildMemberData!.id,
+            guildRoleId: guildRoleData.id,
+          };
+          await prisma.guildMemberRoleRelation.upsert({
+            where: {
+              guildMemberId_guildRoleId: {
+                guildMemberId: newGuildMemberData!.id,
+                guildRoleId: guildRoleData.id,
               },
             },
-            data: {
-              ...data,
-            },
+            create: data2,
+            update: data2,
           });
         }
-        newGuildMemberData = existingGuildMember;
-      } else {
-        newGuildMemberData = await prisma.guildMember.create({
-          data,
-        });
-      }
-
-      // Upsert posts
-      if (guildData.autoGenerateManagerPost) {
-        const postIds = [];
-        if (
-          this.hasPermission(
-            Number(newGuildMemberData.permissions),
-            'MANAGE_GUILD'
-          )
-        ) {
-          const postData = await prisma.guildPost.findFirst({
-            where: {
-              name: 'MANAGER',
-            },
-          });
-          if (postData) {
-            postIds.push(postData.id);
-          }
-        }
-        await this.updatePosts(newGuildMemberData.id, postIds);
-      }
-
-      // Fetch roles
-      for (const role of fetchedMember.roles.cache.values()) {
-        const data1 = {
-          discordId: role.id,
-          guildId: props.guildId,
-          name: role.name,
-          permissions: role.permissions.bitfield,
-          hexColor: role.hexColor,
-          position: role.position,
-        };
-        const guildRoleData = await prisma.guildRole.upsert({
-          where: {
-            discordId: role.id,
-          },
-          update: data1,
-          create: data1,
-        });
-
-        const data2 = {
-          guildMemberId: newGuildMemberData.id,
-          guildRoleId: guildRoleData.id,
-        };
-        await prisma.guildMemberRoleRelation.upsert({
-          where: {
-            guildMemberId_guildRoleId: {
-              guildMemberId: newGuildMemberData.id,
-              guildRoleId: guildRoleData.id,
-            },
-          },
-          create: data2,
-          update: data2,
-        });
       }
     }
 

@@ -57,6 +57,7 @@ const generate = async (req: Request, res: Response) => {
   try {
     const { guildId, guildBatchId } = await GuildRepository.generate(
       guildDiscordId,
+      // '1055359796171247616',
       user!.id
     );
 
