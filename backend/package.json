@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development nodemon -q -r ./ts-node-require.ts src/app.ts",
+    "dev:trace-warnings": "NODE_ENV=development nodemon -q --exec \"node --trace-warnings -r ts-node/register -r ./ts-node-require.ts\" src/app.ts",
     "start": "NODE_ENV=production nodemon -q -r ./ts-node-require.ts src/app.ts",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev",
     "db:migrate:reset": "dotenv -e .env.development.local -- npx prisma migrate reset",
