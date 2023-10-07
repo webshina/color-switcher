@@ -1,12 +1,12 @@
-import { loadModule } from 'cld3-asm';
+import { loadCld3Factory } from '@/lib/cld3-asm';
 import ISO6391 from 'iso-639-1';
 
 export const detectLanguage = async (sentence: string) => {
-  const cldFactory = await loadModule();
-  const langId = cldFactory.create(0);
+  const cldFactory = await loadCld3Factory();
+  const languageIdentifier = cldFactory.create(0);
 
   try {
-    const languageData = langId.findMostFrequentLanguages(
+    const languageData = languageIdentifier.findMostFrequentLanguages(
       JSON.stringify(sentence),
       1
     )[0];
@@ -18,5 +18,7 @@ export const detectLanguage = async (sentence: string) => {
     }
   } catch (error) {
     throw error;
+  } finally {
+    languageIdentifier.dispose();
   }
 };
