@@ -273,12 +273,20 @@ export class GuildRepository {
     const bot = await getBot();
 
     // Fetch Guild Info
-    const cachedGuilds = bot.guilds.cache;
-    const fetchedGuild = await cachedGuilds.get(discordId)?.fetch();
+    let fetchedGuild = await bot.guilds.fetch(discordId);
     if (!fetchedGuild) {
       throw new Error(messages.botNotInstalled);
     } else if (!fetchedGuild.available) {
-      throw new Error(messages.guildNotAvailable);
+      // Retry fetching guild info if not available
+      for (let i = 0; i < 3; i++) {
+        fetchedGuild = await bot.guilds.fetch(discordId);
+        if (fetchedGuild.available) {
+          break;
+        }
+      }
+      if (!fetchedGuild.available) {
+        throw new Error(messages.guildNotAvailable);
+      }
     }
 
     // Save guild data to DB
@@ -303,10 +311,15 @@ export class GuildRepository {
       },
     });
 
+    // Create guild batch
     const guildBatch = await prisma.guildBatch.create({
       data: {
         guildId: guildData.id,
         isStarted: true,
+        totalChannelCnt: fetchedGuild.channels.cache.size,
+        completedChannelCnt: 0,
+        totalMemberCnt: fetchedGuild.memberCount,
+        completedMemberCnt: 0,
       },
     });
 
@@ -891,7 +904,7 @@ Word:
       1 + // isGuildShareMessageGenerationCompleted
       1 + // isGuildTagGenerationCompleted
       1 + // isGuildImageGenerationCompleted
-      1 + // isGuildMemberGenerationCompleted
+      (guildBatch.totalMemberCnt ?? 0) / 100 +
       1; // isGuildAnnouncementGenerationCompleted
 
     let completedWorkCnt =
@@ -902,7 +915,7 @@ Word:
       (guildBatch.isGuildShareMessageGenerationCompleted ? 1 : 0) +
       (guildBatch.isGuildTagGenerationCompleted ? 1 : 0) +
       (guildBatch.isGuildImageGenerationCompleted ? 1 : 0) +
-      (guildBatch.isGuildMemberGenerationCompleted ? 1 : 0) +
+      (guildBatch.completedMemberCnt ?? 0) / 100 +
       (guildBatch.isGuildAnnouncementGenerationCompleted ? 1 : 0);
     result.progressRate = Number((completedWorkCnt / allWorkCnt).toFixed(2));
 

@@ -157,17 +157,31 @@ export class GuildMemberRepository {
     }
 
     const fetchedMembers = (await props.fetchedGuild.members.fetch()).values();
+    const availableMembers = [];
     for (const fetchedMember of fetchedMembers) {
       // Skip bots
       if (fetchedMember.user.bot) {
         continue;
       }
+      availableMembers.push(fetchedMember);
+    }
 
+    // Update batch progress
+    await prisma.guildBatch.update({
+      where: {
+        id: props.batchId,
+      },
+      data: {
+        totalMemberCnt: availableMembers.length,
+      },
+    });
+
+    for (const availableMember of availableMembers) {
       const existingGuildMember = await prisma.guildMember.findUnique({
         where: {
           guildId_discordId: {
             guildId: props.guildId,
-            discordId: fetchedMember.id,
+            discordId: availableMember.id,
           },
         },
         include: {
@@ -181,15 +195,15 @@ export class GuildMemberRepository {
 
       // Skip if the member is not updated
       const guildMemberData = {
-        discordId: fetchedMember.id,
+        discordId: availableMember.id,
         guildId: props.guildId,
-        name: fetchedMember.user.username,
-        permissions: Number(fetchedMember.permissions),
-        displayName: fetchedMember.displayName,
-        avatarURL: fetchedMember.user.avatarURL(),
-        joinedAt: fetchedMember.joinedAt,
+        name: availableMember.user.username,
+        permissions: Number(availableMember.permissions),
+        displayName: availableMember.displayName,
+        avatarURL: availableMember.user.avatarURL(),
+        joinedAt: availableMember.joinedAt,
       };
-      const fetchedRoles = fetchedMember.roles.cache.values();
+      const fetchedRoles = availableMember.roles.cache.values();
       let newGuildMemberData;
       if (
         existingGuildMember?.name !== guildMemberData.name ||
@@ -201,7 +215,7 @@ export class GuildMemberRepository {
           existingGuildMember.roleRelations.map(
             (roleRelation) => roleRelation.guildRole.discordId
           ),
-          fetchedMember.roles.cache.map((role) => role.id)
+          availableMember.roles.cache.map((role) => role.id)
         )
       ) {
         if (existingGuildMember) {
@@ -210,7 +224,7 @@ export class GuildMemberRepository {
               where: {
                 guildId_discordId: {
                   guildId: props.guildId,
-                  discordId: fetchedMember.id,
+                  discordId: availableMember.id,
                 },
               },
               data: {
@@ -279,6 +293,18 @@ export class GuildMemberRepository {
           });
         }
       }
+
+      // Update batch progress
+      await prisma.guildBatch.update({
+        where: {
+          id: props.batchId,
+        },
+        data: {
+          completedMemberCnt: {
+            increment: 1,
+          },
+        },
+      });
     }
 
     // calculate active score

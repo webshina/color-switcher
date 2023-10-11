@@ -264,19 +264,14 @@ export class ChannelRepository {
       }
 
       // Update batch progress
-      const batch = await prisma.guildBatch.findUnique({
-        where: {
-          id: props.batchId,
-        },
-      });
       await prisma.guildBatch.update({
         where: {
           id: props.batchId,
         },
         data: {
-          completedChannelCnt: batch?.completedChannelCnt
-            ? batch.completedChannelCnt + 1
-            : 1,
+          completedChannelCnt: {
+            increment: 1,
+          },
         },
       });
     }
