@@ -394,6 +394,12 @@ Keyword:
   }
 
   static async generateSummary(channelId: number, batchId: number) {
+    const channelSummaries = await prisma.channelSummary.findMany({
+      where: {
+        channelId,
+      },
+    });
+
     // If channel is not updated, skip
     const updatedMessage = await prisma.message.findFirst({
       where: {
@@ -401,7 +407,7 @@ Keyword:
         batchId,
       },
     });
-    if (!updatedMessage) return;
+    if (!updatedMessage && channelSummaries.length > 0) return;
 
     const messages = await prisma.message.findMany({
       where: {
