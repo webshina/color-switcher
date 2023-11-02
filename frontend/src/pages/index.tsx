@@ -1,17 +1,36 @@
-import { LandingPage } from '@/components/landingPage/LandingPage';
-import DefaultLayout from '@/components/layout/default';
-import type { NextPage } from 'next';
-import 'react-datepicker/dist/react-datepicker.css';
+import { useEffect, useState } from 'react';
+import io from 'socket.io-client';
 
-const Home: NextPage = () => {
+const Home = () => {
+  const [color, setColor] = useState('#000000'); // default to black
+
+  useEffect(() => {
+    // setup WebSocket connection
+    const socket = io('https://c5f7-153-125-143-186.ngrok-free.app');
+
+    socket.on('connect', () => {
+      console.log('connected to socket');
+    });
+
+    // listen for all events
+    socket.onAny((event, ...args) => {
+      console.log(event, args);
+    });
+
+    socket.on('color-changed', (newColor) => {
+      console.log('new color', newColor);
+      setColor(newColor);
+    });
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   return (
-    <DefaultLayout
-      showLogo={false}
-      bgClassName="bg-gradient-to-b from-[#1F215A] from-5% to-dark to-40%"
-      noPadding
-    >
-      <LandingPage />
-    </DefaultLayout>
+    <div style={{ backgroundColor: color, width: '100vw', height: '100vh' }}>
+      {/* Your content goes here */}
+    </div>
   );
 };
 

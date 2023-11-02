@@ -1,11 +1,8 @@
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
+import http from 'http';
 import path from 'path';
-import { localStoragePath } from './config/config';
-import { logger } from './lib/winston';
-import { router } from './routes';
+import * as IO from 'socket.io';
 
 // env
 dotenv.config({
@@ -17,48 +14,27 @@ dotenv.config({
 
 // Express
 const app = express();
+const httpServer = http.createServer(app);
+const io = new IO.Server(httpServer, {
+  cors: {
+    origin: '*',
+  },
+});
 
-// Middleware
-app.use(express.json());
-const allowedOrigins = [
-  'http://localhost:3004',
-  'https://favo-community.com',
-  'https://www.favo-community.com',
-];
+io.on('connection', (socket) => {
+  console.log('A user connected');
 
-// CORS
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        return callback(
-          new Error(
-            'The CORS policy for this site does not allow access from the specified Origin.'
-          ),
-          false
-        );
-      }
-      return callback(null, true);
-    },
-    credentials: true,
-  })
-);
-app.use(cookieParser());
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
 
-// Static files
-app.use(express.static(localStoragePath));
-
-// router & controllers
-app.use('/', router);
-
-// Handle uncaught exceptions and rejections
-process.on('uncaughtException', (err) => {
-  logger.error(err);
+  socket.on('change-color', (color) => {
+    io.emit('color-changed', color);
+  });
 });
 
 // Start the server
-const port = 3005;
-app.listen(port, () => {
+const port = 3001;
+httpServer.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
